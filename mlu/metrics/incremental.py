@@ -10,6 +10,7 @@ from typing import List, Optional
 class IncrementalMean(IncrementalMetric):
 	def __init__(self):
 		super().__init__()
+		# TODO : return Nan if empty ?
 		self._sum = None
 		self._counter = 0
 
@@ -38,21 +39,37 @@ class IncrementalMean(IncrementalMetric):
 class IncrementalStd(IncrementalMetric):
 	def __init__(self):
 		super().__init__()
-		self._items = []
+		# TODO : return Nan if empty ?
+		self._items_sum = None
+		self._items_sq_sum = None
+		self._counter = 0
 
 	def reset(self):
-		self._items = []
+		self._items_sum = None
+		self._items_sq_sum = None
+		self._counter = 0
 
 	def add(self, item: Tensor):
 		if isinstance(item, float):
 			item = torch.scalar_tensor(item)
-		self._items.append(item)
+
+		if self._items_sum is None or self._items_sq_sum is None:
+			self._items_sum = item
+			self._items_sq_sum = item ** 2
+			self._counter = 1
+		else:
+			self._items_sum += item
+			self._items_sq_sum += item ** 2
+			self._counter += 1
 
 	def get_current(self) -> Optional[Tensor]:
 		return self.get_std()
 
 	def get_std(self) -> Optional[Tensor]:
-		return torch.stack(self._items).std() if len(self._items) > 0 else None
+		if self._items_sum is not None and self._items_sq_sum is not None:
+			return torch.sqrt(self._items_sq_sum / self._counter - (self._items_sum / self._counter) ** 2)
+		else:
+			return None
 
 
 class IncrementalWrapper(Metric):
