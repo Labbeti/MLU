@@ -80,6 +80,7 @@ def get_lr(optim: Optimizer, idx: int = 0) -> float:
 def get_nb_parameters(model: Module) -> int:
 	"""
 		Return the number of parameters in a model.
+
 		:param model: Pytorch Module to check.
 		:returns: The number of parameters.
 	"""
@@ -89,6 +90,7 @@ def get_nb_parameters(model: Module) -> int:
 def get_nb_trainable_parameters(model: Module) -> int:
 	"""
 		Return the number of trainable parameters in a model.
+
 		:param model: Pytorch Module.
 		:returns: The number of trainable parameters.
 	"""

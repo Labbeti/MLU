@@ -28,12 +28,12 @@ Set of classes, functions and tools for machine learning in Pytorch.
 - VerticalFlip
 
 #### For tensors images
+- CutOutImg,
+- Gray,
+- Inversion,
 - Normalize,
 - Standardize,
-- Gray,
-- CutOutImg,
-- UniColor,
-- Inversion
+- UniColor
 
 ### Spectrogram transforms
 - CutOutSpec
@@ -42,13 +42,15 @@ Set of classes, functions and tools for machine learning in Pytorch.
 - Crop,
 - Occlusion,
 - Pad,
-- PadCrop
+- PadCrop,
+- TimeStretchNearest,
+- StretchPadCrop
 
 ## Metrics
-- Precision,
-- Recall,
 - BLEU,
-- METEOR
+- METEOR,
+- Precision,
+- Recall
 
 ## TODO
 - FScore, LCS, NIST, WER metrics.
