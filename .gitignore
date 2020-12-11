@@ -1,0 +1,11 @@
+
+# Folders
+.idea/
+__pycache__/
+dataset/
+
+# Folders types
+*.egg-info/
+
+# Files types
+*ign_*
