@@ -7,3 +7,4 @@ from .incremental import IncrementalMean, IncrementalStd, IncrementalWrapper, In
 from .meteor import METEOR
 from .metric import EqMetric, Precision, Recall
 from .wer import WordErrorRate
+from .wrapper import MetricWrapper

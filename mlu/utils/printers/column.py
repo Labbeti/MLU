@@ -7,7 +7,18 @@ from typing import Dict, List
 class ColumnPrinter(PrinterABC):
 	KEY_MAX_LENGTH = 10
 
-	def __init__(self):
+	def __init__(self, print_exec_time: bool = True):
+		"""
+			Class for print current values of a training or validation by columns.
+
+			Ex:
+			> printer = ColumnPrinter()
+			> printer.print_current_values({"train/accuracy": 0.89, "train/loss": 1.525}, 33, 100, 2)
+			-      train       -  accuracy  -    loss    -  took (s)  -
+			- Epoch   2 -  33% - 8.9000e-01 - 1.5250e-00 -    0.00    -
+		"""
+		self.print_exec_time = print_exec_time
+
 		self._epoch_start_date = time()
 		self._keys = []
 
@@ -26,11 +37,14 @@ class ColumnPrinter(PrinterABC):
 		content = \
 			["Epoch {:3d} - {:3d}%".format(epoch + 1, progression)] + \
 			[
-				"{:.4e}".format(current_values[key]).center(
-					self.KEY_MAX_LENGTH) if key in current_values.keys() else " " * self.KEY_MAX_LENGTH
+				"{:.4e}".format(current_values[key]).center(self.KEY_MAX_LENGTH)
+				if key in current_values.keys() else
+				" " * self.KEY_MAX_LENGTH
 				for key in self._keys
-			] + \
-			["{:.2f}".format(time() - self._epoch_start_date).center(self.KEY_MAX_LENGTH)]
+			]
+
+		if self.print_exec_time:
+			content += ["{:.2f}".format(time() - self._epoch_start_date).center(self.KEY_MAX_LENGTH)]
 
 		print("- {:s} -".format(" - ".join(content)), end="\r")
 

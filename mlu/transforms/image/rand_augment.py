@@ -47,11 +47,6 @@ RAND_AUGMENT_DEFAULT_POOL = [
 
 
 class RandAugment(Generic[T_InputType, T_OutputType], ImageTransform[T_InputType, T_OutputType]):
-	"""
-		Unofficial pytorch implementation of RandAugment with constant magnitude.
-		Original paper : https://arxiv.org/pdf/1909.13719.pdf
-	"""
-
 	def __init__(
 		self,
 		nb_augm_apply: int = 1,
@@ -61,6 +56,9 @@ class RandAugment(Generic[T_InputType, T_OutputType], ImageTransform[T_InputType
 		p: float = 1.0,
 	):
 		"""
+			Unofficial pytorch implementation of RandAugment with constant magnitude.
+			Original paper : https://arxiv.org/pdf/1909.13719.pdf
+
 			:param nb_augm_apply: The number of augmentations "N" to apply on 1 image.
 			:param magnitude: The magnitude "M" used in RandAugment in range [0, 1].
 				If magnitude_policy == "random", this parameter is ignored.

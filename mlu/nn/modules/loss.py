@@ -127,5 +127,3 @@ class JSDivLossWithLogits(Module):
 		b = self.kl_div(q, m)
 
 		return 0.5 * (a + b)
-
-

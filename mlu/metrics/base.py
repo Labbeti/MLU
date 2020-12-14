@@ -21,10 +21,25 @@ class IncrementalMetric(Module, Callable, ABC):
 		Base class for continue metrics modules, which wrap a metric and compute a continue value on the scores.
 	"""
 	def reset(self):
+		"""
+			Reset the current incremental value.
+		"""
 		raise NotImplementedError("Abstract method")
 
-	def add(self, item: Tensor):
+	def add(self, value: Tensor):
+		"""
+			Add a value to the incremental score.
+		"""
 		raise NotImplementedError("Abstract method")
 
 	def get_current(self) -> Optional[Tensor]:
+		"""
+			Get the current incremental score.
+		"""
+		raise NotImplementedError("Abstract method")
+
+	def is_empty(self) -> bool:
+		"""
+			Return True if no value has been added to the incremental score.
+		"""
 		raise NotImplementedError("Abstract method")

@@ -22,15 +22,16 @@ class ToNumpy(Module):
 
 
 class ToTensor(Module):
-	def __init__(self, device: torch.device = torch.device("cpu")):
+	def __init__(self, dtype: Optional[torch.dtype] = None, device: torch.device = torch.device("cpu")):
 		"""
 			Convert a python list, numpy array or PIL image to pytorch tensor.
 		"""
 		super().__init__()
+		self.dtype = dtype
 		self.device = device
 
 	def forward(self, x: Union[list, np.ndarray, Tensor, Image.Image]) -> Tensor:
-		return to_tensor(x, self.device)
+		return to_tensor(x, self.dtype, self.device)
 
 
 class ToList(Module):
@@ -73,19 +74,20 @@ def to_numpy(
 
 def to_tensor(
 	x: Union[list, np.ndarray, Tensor, Image.Image],
+	dtype: Optional[torch.dtype] = None,
 	device: torch.device = torch.device("cpu")
 ) -> Tensor:
 
 	if isinstance(x, list):
-		return torch.as_tensor(x, device=device)
+		return torch.as_tensor(x, dtype=dtype, device=device)
 	elif isinstance(x, np.ndarray):
-		return torch.from_numpy(x.copy()).to(device)
+		return torch.from_numpy(x.copy()).to(dtype).to(device)
 	elif isinstance(x, Tensor):
-		return x.to(device)
+		return x.to(dtype).to(device)
 	elif isinstance(x, Image.Image):
-		return to_tensor(to_numpy(x), device=device)
+		return to_tensor(to_numpy(x), dtype=dtype, device=device)
 	else:
-		return torch.as_tensor(x, device=device)
+		return torch.as_tensor(x, dtype=dtype, device=device)
 
 
 def to_list(

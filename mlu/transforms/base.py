@@ -6,8 +6,8 @@ from torch.nn import Module
 from typing import Callable, Generic, TypeVar
 
 
-T_InputType = TypeVar("InputType")
-T_OutputType = TypeVar("OutputType")
+T_InputType = TypeVar("T_InputType")
+T_OutputType = TypeVar("T_OutputType")
 
 
 class Transform(Module, Callable, ABC, Generic[T_InputType, T_OutputType]):
@@ -16,7 +16,7 @@ class Transform(Module, Callable, ABC, Generic[T_InputType, T_OutputType]):
 		self.p = p
 
 	def forward(self, x: Tensor) -> Tensor:
-		if random() <= self.p:
+		if self.p < 1.0 and random() <= self.p:
 			return self.apply(x)
 		else:
 			return x
