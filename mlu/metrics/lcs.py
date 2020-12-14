@@ -5,7 +5,7 @@ from mlu.metrics.base import Metric
 from torch import Tensor
 
 
-class LongestCommonSubsequence(Metric):
+class LongestCommonSubsequence(Metric[Tensor, Tensor, Tensor]):
 	""" TODO : test """
 	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
 		lengths = torch.zeros((len(input_), len(target)))

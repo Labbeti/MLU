@@ -5,7 +5,7 @@ from torch import Tensor
 from typing import List
 
 
-class NIST(Metric):
+class NIST(Metric[List[str], List[List[str]], Tensor]):
 	def __init__(self, ngram_order: int):
 		super().__init__()
 		self.ngram_order = ngram_order

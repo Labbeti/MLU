@@ -3,7 +3,7 @@ from mlu.metrics.base import Metric
 from torch import Tensor
 
 
-class EqMetric(Metric):
+class EqMetric(Metric[Tensor, Tensor, Tensor]):
 	def __init__(self, dim: int):
 		super().__init__()
 		self.dim = dim
@@ -12,7 +12,7 @@ class EqMetric(Metric):
 		return input_.eq(target).all(self.dim).float()
 
 
-class Precision(Metric):
+class Precision(Metric[Tensor, Tensor, Tensor]):
 	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
 		"""
 			Compute score with one-hot or multi-hot inputs and targets.
@@ -27,7 +27,7 @@ class Precision(Metric):
 		return true_positives / (true_positives + false_positives)
 
 
-class Recall(Metric):
+class Recall(Metric[Tensor, Tensor, Tensor]):
 	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
 		"""
 			Compute score with one-hot or multi-hot inputs and targets.

@@ -6,7 +6,7 @@ from mlu.metrics.metric import Recall, Precision
 from torch import Tensor
 
 
-class FScore(Metric):
+class FScore(Metric[Tensor, Tensor, Tensor]):
 	def __init__(self):
 		super().__init__()
 		self.recall = Recall()

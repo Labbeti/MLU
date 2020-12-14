@@ -44,7 +44,8 @@ def random_rect(
 		:param height_range: The height ratio range of the rectangle. Ex: (0.0, 0.9) => height is sampled from (0.0, 0.9 * height).
 		:returns: The limits (left, right, top, down) of the rectangle created.
 	"""
-	assert width_range[0] <= width_range[1] and height_range[0] <= height_range[1]
+	assert 0.0 <= width_range[0] <= width_range[1] <= 1.0
+	assert 0.0 <= height_range[0] <= height_range[1] <= 1.0
 
 	width_min, width_max = max(int(width_range[0] * width_img), 1), max(int(width_range[1] * width_img), 2)
 	height_min, height_max = max(int(height_range[0] * height_img), 1), max(int(height_range[1] * height_img), 2)

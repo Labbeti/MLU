@@ -3,7 +3,7 @@ from mlu.metrics.base import Metric
 from torch import Tensor
 
 
-class CategoricalAccuracy(Metric):
+class CategoricalAccuracy(Metric[Tensor, Tensor, Tensor]):
 	"""
 		Compute the categorical accuracy between a batch of prediction and labels.
 	"""

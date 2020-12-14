@@ -31,11 +31,11 @@ class IncrementalMean(IncrementalMetric):
 	def get_current(self) -> Optional[Tensor]:
 		return self.get_mean()
 
-	def get_mean(self) -> Optional[Tensor]:
-		return self._sum / self._counter if self._sum is not None else None
-
 	def is_empty(self) -> bool:
 		return self._counter == 0
+
+	def get_mean(self) -> Optional[Tensor]:
+		return self._sum / self._counter if self._sum is not None else None
 
 
 class IncrementalStd(IncrementalMetric):
@@ -66,42 +66,55 @@ class IncrementalStd(IncrementalMetric):
 	def get_current(self) -> Optional[Tensor]:
 		return self.get_std()
 
+	def is_empty(self) -> bool:
+		return self._counter == 0
+
 	def get_std(self) -> Optional[Tensor]:
 		if self._items_sum is not None and self._items_sq_sum is not None:
 			return torch.sqrt(self._items_sq_sum / self._counter - (self._items_sum / self._counter) ** 2)
 		else:
 			return None
 
+
+class MinTracker(IncrementalMetric):
+	def __init__(self):
+		super().__init__()
+		self._min = None
+
+	def reset(self):
+		self._min = None
+
+	def add(self, value: Tensor):
+		if self._min is None or self._min > value:
+			self._min = value
+
+	def get_current(self) -> Optional[Tensor]:
+		return self.get_min()
+
 	def is_empty(self) -> bool:
-		return self._counter == 0
+		return self._min is None
+
+	def get_min(self) -> Optional[Tensor]:
+		return self._min
 
 
-class IncrementalWrapper(Metric):
-	"""
-		Compute an incremental score (mean or std) of a metric.
-	"""
-	def __init__(self, metric: Metric, continue_metric: IncrementalMetric = IncrementalMean()):
+class MaxTracker(IncrementalMetric):
+	def __init__(self):
 		super().__init__()
-		self.metric = metric
-		self.continue_metric = continue_metric
+		self._max = None
 
-	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
-		score = self.metric(input_, target)
-		self.continue_metric.add(score)
-		return self.continue_metric.get_current()
+	def reset(self):
+		self._max = None
 
+	def add(self, value: Tensor):
+		if self._max is None or self._max < value:
+			self._max = value
 
-class IncrementalListWrapper(Metric):
-	"""
-		Compute a list of incremental scores (mean or std) of a metric.
-	"""
-	def __init__(self, metric: Metric, continue_metric_list: Optional[List[IncrementalMetric]] = None):
-		super().__init__()
-		self.metric = metric
-		self.continue_metric_list = continue_metric_list if continue_metric_list is not None else [IncrementalMean()]
+	def get_current(self) -> Optional[Tensor]:
+		return self.get_max()
 
-	def compute_score(self, input_: Tensor, target: Tensor) -> List[Tensor]:
-		score = self.metric(input_, target)
-		for continue_metric in self.continue_metric_list:
-			continue_metric.add(score)
-		return [continue_metric.get_current() for continue_metric in self.continue_metric_list]
+	def is_empty(self) -> bool:
+		return self._max is None
+
+	def get_max(self) -> Optional[Tensor]:
+		return self._max
