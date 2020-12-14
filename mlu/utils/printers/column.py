@@ -16,6 +16,8 @@ class ColumnPrinter(PrinterABC):
 			> printer.print_current_values({"train/accuracy": 0.89, "train/loss": 1.525}, 33, 100, 2)
 			-      train       -  accuracy  -    loss    -  took (s)  -
 			- Epoch   2 -  33% - 8.9000e-01 - 1.5250e-00 -    0.00    -
+
+			:param print_exec_time: Print time elapsed with the beginning of the loop (iteration == 0).
 		"""
 		self.print_exec_time = print_exec_time
 
