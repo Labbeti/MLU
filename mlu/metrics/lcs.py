@@ -8,6 +8,7 @@ from torch import Tensor
 class LongestCommonSubsequence(Metric[Tensor, Tensor, Tensor]):
 	""" TODO : test """
 	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
+		assert input_.shape == target.shape and len(input_.shape) == 1
 		lengths = torch.zeros((len(input_), len(target)))
 
 		for i in range(1, len(input_) + 1):

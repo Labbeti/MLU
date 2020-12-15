@@ -12,6 +12,9 @@ T_Output = TypeVar("T_Output")
 class Metric(Module, Callable, ABC, Generic[T_Input, T_Target, T_Output]):
 	"""
 		Base class for metric modules.
+
+		Abstract methods:
+			- compute_score(self, input_: T_Input, target: T_Target) -> T_Output:
 	"""
 	def forward(self, input_: T_Input, target: T_Target) -> T_Output:
 		return self.compute_score(input_, target)
@@ -23,6 +26,12 @@ class Metric(Module, Callable, ABC, Generic[T_Input, T_Target, T_Output]):
 class IncrementalMetric(Module, Callable, ABC):
 	"""
 		Base class for continue metrics modules, which wrap a metric and compute a continue value on the scores.
+
+		Abstract methods:
+			- reset(self):
+			- add(self, value: Tensor):
+			- get_current(self) -> Optional[Tensor]:
+			- is_empty(self) -> bool:
 	"""
 	def reset(self):
 		"""

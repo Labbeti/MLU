@@ -7,7 +7,8 @@ from datetime import datetime
 from torch import Tensor
 from torch.nn import Module
 from torch.optim import Optimizer
-from typing import Callable, List, Tuple
+from torch.utils.tensorboard import SummaryWriter
+from typing import Any, Dict, List, Tuple, Union
 
 
 def get_datetime() -> str:
@@ -96,3 +97,13 @@ def get_nb_trainable_parameters(model: Module) -> int:
 		:returns: The number of trainable parameters.
 	"""
 	return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
+def add_dict_to_writer(dic: Dict[str, Any], writer: SummaryWriter):
+	def filter_(v: Any) -> Union[str, int, float, Tensor]:
+		if any([isinstance(v, type_) for type_ in [str, int, float, Tensor]]):
+			return v
+		else:
+			return str(v)
+	dic = {k: filter_(v) for k, v in dic.items()}
+	writer.add_hparams(hparam_dict=dic, metric_dict={})
