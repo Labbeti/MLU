@@ -60,7 +60,7 @@ class RandomChoice(Transform):
 		*transforms: Transform,
 		nb_choices: int = 1,
 		weights: Optional[Sequence[float]] = None,
-		p: float = 1.0
+		p: float = 1.0,
 	):
 		"""
 			Select randomly k transforms in a list and apply them sequentially.

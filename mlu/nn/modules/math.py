@@ -12,6 +12,12 @@ DEFAULT_EPSILON = 2e-20
 
 class OneHot(Module):
 	def __init__(self, nb_classes: int, smooth: Optional[float] = 0.0):
+		"""
+			Convert label to one-hot encoding.
+
+			:param nb_classes: The number of classes in the dataset.
+			:param smooth: The optional label smoothing coefficient parameter.
+		"""
 		super().__init__()
 		self.nb_classes = nb_classes
 		self.smooth = smooth if smooth is not None else 0.0

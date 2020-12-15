@@ -1,6 +1,6 @@
 
-from mlu.transforms.base import ImageTransform, Transform, T_InputType, T_OutputType
-from mlu.utils.convert import ToPIL, ToTensor
+from mlu.transforms.base import ImageTransform, Transform, T_Input, T_Output
+from mlu.transforms.convert import ToPIL, ToTensor
 
 from PIL import Image
 
@@ -8,7 +8,7 @@ from torch import Tensor
 from typing import Any, Callable, Optional, Generic
 
 
-class ConversionWrapper(Transform, Generic[T_InputType, T_OutputType]):
+class ConversionWrapper(Transform, Generic[T_Input, T_Output]):
 	def __init__(self, transform: ImageTransform, pre_convert: Callable, post_convert: Callable, p: float = 1.0):
 		super().__init__(p=p)
 		self.transform = transform
@@ -61,3 +61,36 @@ class TensorInternalWrapper(ConversionWrapper[Image.Image, Image.Image]):
 	def apply(self, x: Image.Image) -> Image.Image:
 		self.post_convert.mode = x.mode
 		return self.post_convert(self.transform(self.pre_convert(x)))
+
+
+class TransformWrapper(Transform):
+	def __init__(
+		self,
+		callable_: Callable,
+		image_transform: bool = False,
+		waveform_transform: bool = False,
+		spectrogram_transform: bool = False,
+		p: float = 1.0
+	):
+		"""
+			Wrap a callable object to Transform.
+
+			:param p: The probability to apply the transform.
+		"""
+		super().__init__(p=p)
+		self.callable_ = callable_
+		self.image_transform = image_transform
+		self.waveform_transform = waveform_transform
+		self.spectrogram_transform = spectrogram_transform
+
+	def apply(self, x: Tensor) -> Tensor:
+		return self.callable_(x)
+
+	def is_image_transform(self) -> bool:
+		return self.image_transform
+
+	def is_waveform_transform(self) -> bool:
+		return self.waveform_transform
+
+	def is_spectrogram_transform(self) -> bool:
+		return self.spectrogram_transform

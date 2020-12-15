@@ -1,7 +1,7 @@
 
 from mlu.transforms.base import WaveformTransform
 from mlu.transforms.waveform.pad_crop import PadCrop
-from mlu.transforms.waveform.stretch import TimeStretchNearest
+from mlu.transforms.waveform.time_stretch_nearest import TimeStretchNearest
 
 from torch import Tensor
 from torch.distributions import Uniform

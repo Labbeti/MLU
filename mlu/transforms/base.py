@@ -6,17 +6,18 @@ from torch.nn import Module
 from typing import Callable, Generic, TypeVar
 
 
-T_InputType = TypeVar("InputType")
-T_OutputType = TypeVar("OutputType")
+T_Input = TypeVar("T_Input")
+T_Output = TypeVar("T_Output")
 
 
-class Transform(Module, Callable, ABC, Generic[T_InputType, T_OutputType]):
+class Transform(Module, Callable, ABC, Generic[T_Input, T_Output]):
 	def __init__(self, p: float = 1.0):
 		super().__init__()
+		assert 0.0 <= p <= 1.0, "Probability must be a float in range [0, 1]."
 		self.p = p
 
 	def forward(self, x: Tensor) -> Tensor:
-		if random() <= self.p:
+		if self.p < 1.0 and random() <= self.p:
 			return self.apply(x)
 		else:
 			return x
@@ -36,11 +37,11 @@ class Transform(Module, Callable, ABC, Generic[T_InputType, T_OutputType]):
 	def is_spectrogram_transform(self) -> bool:
 		return False
 
-	def apply(self, x: T_InputType) -> T_OutputType:
+	def apply(self, x: T_Input) -> T_Output:
 		raise NotImplementedError("Abstract method")
 
 
-class ImageTransform(Transform, ABC, Generic[T_InputType, T_OutputType]):
+class ImageTransform(Transform, ABC, Generic[T_Input, T_Output]):
 	def __init__(self, p: float = 1.0):
 		super().__init__(p)
 
@@ -48,7 +49,7 @@ class ImageTransform(Transform, ABC, Generic[T_InputType, T_OutputType]):
 		return True
 
 
-class WaveformTransform(Transform, ABC, Generic[T_InputType, T_OutputType]):
+class WaveformTransform(Transform, ABC, Generic[T_Input, T_Output]):
 	def __init__(self, p: float = 1.0):
 		super().__init__(p)
 
@@ -56,7 +57,7 @@ class WaveformTransform(Transform, ABC, Generic[T_InputType, T_OutputType]):
 		return True
 
 
-class SpectrogramTransform(Transform, ABC, Generic[T_InputType, T_OutputType]):
+class SpectrogramTransform(Transform, ABC, Generic[T_Input, T_Output]):
 	def __init__(self, p: float = 1.0):
 		super().__init__(p)
 

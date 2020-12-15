@@ -9,10 +9,34 @@ from torch.nn import Module, KLDivLoss, LogSoftmax
 from typing import Optional
 
 
+class CrossEntropyWithVectors(Module):
+	"""
+		Compute Cross-Entropy between two distributions.
+		Input and targets must be a batch of probabilities distributions of shape (batch_size, nb_classes) tensor.
+	"""
+	def __init__(self, reduction: str = "mean", dim: Optional[int] = 1, log_input: bool = False):
+		super().__init__()
+		self.reduce_fn = get_reduction_from_name(reduction)
+		self.dim = dim
+		self.log_input = log_input
+
+	def forward(self, input_: Tensor, targets: Tensor, dim: Optional[int] = None) -> Tensor:
+		"""
+			Compute cross-entropy with targets.
+			Input and target must be a (batch_size, nb_classes) tensor.
+		"""
+		if dim is None:
+			dim = self.dim
+		if not self.log_input:
+			input_ = torch.log(input_)
+		loss = -torch.sum(input_ * targets, dim=dim)
+		return self.reduce_fn(loss)
+
+
 class Entropy(Module):
 	def __init__(
 		self,
-		reduction: str = "batchmean",
+		reduction: str = "mean",
 		dim: int = 1,
 		epsilon: float = DEFAULT_EPSILON,
 		base: Optional[float] = None,
@@ -48,56 +72,13 @@ class Entropy(Module):
 		return self.reduce_fn(entropy)
 
 
-class CrossEntropyWithVectors(Module):
-	"""
-		Compute Cross-Entropy between two distributions.
-		Input and targets must be a batch of probabilities distributions of shape (batch_size, nb_classes) tensor.
-	"""
-	def __init__(self, reduction: str = "batchmean", dim: Optional[int] = 1, log_input: bool = False):
-		super().__init__()
-		self.reduce_fn = get_reduction_from_name(reduction)
-		self.dim = dim
-		self.log_input = log_input
-
-	def forward(self, input_: Tensor, targets: Tensor, dim: Optional[int] = None) -> Tensor:
-		"""
-			Compute cross-entropy with targets.
-			Input and target must be a (batch_size, nb_classes) tensor.
-		"""
-		if dim is None:
-			dim = self.dim
-		if not self.log_input:
-			input_ = torch.log(input_)
-		loss = -torch.sum(input_ * targets, dim=dim)
-		return self.reduce_fn(loss)
-
-
-class KLDivLossWithProbabilities(KLDivLoss):
-	"""
-		KL divergence with probabilities.
-		The probabilities are transform to log scale internally.
-	"""
-	def __init__(self, reduction: str = "batchmean", epsilon: float = DEFAULT_EPSILON, log_input: bool = False, log_target: bool = False):
-		super().__init__(reduction=reduction, log_target=True)
-		self.epsilon = epsilon
-		self.log_input = log_input
-		self.log_target = log_target
-
-	def forward(self, p: Tensor, q: Tensor) -> Tensor:
-		if not self.log_input:
-			p = torch.log(p + self.epsilon)
-		if not self.log_target:
-			q = torch.log(q + self.epsilon)
-		return super().forward(input=p, target=q)
-
-
 class JSDivLoss(Module):
 	"""
 		Jensen-Shannon Divergence loss.
 		Use Entropy as backend.
 	"""
 
-	def __init__(self, reduction: str = "batchmean", dim: int = 1, epsilon: float = DEFAULT_EPSILON):
+	def __init__(self, reduction: str = "mean", dim: int = 1, epsilon: float = DEFAULT_EPSILON):
 		super().__init__()
 		self.entropy = Entropy(reduction, dim, epsilon)
 
@@ -113,7 +94,7 @@ class JSDivLossWithLogits(Module):
 		Use KLDivLoss and LogSoftmax as backend.
 	"""
 
-	def __init__(self, reduction: str = "batchmean"):
+	def __init__(self, reduction: str = "mean"):
 		super().__init__()
 		self.kl_div = KLDivLoss(reduction=reduction, log_target=True)
 		self.log_softmax = LogSoftmax(dim=1)
@@ -129,3 +110,20 @@ class JSDivLossWithLogits(Module):
 		return 0.5 * (a + b)
 
 
+class KLDivLossWithProbabilities(KLDivLoss):
+	"""
+		KL divergence with probabilities.
+		The probabilities are transform to log scale internally.
+	"""
+	def __init__(self, reduction: str = "mean", epsilon: float = DEFAULT_EPSILON, log_input: bool = False, log_target: bool = False):
+		super().__init__(reduction=reduction, log_target=True)
+		self.epsilon = epsilon
+		self.log_input = log_input
+		self.log_target = log_target
+
+	def forward(self, p: Tensor, q: Tensor) -> Tensor:
+		if not self.log_input:
+			p = torch.log(p + self.epsilon)
+		if not self.log_target:
+			q = torch.log(q + self.epsilon)
+		return super().forward(input=p, target=q)

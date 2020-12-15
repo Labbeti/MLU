@@ -10,7 +10,7 @@ from torch.nn.functional import one_hot
 from typing import Optional, List
 
 
-class METEOR(Metric):
+class METEOR(Metric[str, List[str], Tensor]):
 	def __init__(self, alpha: float = 0.9, gamma: float = 0.5, beta: float = 3.0):
 		super().__init__()
 		self.alpha = alpha

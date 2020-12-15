@@ -7,7 +7,8 @@ from datetime import datetime
 from torch import Tensor
 from torch.nn import Module
 from torch.optim import Optimizer
-from typing import Callable, List, Tuple
+from torch.utils.tensorboard import SummaryWriter
+from typing import Any, Dict, List, Tuple, Union
 
 
 def get_datetime() -> str:
@@ -44,7 +45,8 @@ def random_rect(
 		:param height_range: The height ratio range of the rectangle. Ex: (0.0, 0.9) => height is sampled from (0.0, 0.9 * height).
 		:returns: The limits (left, right, top, down) of the rectangle created.
 	"""
-	assert width_range[0] <= width_range[1] and height_range[0] <= height_range[1]
+	assert 0.0 <= width_range[0] <= width_range[1] <= 1.0
+	assert 0.0 <= height_range[0] <= height_range[1] <= 1.0
 
 	width_min, width_max = max(int(width_range[0] * width_img), 1), max(int(width_range[1] * width_img), 2)
 	height_min, height_max = max(int(height_range[0] * height_img), 1), max(int(height_range[1] * height_img), 2)
@@ -80,6 +82,7 @@ def get_lr(optim: Optimizer, idx: int = 0) -> float:
 def get_nb_parameters(model: Module) -> int:
 	"""
 		Return the number of parameters in a model.
+
 		:param model: Pytorch Module to check.
 		:returns: The number of parameters.
 	"""
@@ -89,7 +92,18 @@ def get_nb_parameters(model: Module) -> int:
 def get_nb_trainable_parameters(model: Module) -> int:
 	"""
 		Return the number of trainable parameters in a model.
+
 		:param model: Pytorch Module.
 		:returns: The number of trainable parameters.
 	"""
 	return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
+def add_dict_to_writer(dic: Dict[str, Any], writer: SummaryWriter):
+	def filter_(v: Any) -> Union[str, int, float, Tensor]:
+		if any([isinstance(v, type_) for type_ in [str, int, float, Tensor]]):
+			return v
+		else:
+			return str(v)
+	dic = {k: filter_(v) for k, v in dic.items()}
+	writer.add_hparams(hparam_dict=dic, metric_dict={})

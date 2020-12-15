@@ -2,7 +2,7 @@
 import numpy as np
 import torch
 
-from mlu.utils.convert import ToList, ToPIL, ToNumpy, ToTensor
+from mlu.transforms.convert import ToList, ToPIL, ToNumpy, ToTensor
 from unittest import TestCase, main
 
 

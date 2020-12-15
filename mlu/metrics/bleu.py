@@ -7,15 +7,15 @@ from torch import Tensor
 from typing import List, Optional
 
 
-class BLEU(Metric):
+class BLEU(Metric[List[Tensor], List[List[Tensor]], Tensor]):
 	"""
 		BLEU metric score.
 
 		Original paper : https://www.aclweb.org/anthology/P02-1040.pdf
 	"""
-	def __init__(self, max_order: int, smooth: bool = False):
+	def __init__(self, ngram_order: int, smooth: bool = False):
 		super().__init__()
-		self.max_order = max_order
+		self.ngram_order = ngram_order
 		self.smooth = smooth
 
 	def compute_score(self, candidate_corpus: List[Tensor], references_corpus: List[List[Tensor]]) -> Tensor:
@@ -32,7 +32,7 @@ class BLEU(Metric):
 			:param references_corpus: (N, nb references, reference size)
 			:return: The BLEU score in range [0.0, 1.0].
 		"""
-		return compute_bleu_score(candidate_corpus, references_corpus, self.max_order, self.smooth)
+		return compute_bleu_score(candidate_corpus, references_corpus, self.ngram_order, self.smooth)
 
 
 def compute_bleu_score(
