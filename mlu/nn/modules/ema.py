@@ -6,7 +6,7 @@ class EMA:
 	"""
 		Compute the exponential moving average of a model.
 	"""
-	def __init__(self, model: Module, decay: float = 0.999):
+	def __init__(self, model: Module, decay: float = 0.99):
 		super().__init__()
 		self.model = model
 		self.decay = decay

@@ -100,6 +100,9 @@ def get_nb_trainable_parameters(model: Module) -> int:
 
 
 def add_dict_to_writer(dic: Dict[str, Any], writer: SummaryWriter):
+	"""
+		Add dictionary content to tensorboard hyperparameters.
+	"""
 	def filter_(v: Any) -> Union[str, int, float, Tensor]:
 		if any([isinstance(v, type_) for type_ in [str, int, float, Tensor]]):
 			return v

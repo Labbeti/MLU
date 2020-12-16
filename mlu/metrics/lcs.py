@@ -3,12 +3,15 @@ import torch
 
 from mlu.metrics.base import Metric
 from torch import Tensor
+from typing import Sequence
 
 
-class LongestCommonSubsequence(Metric[Tensor, Tensor, Tensor]):
-	""" TODO : test """
-	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
-		assert input_.shape == target.shape and len(input_.shape) == 1
+class LCS(Metric[Sequence, Sequence, Tensor]):
+	"""
+		Longest Common Subsequence
+		TODO : test
+	"""
+	def compute_score(self, input_: Sequence, target: Sequence) -> Tensor:
 		lengths = torch.zeros((len(input_), len(target)))
 
 		for i in range(1, len(input_) + 1):

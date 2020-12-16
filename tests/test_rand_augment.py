@@ -5,14 +5,14 @@ import torch
 from matplotlib import pyplot as plt
 from mlu.transforms.image import RandAugment
 from mlu.transforms.image.rand_augment import RAND_AUGMENT_DEFAULT_POOL
-from mlu.transforms.convert import ToTensor
+from mlu.transforms.conversion.conversion import ToTensor
 from torchvision.datasets import CIFAR10
 from unittest import main, TestCase
 
 
 class TestRandAugment(TestCase):
 	def test_ra(self):
-		dataset = CIFAR10(root=osp.join("..", "dataset"), train=False, download=True, transform=None)
+		dataset = CIFAR10(root=osp.join("..", "datasets"), train=False, download=True, transform=None)
 		idx = torch.randint(low=0, high=len(dataset), size=()).item()  # 908
 		img, label = dataset[idx]
 
