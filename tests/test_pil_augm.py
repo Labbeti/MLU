@@ -17,7 +17,7 @@ from unittest import TestCase, main
 
 class TestPIL(TestCase):
 	def get_example(self):
-		dataset = CIFAR10(root=osp.join("..", "dataset"), train=False, download=True, transform=None)
+		dataset = CIFAR10(root=osp.join("..", "datasets"), train=False, download=True, transform=None)
 		idx = torch.randint(low=0, high=len(dataset), size=()).item()  # 908
 		img, label = dataset[idx]
 

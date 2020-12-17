@@ -50,7 +50,7 @@ class RandAugment(Generic[T_Input, T_Output], ImageTransform[T_Input, T_Output])
 	def __init__(
 		self,
 		nb_augm_apply: int = 1,
-		magnitude: float = 2.0,
+		magnitude: Optional[float] = 2.0,
 		augm_pool: Optional[List[Tuple[Type[ImageTransform], Optional[Tuple[float, float]]]]] = None,
 		magnitude_policy: str = "random",
 		p: float = 1.0,
@@ -69,7 +69,7 @@ class RandAugment(Generic[T_Input, T_Output], ImageTransform[T_Input, T_Output])
 		"""
 		super().__init__(p)
 		self._nb_augm_apply = nb_augm_apply
-		self._magnitude = magnitude
+		self._magnitude = magnitude if magnitude is not None else random.random()
 		self._augm_pool = augm_pool if augm_pool is not None else RAND_AUGMENT_DEFAULT_POOL
 		self._magnitude_policy = magnitude_policy
 
@@ -86,8 +86,14 @@ class RandAugment(Generic[T_Input, T_Output], ImageTransform[T_Input, T_Output])
 		return x
 
 	def set_magnitude(self, magnitude: float):
-		self._magnitude = magnitude
+		self._magnitude = magnitude if magnitude is not None else random.random()
 		self._augms = _build_augms(self._augm_pool, self._magnitude)
+
+	def get_magnitude(self) -> float:
+		return self._magnitude
+
+	def get_magnitude_policy(self) -> str:
+		return self._magnitude_policy
 
 
 def _build_augms(

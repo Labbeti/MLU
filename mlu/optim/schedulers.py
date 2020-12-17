@@ -15,7 +15,7 @@ class CosineLRScheduler(LambdaLR):
 		super().__init__(optim, self.lr_lambda)
 
 	def lr_lambda(self, epoch: int) -> float:
-		return math.cos(7.0 * math.pi * epoch / (16.0 * self.nb_epochs))
+		return max(0.0, math.cos(7.0 * math.pi * epoch / (16.0 * self.nb_epochs)))
 
 
 class SoftCosineLRScheduler(LambdaLR):
