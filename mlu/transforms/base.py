@@ -16,7 +16,7 @@ class Transform(Module, Callable, ABC, Generic[T_Input, T_Output]):
 		self.p = p
 
 	def forward(self, x: T_Input) -> T_Output:
-		if self.p < 1.0 and random() <= self.p:
+		if self.p == 1.0 or random() <= self.p:
 			return self.apply(x)
 		else:
 			return x
