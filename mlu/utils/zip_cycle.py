@@ -3,32 +3,42 @@ from typing import Iterable, Sized
 
 
 class ZipCycle(Iterable, Sized):
-	"""
-		Zip through a list of iterables and sized objects of different lengths.
-		Reset the iterators when there and finish iteration when the longest one is over.
+	def __init__(self, iterables: list, policy: str = "max"):
+		"""
+			Zip through a list of iterables and sized objects of different lengths.
+			Reset the iterators when there and finish iteration when the longest one is over.
 
-		Example :
-		r1 = range(1, 4)
-		r2 = range(1, 6)
-		iters = ZipCycle([r1, r2])
-		for v1, v2 in iters:
-			print(v1, v2)
+			Example :
+				r1 = range(1, 4)
 
-		will print :
-		1 1
-		2 2
-		3 3
-		1 4
-		2 5
-	"""
+				r2 = range(1, 6)
 
-	def __init__(self, iterables: list):
-		for iterable in iterables:
-			if len(iterable) == 0:
+				cycle = ZipCycle([r1, r2])
+
+				for v1, v2 in cycle:
+					print("(", v1, v2, ")")
+
+			will print :
+				( 1 1 )
+				( 2 2 )
+				( 3 3 )
+				( 1 4 )
+				( 2 5 )
+
+			:param iterables: A list of Sized Iterables to browse.
+			:param policy: The policy to use during iteration.
+				If policy = "max", the output will stop when the last iterable is finished. (like in the example above)
+				If policy = "min", the class will stop when the first iterable is finished. (like in the built-in "zip" python)
+		"""
+		assert policy in ["min", "max"]
+		lens = [len(iterable) for iterable in self._iterables]
+		for len_ in lens:
+			if len_ == 0:
 				raise RuntimeError("An iterable is empty.")
 
 		self._iterables = iterables
-		self._len = max([len(iterable) for iterable in self._iterables])
+		self._len = max(lens) if policy == "max" else min(lens)
+		self._policy = policy
 
 	def __iter__(self) -> list:
 		cur_iters = [iter(iterable) for iterable in self._iterables]
@@ -51,3 +61,9 @@ class ZipCycle(Iterable, Sized):
 
 	def __len__(self) -> int:
 		return self._len
+
+	def set_policy(self, policy: str):
+		assert policy in ["min", "max"]
+		lens = [len(iterable) for iterable in self._iterables]
+		self._len = max(lens) if policy == "max" else min(lens)
+		self._policy = policy

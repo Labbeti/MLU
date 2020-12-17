@@ -1,7 +1,6 @@
 
 from abc import ABC
 from random import random
-from torch import Tensor
 from torch.nn import Module
 from typing import Callable, Generic, TypeVar
 
@@ -16,7 +15,7 @@ class Transform(Module, Callable, ABC, Generic[T_Input, T_Output]):
 		assert 0.0 <= p <= 1.0, "Probability must be a float in range [0, 1]."
 		self.p = p
 
-	def forward(self, x: Tensor) -> Tensor:
+	def forward(self, x: T_Input) -> T_Output:
 		if self.p < 1.0 and random() <= self.p:
 			return self.apply(x)
 		else:

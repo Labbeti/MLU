@@ -2,8 +2,30 @@
 import numpy as np
 import random
 
-from torch.utils.data import Dataset, Subset
+from torch.utils.data.dataset import Dataset, Subset
 from typing import List
+
+
+def split_dataset(
+	dataset: Dataset,
+	nb_classes: int,
+	ratios: List[float],
+	shuffle_idx: bool = True,
+	target_one_hot: bool = True,
+) -> List[Dataset]:
+	"""
+		Split dataset in several sub-wrappers by using a list of ratios.
+		Also keep the original class distribution in every sub-dataset.
+
+		:param dataset: The original dataset.
+		:param nb_classes: The number of classes in the original dataset.
+		:param ratios: Ratios used to split the dataset. The sum must be 1.
+		:param shuffle_idx: Shuffle classes indexes before split them.
+		:param target_one_hot: Consider labels as one-hot vectors. If False, consider labels as class indexes.
+		:returns: A list of sub-wrappers.
+	"""
+	indexes = generate_indexes(dataset, nb_classes, ratios, shuffle_idx, target_one_hot)
+	return [Subset(dataset, idx) for idx in indexes]
 
 
 def generate_indexes(
@@ -31,28 +53,6 @@ def generate_indexes(
 	return indexes
 
 
-def split_dataset(
-	dataset: Dataset,
-	nb_classes: int,
-	ratios: List[float],
-	shuffle_idx: bool = True,
-	target_one_hot: bool = True,
-) -> List[Dataset]:
-	"""
-		Split dataset in several sub-wrappers by using a list of ratios.
-		Also keep the original class distribution in every sub-dataset.
-
-		:param dataset: The original dataset.
-		:param nb_classes: The number of classes in the original dataset.
-		:param ratios: Ratios used to split the dataset. The sum must be 1.
-		:param shuffle_idx: Shuffle classes indexes before split them.
-		:param target_one_hot: Consider labels as one-hot vectors. If False, consider labels as class indexes.
-		:returns: A list of sub-wrappers.
-	"""
-	indexes = generate_indexes(dataset, nb_classes, ratios, shuffle_idx, target_one_hot)
-	return [Subset(dataset, idx) for idx in indexes]
-
-
 def _get_classes_idx(dataset: Dataset, nb_classes: int, target_one_hot: bool = True) -> List[List[int]]:
 	"""
 		Get class indexes from a standard dataset with index of class as label.
@@ -69,13 +69,11 @@ def _get_classes_idx(dataset: Dataset, nb_classes: int, target_one_hot: bool = T
 
 def _shuffle_classes_idx(classes_idx: List[List[int]]) -> List[List[int]]:
 	"""
-		Shuffle each class indexes.
+		Shuffle each class indexes. (operation "in-place").
 	"""
-	result = []
 	for indexes in classes_idx:
 		random.shuffle(indexes)
-		result.append(indexes)
-	return result
+	return classes_idx
 
 
 def _split_classes_idx(classes_idx: List[List[int]], ratios: List[float]) -> List[List[int]]:
