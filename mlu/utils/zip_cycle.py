@@ -20,9 +20,13 @@ class ZipCycle(Iterable, Sized):
 
 			will print :
 				( 1 1 )
+
 				( 2 2 )
+
 				( 3 3 )
+
 				( 1 4 )
+
 				( 2 5 )
 
 			:param iterables: A list of Sized Iterables to browse.
@@ -31,7 +35,7 @@ class ZipCycle(Iterable, Sized):
 				If policy = "min", the class will stop when the first iterable is finished. (like in the built-in "zip" python)
 		"""
 		assert policy in ["min", "max"]
-		lens = [len(iterable) for iterable in self._iterables]
+		lens = [len(iterable) for iterable in iterables]
 		for len_ in lens:
 			if len_ == 0:
 				raise RuntimeError("An iterable is empty.")

@@ -27,7 +27,7 @@ class ColumnPrinter(PrinterABC):
 	def print_current_values(self, current_values: Dict[str, float], iteration: int, nb_iterations: int, epoch: int):
 		if iteration == 0:
 			keys = list(sorted(current_values.keys()))
-			name = "/".join(keys[0].split("/")[:-1])
+			name = "/".join(keys[0].split("/")[:-1]) if len(keys) > 0 else ""
 			keys_names = [key.split("/")[-1] for key in keys]
 			self._keys = keys
 			self._print_header(name, keys_names)

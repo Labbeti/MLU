@@ -42,7 +42,7 @@ class Transform(Module, Callable, ABC, Generic[T_Input, T_Output]):
 
 class ImageTransform(Transform, ABC, Generic[T_Input, T_Output]):
 	def __init__(self, p: float = 1.0):
-		super().__init__(p)
+		super().__init__(p=p)
 
 	def is_image_transform(self) -> bool:
 		return True
@@ -50,7 +50,7 @@ class ImageTransform(Transform, ABC, Generic[T_Input, T_Output]):
 
 class WaveformTransform(Transform, ABC, Generic[T_Input, T_Output]):
 	def __init__(self, p: float = 1.0):
-		super().__init__(p)
+		super().__init__(p=p)
 
 	def is_waveform_transform(self) -> bool:
 		return True
@@ -58,7 +58,7 @@ class WaveformTransform(Transform, ABC, Generic[T_Input, T_Output]):
 
 class SpectrogramTransform(Transform, ABC, Generic[T_Input, T_Output]):
 	def __init__(self, p: float = 1.0):
-		super().__init__(p)
+		super().__init__(p=p)
 
 	def is_spectrogram_transform(self) -> bool:
 		return True
