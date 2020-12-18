@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 from mlu.transforms.image.pil import (
 	Brightness, Color, Contrast, Sharpness,
 	Posterize,
-	Rotation,
+	Rotate,
 	ShearX, ShearY,
 	TranslateX, TranslateY,
 	Solarize,
@@ -58,7 +58,7 @@ class TestPIL(TestCase):
 
 	def test_rotation(self):
 		angle = 0
-		augms = [Rotation(angle)]
+		augms = [Rotate(angle)]
 		self.plot_augms(augms)
 
 	def test_shear(self):

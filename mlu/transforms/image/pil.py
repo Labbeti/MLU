@@ -14,6 +14,7 @@ class _Enhance(ImageTransform[Image.Image, Image.Image]):
 	def __init__(self, method: ImageEnhance_t, levels: Union[float, Tuple[float, float]], p: float = 1.0):
 		"""
 			Enhance a PIL image with a specific method.
+
 			:param method: The enhance method to use.
 			:param levels: A constant level or a range of levels. Values should be in [-1, 1]
 			:param p: The probability to apply the augmentation.
@@ -52,11 +53,11 @@ class Blur(ImageTransform[Image.Image, Image.Image]):
 
 
 class Brightness(ImageTransform[Image.Image, Image.Image]):
-	"""
-		Increase the brightness of an image.
-		Levels must be in range [-1, 1]. -1 means a full black image, 1 means a brighter image and 0 does not change the image.
-	"""
 	def __init__(self, levels: Union[float, Tuple[float, float]] = 0.5, p: float = 1.0):
+		"""
+			Increase the brightness of an image.
+			Levels must be in range [-1, 1]. -1 means a full black image, 1 means a brighter image and 0 does not change the image.
+		"""
 		super().__init__(p=p)
 		self.enhance = _Enhance(method=ImageEnhance.Brightness, levels=levels, p=1.0)
 
@@ -65,11 +66,11 @@ class Brightness(ImageTransform[Image.Image, Image.Image]):
 
 
 class Color(ImageTransform[Image.Image, Image.Image]):
-	"""
-		Colorize an image.
-		Levels must be in range [-1, 1]. -1 means a image without colors, 1 means a colorized image and 0 does not change the image.
-	"""
 	def __init__(self, levels: Union[float, Tuple[float, float]] = 0.5, p: float = 1.0):
+		"""
+			Colorize an image.
+			Levels must be in range [-1, 1]. -1 means a image without colors, 1 means a colorized image and 0 does not change the image.
+		"""
 		super().__init__(p=p)
 		self.enhance = _Enhance(method=ImageEnhance.Color, levels=levels, p=1.0)
 
@@ -78,11 +79,11 @@ class Color(ImageTransform[Image.Image, Image.Image]):
 
 
 class Contrast(ImageTransform[Image.Image, Image.Image]):
-	"""
-		Increase contrast of an image.
-		Levels must be in range [-1, 1]. -1 means a full grey image, 1 means a contrasted image and 0 does not change the image.
-	"""
 	def __init__(self, levels: Union[float, Tuple[float, float]] = 0.5, p: float = 1.0):
+		"""
+			Increase contrast of an image.
+			Levels must be in range [-1, 1]. -1 means a full grey image, 1 means a contrasted image and 0 does not change the image.
+		"""
 		super().__init__(p=p)
 		self.enhance = _Enhance(method=ImageEnhance.Contrast, levels=levels, p=1.0)
 
@@ -91,19 +92,19 @@ class Contrast(ImageTransform[Image.Image, Image.Image]):
 
 
 class CutOutImgPIL(ImageTransform[Image.Image, Image.Image]):
-	"""
-		Put gray value in an area randomly placed.
-	"""
 	def __init__(
 		self,
-		width_scale_range: Tuple[float, float] = (0.1, 0.5),
-		height_scale_range: Tuple[float, float] = (0.1, 0.5),
+		scales: Union[float, Tuple[float, float]] = 0.5,
 		fill_value: Union[float, int] = 0,
 		p: float = 1.0,
 	):
+		"""
+			Put black value in an area randomly placed.
+		"""
 		super().__init__(p=p)
-		self.width_scale_range = width_scale_range
-		self.height_scale_range = height_scale_range
+		scales = scales if isinstance(scales, tuple) else (scales, scales)
+		self.width_scale_range = scales
+		self.height_scale_range = scales
 		self.fill_value = fill_value
 
 	def apply(self, x: Image.Image) -> Image.Image:
@@ -177,10 +178,11 @@ class Rescale(ImageTransform[Image.Image, Image.Image]):
 		return data.crop(crop).resize(data.size, self.method)
 
 
-class Rotation(ImageTransform[Image.Image, Image.Image]):
+class Rotate(ImageTransform[Image.Image, Image.Image]):
 	def __init__(self, angles: Union[float, Tuple[float, float]] = 0.0, p: float = 1.0):
 		"""
 			Rotate an image using PIL methods.
+
 			:param angles: The float or range values for the angle of rotation.
 				Angles must be in degrees and in range [-180, 180].
 			:param p: The probability to apply the transform.
@@ -194,11 +196,11 @@ class Rotation(ImageTransform[Image.Image, Image.Image]):
 
 
 class Sharpness(ImageTransform[Image.Image, Image.Image]):
-	"""
-		Sharp an image.
-		Levels must be in range [-1, 1]. -1 means a blurred image, 1 means a sharpened image and 0 does not change the image.
-	"""
 	def __init__(self, levels: Union[float, Tuple[float, float]] = 0.5, p: float = 1.0):
+		"""
+			Sharp an image.
+			Levels must be in range [-1, 1]. -1 means a blurred image, 1 means a sharpened image and 0 does not change the image.
+		"""
 		super().__init__(p=p)
 		self.enhance = _Enhance(method=ImageEnhance.Sharpness, levels=levels, p=1.0)
 
@@ -242,6 +244,8 @@ class Smooth(ImageTransform[Image.Image, Image.Image]):
 class Solarize(ImageTransform[Image.Image, Image.Image]):
 	def __init__(self, thresholds: Union[int, Tuple[int, int]] = (0, 256), p: float = 1.0):
 		"""
+			Invert pixel values above a specific threshold.
+
 			:param thresholds: The int or range values for the threshold parameter.
 				All pixel below this value are inverted.
 				Must be in range [0, 256].

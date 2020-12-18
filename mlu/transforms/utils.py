@@ -92,7 +92,7 @@ class RandomChoice(Transform):
 		return all([transform.is_spectrogram_transform() for transform in self.transforms])
 
 
-class Permute(ImageTransform[Tensor, Tensor]):
+class Permute(Transform[Tensor, Tensor]):
 	def __init__(self, *dims, p: float = 1.0):
 		super().__init__(p=p)
 		self.dims = list(dims)

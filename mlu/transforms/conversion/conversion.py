@@ -43,7 +43,7 @@ class ToList(Module):
 
 
 class ToPIL(Module):
-	def __init__(self, mode: Optional[str] = "RGB"):
+	def __init__(self, mode: Optional[str] = "RGB", permute_tensor: bool = True):
 		"""
 			Convert a pytorch tensor, numpy array or python list to PIL image.
 
@@ -52,9 +52,10 @@ class ToPIL(Module):
 		"""
 		super().__init__()
 		self.mode = mode
+		self.permute_tensor = permute_tensor
 
 	def forward(self, x: Union[list, np.ndarray, Tensor, Image.Image]) -> Image.Image:
-		return to_pil(x, self.mode)
+		return to_pil(x, self.mode, self.permute_tensor)
 
 
 def to_numpy(
@@ -106,7 +107,8 @@ def to_list(
 
 def to_pil(
 	x: Union[list, np.ndarray, Tensor, Image.Image],
-	mode: Optional[str] = "RGB"
+	mode: Optional[str] = "RGB",
+	permute_tensor: bool = True,
 ) -> Image.Image:
 
 	if isinstance(x, list):
@@ -115,8 +117,9 @@ def to_pil(
 		to_pil_image = tv.transforms.ToPILImage(mode)
 		return to_pil_image(x)
 	elif isinstance(x, Tensor):
-		# Permute dimensions (height, width, channel) to (channel, height, width).
-		x = x.permute(2, 0, 1)
+		if permute_tensor:
+			# Permute dimensions (height, width, channel) to (channel, height, width).
+			x = x.permute(2, 0, 1)
 		to_pil_image = tv.transforms.ToPILImage(mode)
 		return to_pil_image(x)
 	elif isinstance(x, Image.Image):

@@ -2,61 +2,21 @@
 import random
 
 from mlu.transforms.base import ImageTransform, T_Input, T_Output
-from mlu.transforms.image.pil import (
-	AutoContrast,
-	Brightness,
-	Color,
-	Contrast,
-	Equalize,
-	IdentityImage,
-	Posterize,
-	Rotation,
-	Sharpness,
-	ShearX,
-	ShearY,
-	Solarize,
-	TranslateX,
-	TranslateY,
-)
-from typing import Any, Generic, List, Optional, Tuple, Type
+from typing import List, Optional, Tuple, Type
 
 
-"""
-	The 14 default augmentations used in RandAugment with the range of their parameter.
-	If no parameter is available, then the range is None.
-	
-	- An augment is range must have a constructor with 1 parameter.
-	- An augment without range must have a constructor without any parameters.
-"""
-RAND_AUGMENT_DEFAULT_POOL = [
-	(AutoContrast, None),
-	(Brightness, (-0.9, 0.9)),
-	(Color, (-0.9, 0.9)),
-	(Contrast, (-0.9, 0.9)),
-	(Equalize, None),
-	(IdentityImage, None),
-	(Posterize, (0, 4)),
-	(Rotation, (-30, 30)),
-	(Sharpness, (-0.9, 0.9)),
-	(ShearX, (-0.3, 0.3)),
-	(ShearY, (-0.3, 0.3)),
-	(Solarize, (0, 256)),
-	(TranslateX, (-0.3, 0.3)),
-	(TranslateY, (-0.3, 0.3)),
-]
-
-
-class RandAugment(Generic[T_Input, T_Output], ImageTransform[T_Input, T_Output]):
+class RandAugment(ImageTransform):
 	def __init__(
 		self,
 		nb_augm_apply: int = 1,
-		magnitude: Optional[float] = 2.0,
+		magnitude: Optional[float] = 0.5,
 		augm_pool: Optional[List[Tuple[Type[ImageTransform], Optional[Tuple[float, float]]]]] = None,
 		magnitude_policy: str = "random",
 		p: float = 1.0,
 	):
 		"""
-			Unofficial pytorch implementation of RandAugment with constant magnitude.
+			Unofficial pytorch implementation of RandAugment.
+
 			Original paper : https://arxiv.org/pdf/1909.13719.pdf
 
 			:param nb_augm_apply: The number of augmentations "N" to apply on 1 image.
@@ -67,6 +27,10 @@ class RandAugment(Generic[T_Input, T_Output], ImageTransform[T_Input, T_Output])
 				Available policies are "constant" and "random".
 			:param p: The probability to apply the augmentation.
 		"""
+		assert magnitude is None or 0.0 <= magnitude <= 1.0
+		assert magnitude_policy in ["constant", "random"]
+		assert magnitude is not None or magnitude_policy == "random"
+
 		super().__init__(p)
 		self._nb_augm_apply = nb_augm_apply
 		self._magnitude = magnitude if magnitude is not None else random.random()
@@ -75,7 +39,7 @@ class RandAugment(Generic[T_Input, T_Output], ImageTransform[T_Input, T_Output])
 
 		self._augms = _build_augms(self._augm_pool, self._magnitude)
 
-	def apply(self, x: Any) -> Any:
+	def apply(self, x: T_Input) -> T_Output:
 		if self._magnitude_policy == "random":
 			new_magnitude = random.random()
 			self.set_magnitude(new_magnitude)

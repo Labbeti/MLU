@@ -11,6 +11,11 @@ T_Output = TypeVar("T_Output")
 
 class Transform(Module, Callable, ABC, Generic[T_Input, T_Output]):
 	def __init__(self, p: float = 1.0):
+		"""
+			Base class for all Transforms.
+
+			:param p: The probability to apply the transform.
+		"""
 		super().__init__()
 		assert 0.0 <= p <= 1.0, "Probability must be a float in range [0, 1]."
 		self.p = p
