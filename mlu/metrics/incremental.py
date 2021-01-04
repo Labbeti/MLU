@@ -80,13 +80,16 @@ class MinTracker(IncrementalMetric):
 	def __init__(self):
 		super().__init__()
 		self._min = None
+		self._index = -1
 
 	def reset(self):
 		self._min = None
+		self._index = -1
 
 	def add(self, value: Tensor):
 		if self._min is None or self._min > value:
 			self._min = value
+		self._index += 1
 
 	def get_current(self) -> Optional[Tensor]:
 		return self.get_min()
@@ -97,18 +100,24 @@ class MinTracker(IncrementalMetric):
 	def get_min(self) -> Optional[Tensor]:
 		return self._min
 
+	def get_index(self) -> int:
+		return self._index
+
 
 class MaxTracker(IncrementalMetric):
 	def __init__(self):
 		super().__init__()
 		self._max = None
+		self._index = -1
 
 	def reset(self):
 		self._max = None
+		self._index = -1
 
 	def add(self, value: Tensor):
 		if self._max is None or self._max < value:
 			self._max = value
+		self._index += 1
 
 	def get_current(self) -> Optional[Tensor]:
 		return self.get_max()
@@ -118,3 +127,6 @@ class MaxTracker(IncrementalMetric):
 
 	def get_max(self) -> Optional[Tensor]:
 		return self._max
+
+	def get_index(self) -> int:
+		return self._index
