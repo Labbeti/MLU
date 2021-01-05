@@ -10,7 +10,7 @@ from typing import Tuple, Union
 ImageEnhance_t = "ImageEnhance"
 
 
-class _Enhance(ImageTransform[Image.Image, Image.Image]):
+class _Enhance(ImageTransform):
 	def __init__(self, method: ImageEnhance_t, levels: Union[float, Tuple[float, float]], p: float = 1.0):
 		"""
 			Enhance a PIL image with a specific method.
@@ -31,8 +31,8 @@ class _Enhance(ImageTransform[Image.Image, Image.Image]):
 		return self.method(data).enhance(level + 1.0)
 
 
-class _Blend(ImageTransform[Image.Image, Image.Image]):
-	def __init__(self, augment: ImageTransform[Image.Image, Image.Image], levels: Union[float, Tuple[float, float]], p: float = 1.0):
+class _Blend(ImageTransform):
+	def __init__(self, augment: ImageTransform, levels: Union[float, Tuple[float, float]], p: float = 1.0):
 		super().__init__(p=p)
 		self.augment = augment
 		self.levels = levels if isinstance(levels, tuple) else (levels, levels)
@@ -42,17 +42,17 @@ class _Blend(ImageTransform[Image.Image, Image.Image]):
 		return Image.blend(data, self.augment.apply(data), level)
 
 
-class AutoContrast(ImageTransform[Image.Image, Image.Image]):
+class AutoContrast(ImageTransform):
 	def apply(self, data: Image.Image) -> Image.Image:
 		return ImageOps.autocontrast(data)
 
 
-class Blur(ImageTransform[Image.Image, Image.Image]):
+class Blur(ImageTransform):
 	def apply(self, data: Image.Image) -> Image.Image:
 		return data.filter(ImageFilter.BLUR)
 
 
-class Brightness(ImageTransform[Image.Image, Image.Image]):
+class Brightness(ImageTransform):
 	def __init__(self, levels: Union[float, Tuple[float, float]] = 0.5, p: float = 1.0):
 		"""
 			Increase the brightness of an image.
@@ -65,7 +65,7 @@ class Brightness(ImageTransform[Image.Image, Image.Image]):
 		return self.enhance.apply(data)
 
 
-class Color(ImageTransform[Image.Image, Image.Image]):
+class Color(ImageTransform):
 	def __init__(self, levels: Union[float, Tuple[float, float]] = 0.5, p: float = 1.0):
 		"""
 			Colorize an image.
@@ -78,7 +78,7 @@ class Color(ImageTransform[Image.Image, Image.Image]):
 		return self.enhance.apply(data)
 
 
-class Contrast(ImageTransform[Image.Image, Image.Image]):
+class Contrast(ImageTransform):
 	def __init__(self, levels: Union[float, Tuple[float, float]] = 0.5, p: float = 1.0):
 		"""
 			Increase contrast of an image.
@@ -91,7 +91,7 @@ class Contrast(ImageTransform[Image.Image, Image.Image]):
 		return self.enhance.apply(data)
 
 
-class CutOutImgPIL(ImageTransform[Image.Image, Image.Image]):
+class CutOutImgPIL(ImageTransform):
 	def __init__(
 		self,
 		scales: Union[float, Tuple[float, float]] = 0.5,
@@ -119,12 +119,12 @@ class CutOutImgPIL(ImageTransform[Image.Image, Image.Image]):
 		return output
 
 
-class Equalize(ImageTransform[Image.Image, Image.Image]):
+class Equalize(ImageTransform):
 	def apply(self, data: Image.Image) -> Image.Image:
 		return ImageOps.equalize(data)
 
 
-class HorizontalFlip(ImageTransform[Image.Image, Image.Image]):
+class HorizontalFlip(ImageTransform):
 	def __init__(self, p: float = 1.0):
 		super().__init__(p=p)
 		self.flip_h = RandomHorizontalFlip(1.0)
@@ -133,17 +133,17 @@ class HorizontalFlip(ImageTransform[Image.Image, Image.Image]):
 		return self.flip_h(data)
 
 
-class Invert(ImageTransform[Image.Image, Image.Image]):
+class Invert(ImageTransform):
 	def apply(self, data: Image.Image) -> Image.Image:
 		return ImageOps.invert(data)
 
 
-class IdentityImage(ImageTransform[Image.Image, Image.Image]):
+class IdentityImage(ImageTransform):
 	def apply(self, data: Image.Image) -> Image.Image:
 		return data
 
 
-class Posterize(ImageTransform[Image.Image, Image.Image]):
+class Posterize(ImageTransform):
 	def __init__(self, nbs_bits: Union[int, Tuple[int, int]] = (0, 4), p: float = 1.0):
 		"""
 			:param nbs_bits: Number of bits to remove in image. Must be in range [0, 8]. (default: (0, 4))
@@ -159,7 +159,7 @@ class Posterize(ImageTransform[Image.Image, Image.Image]):
 		return ImageOps.posterize(data, nb_bits)
 
 
-class Rescale(ImageTransform[Image.Image, Image.Image]):
+class Rescale(ImageTransform):
 	def __init__(self, scales: Union[float, Tuple[float, float]] = 1.0, method: int = Image.NEAREST, p: float = 1.0):
 		"""
 			Available methods :
@@ -178,7 +178,7 @@ class Rescale(ImageTransform[Image.Image, Image.Image]):
 		return data.crop(crop).resize(data.size, self.method)
 
 
-class Rotate(ImageTransform[Image.Image, Image.Image]):
+class Rotate(ImageTransform):
 	def __init__(self, angles: Union[float, Tuple[float, float]] = 0.0, p: float = 1.0):
 		"""
 			Rotate an image using PIL methods.
@@ -195,7 +195,7 @@ class Rotate(ImageTransform[Image.Image, Image.Image]):
 		return data.rotate(angle)
 
 
-class Sharpness(ImageTransform[Image.Image, Image.Image]):
+class Sharpness(ImageTransform):
 	def __init__(self, levels: Union[float, Tuple[float, float]] = 0.5, p: float = 1.0):
 		"""
 			Sharp an image.
@@ -208,7 +208,7 @@ class Sharpness(ImageTransform[Image.Image, Image.Image]):
 		return self.enhance.apply(data)
 
 
-class ShearX(ImageTransform[Image.Image, Image.Image]):
+class ShearX(ImageTransform):
 	def __init__(self, shears: Union[float, Tuple[float, float]] = 0.0, p: float = 1.0):
 		"""
 			:param shears: The float or range values for the shear parameter.
@@ -222,7 +222,7 @@ class ShearX(ImageTransform[Image.Image, Image.Image]):
 		return data.transform(data.size, Image.AFFINE, (1, shear, 0, 0, 1, 0))
 
 
-class ShearY(ImageTransform[Image.Image, Image.Image]):
+class ShearY(ImageTransform):
 	def __init__(self, shears: Union[float, Tuple[float, float]] = 0.0, p: float = 1.0):
 		"""
 			:param shears: The float or range values for the shear parameter.
@@ -236,12 +236,12 @@ class ShearY(ImageTransform[Image.Image, Image.Image]):
 		return data.transform(data.size, Image.AFFINE, (1, 0, 0, shear, 1, 0))
 
 
-class Smooth(ImageTransform[Image.Image, Image.Image]):
+class Smooth(ImageTransform):
 	def apply(self, data: Image.Image) -> Image.Image:
 		return data.filter(ImageFilter.SMOOTH)
 
 
-class Solarize(ImageTransform[Image.Image, Image.Image]):
+class Solarize(ImageTransform):
 	def __init__(self, thresholds: Union[int, Tuple[int, int]] = (0, 256), p: float = 1.0):
 		"""
 			Invert pixel values above a specific threshold.
@@ -261,7 +261,7 @@ class Solarize(ImageTransform[Image.Image, Image.Image]):
 		return ImageOps.solarize(data, threshold)
 
 
-class TranslateX(ImageTransform[Image.Image, Image.Image]):
+class TranslateX(ImageTransform):
 	def __init__(self, deltas: Union[float, Tuple[float, float]] = 0.0, p: float = 1.0):
 		"""
 			:param deltas: Ratios min and max for translate image along X axis.
@@ -277,7 +277,7 @@ class TranslateX(ImageTransform[Image.Image, Image.Image]):
 		return data.transform(data.size, Image.AFFINE, (1, 0, delta, 0, 1, 0))
 
 
-class TranslateY(ImageTransform[Image.Image, Image.Image]):
+class TranslateY(ImageTransform):
 	def __init__(self, deltas: Union[float, Tuple[float, float]] = 0.0, p: float = 1.0):
 		"""
 			:param deltas: Ratios min and max for translate image along Y axis.
@@ -293,7 +293,7 @@ class TranslateY(ImageTransform[Image.Image, Image.Image]):
 		return data.transform(data.size, Image.AFFINE, (1, 0, 0, 0, 1, delta))
 
 
-class VerticalFlip(ImageTransform[Image.Image, Image.Image]):
+class VerticalFlip(ImageTransform):
 	def __init__(self, p: float = 1.0):
 		super().__init__(p=p)
 		self.flip_v = RandomVerticalFlip(1.0)

@@ -6,7 +6,7 @@ from torch import Tensor
 from typing import Tuple
 
 
-class CutOutSpec(SpectrogramTransform[Tensor, Tensor]):
+class CutOutSpec(SpectrogramTransform):
 	def __init__(
 		self,
 		width_scale_range: Tuple[float, float] = (0.1, 0.5),

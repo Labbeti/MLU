@@ -8,4 +8,4 @@ datasets/
 *.egg-info/
 
 # Files types
-*ign_*
+*ign*
