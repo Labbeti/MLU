@@ -63,3 +63,10 @@ class IncrementalMetric(Module, Callable, ABC):
 		"""
 		for value in lst:
 			self.add(value)
+
+	def forward(self, value: Tensor) -> Optional[Tensor]:
+		"""
+			Add a value to the incremental metric and return the current incremental value.
+		"""
+		self.add(value)
+		return self.get_current()
