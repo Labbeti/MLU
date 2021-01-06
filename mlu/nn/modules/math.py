@@ -49,3 +49,14 @@ class Mish(Module):
 
 	def forward(self, x: Tensor) -> Tensor:
 		return mish(x)
+
+
+class Max(Module):
+	def __init__(self, dim: Optional[int] = 1):
+		super().__init__()
+		self.dim = dim
+
+	def forward(self, x: Tensor, dim: Optional[int] = None) -> Tensor:
+		if dim is None:
+			dim = self.dim
+		return x.max(dim=dim)

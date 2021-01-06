@@ -7,6 +7,12 @@ from typing import List
 
 class NIST(Metric[List[str], List[List[str]], Tensor]):
 	def __init__(self, ngram_order: int):
+		"""
+			Metric for evaluate the quality of a machine translation.
+			Use "nltk" package as backend.
+
+			:param ngram_order: The ngram max order to use.
+		"""
 		super().__init__()
 		self.ngram_order = ngram_order
 

@@ -2,7 +2,8 @@
 import torch
 
 from mlu.metrics.base import Metric
-from mlu.metrics.metric import Recall, Precision
+from mlu.metrics.precision import Precision
+from mlu.metrics.recall import Recall
 from torch import Tensor
 
 

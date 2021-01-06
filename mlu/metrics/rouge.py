@@ -8,12 +8,11 @@ from typing import List
 
 
 class RougeL(Metric[List[str], List[List[str]], Tensor]):
-	"""
-		Recall Oriented Understudy of Gisting Evaluation.
-
-		Use rouge-metric package as backend.
-	"""
 	def __init__(self):
+		"""
+			Recall Oriented Understudy of Gisting Evaluation.
+			Use "rouge-metric" package as backend.
+		"""
 		super().__init__()
 		self.rouge = PyRouge(rouge_l=True)
 

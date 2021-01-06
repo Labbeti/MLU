@@ -3,7 +3,6 @@ from torch.nn import Module
 
 
 class EMA:
-
 	def __init__(self, model: Module, decay: float = 0.99):
 		"""
 			Compute the exponential moving average of a model.

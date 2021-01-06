@@ -4,14 +4,24 @@ import torch
 from torch import Tensor
 
 from mlu.metrics.base import Metric
-from mlu.metrics.metric import Precision, Recall
+from mlu.metrics.precision import Precision
+from mlu.metrics.recall import Recall
+
 from nltk.translate.meteor_score import meteor_score
 from torch.nn.functional import one_hot
 from typing import Optional, List
 
 
-class METEOR(Metric[str, List[str], Tensor]):
+class METEOR(Metric):
 	def __init__(self, alpha: float = 0.9, gamma: float = 0.5, beta: float = 3.0):
+		"""
+			Metric for Evaluation of Translation with Explicit ORdering (METEOR)
+			Use "nltk" package as backend.
+
+			:param alpha: Parameter for controlling the weights of precision and recall. (default: 0.9)
+			:param gamma: The coefficient used in the brevity penalty function. (default: 0.5)
+			:param beta: The power used in the brevity penalty function. (default: 3.0)
+		"""
 		super().__init__()
 		self.alpha = alpha
 		self.gamma = gamma
