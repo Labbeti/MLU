@@ -8,11 +8,11 @@ from typing import Optional
 
 
 class IncrementalMean(IncrementalMetric):
-	def __init__(self, store_values: bool = False):
+	def __init__(self):
 		"""
 			Compute the continue average of a values.
 		"""
-		super().__init__(store_values)
+		super().__init__()
 		self._sum = None
 		self._counter = 0
 
@@ -30,7 +30,6 @@ class IncrementalMean(IncrementalMetric):
 		else:
 			self._sum += value
 			self._counter += 1
-		self._store_value(value)
 
 	def is_empty(self) -> bool:
 		return self._counter == 0
@@ -43,8 +42,8 @@ class IncrementalMean(IncrementalMetric):
 
 
 class IncrementalStd(IncrementalMetric):
-	def __init__(self, store_values: bool = False):
-		super().__init__(store_values)
+	def __init__(self):
+		super().__init__()
 		self._items_sum = None
 		self._items_sq_sum = None
 		self._counter = 0
@@ -66,7 +65,6 @@ class IncrementalStd(IncrementalMetric):
 			self._items_sum += value
 			self._items_sq_sum += value ** 2
 			self._counter += 1
-		self._store_value(value)
 
 	def is_empty(self) -> bool:
 		return self._counter == 0
@@ -82,8 +80,8 @@ class IncrementalStd(IncrementalMetric):
 
 
 class MinTracker(IncrementalMetric):
-	def __init__(self, store_values: bool = False):
-		super().__init__(store_values)
+	def __init__(self):
+		super().__init__()
 		self._min = None
 		self._idx_min = -1
 		self._index = 0
@@ -98,7 +96,6 @@ class MinTracker(IncrementalMetric):
 			self._min = value
 			self._idx_min = self._index
 		self._index += 1
-		self._store_value(value)
 
 	def is_empty(self) -> bool:
 		return self._min is None
@@ -114,8 +111,8 @@ class MinTracker(IncrementalMetric):
 
 
 class MaxTracker(IncrementalMetric):
-	def __init__(self, store_values: bool = False):
-		super().__init__(store_values)
+	def __init__(self):
+		super().__init__()
 		self._max = None
 		self._idx_max = -1
 		self._index = 0
@@ -130,7 +127,6 @@ class MaxTracker(IncrementalMetric):
 			self._max = value
 			self._idx_max = self._index
 		self._index += 1
-		self._store_value(value)
 
 	def is_empty(self) -> bool:
 		return self._max is None

@@ -33,11 +33,6 @@ class IncrementalMetric(Module, Callable, ABC):
 			- get_current(self) -> Optional[Tensor]:
 			- is_empty(self) -> bool:
 	"""
-	def __init__(self, store_values: bool = False):
-		super().__init__()
-		self._store_values = store_values
-		self._values_stored = []
-
 	def reset(self):
 		"""
 			Reset the current incremental value.
@@ -81,16 +76,3 @@ class IncrementalMetric(Module, Callable, ABC):
 		"""
 		self.add(value)
 		return self.get_current()
-
-	def _store_value(self, value: Tensor):
-		"""
-			:param value: The value to store.
-		"""
-		if self._store_values:
-			self._values_stored.append(value)
-
-	def get_values_stored(self) -> List[Tensor]:
-		"""
-			:return: The list of values stored.
-		"""
-		return self._values_stored
