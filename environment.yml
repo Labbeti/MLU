@@ -53,6 +53,7 @@ dependencies:
   - pytorch=1.7.0
   - qt=5.9.7
   - readline=8.0
+  - scikit-learn=0.23.2
   - setuptools=50.3.1
   - sip=4.19.13
   - six=1.15.0

@@ -4,8 +4,8 @@ import torch
 from torch import Tensor
 
 from mlu.metrics.base import Metric
-from mlu.metrics.precision import Precision
-from mlu.metrics.recall import Recall
+from mlu.metrics.classification.precision import Precision
+from mlu.metrics.classification.recall import Recall
 
 from nltk.translate.meteor_score import meteor_score
 from torch.nn.functional import one_hot

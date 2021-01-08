@@ -52,17 +52,17 @@ class IncrementalMetric(Module, Callable, ABC):
 		"""
 		raise NotImplementedError("Abstract method")
 
+	def is_empty(self) -> bool:
+		"""
+			:return: Return True if no value has been added to the incremental score.
+		"""
+		raise NotImplementedError("Abstract method")
+
 	def get_current(self) -> Optional[Tensor]:
 		"""
 			Get the current incremental score.
 
 			:return: The current incremental metric value.
-		"""
-		raise NotImplementedError("Abstract method")
-
-	def is_empty(self) -> bool:
-		"""
-			:return: Return True if no value has been added to the incremental score.
 		"""
 		raise NotImplementedError("Abstract method")
 

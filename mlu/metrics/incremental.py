@@ -32,11 +32,11 @@ class IncrementalMean(IncrementalMetric):
 			self._counter += 1
 		self._store_value(value)
 
-	def get_current(self) -> Optional[Tensor]:
-		return self.get_mean()
-
 	def is_empty(self) -> bool:
 		return self._counter == 0
+
+	def get_current(self) -> Optional[Tensor]:
+		return self.get_mean()
 
 	def get_mean(self) -> Optional[Tensor]:
 		return self._sum / self._counter if self._sum is not None else None
@@ -68,11 +68,11 @@ class IncrementalStd(IncrementalMetric):
 			self._counter += 1
 		self._store_value(value)
 
-	def get_current(self) -> Optional[Tensor]:
-		return self.get_std()
-
 	def is_empty(self) -> bool:
 		return self._counter == 0
+
+	def get_current(self) -> Optional[Tensor]:
+		return self.get_std()
 
 	def get_std(self) -> Optional[Tensor]:
 		if self._items_sum is not None and self._items_sq_sum is not None:
@@ -85,55 +85,61 @@ class MinTracker(IncrementalMetric):
 	def __init__(self, store_values: bool = False):
 		super().__init__(store_values)
 		self._min = None
-		self._index = -1
+		self._idx_min = -1
+		self._index = 0
 
 	def reset(self):
 		self._min = None
-		self._index = -1
+		self._idx_min = -1
+		self._index = 0
 
 	def add(self, value: Tensor):
 		if self._min is None or self._min > value:
 			self._min = value
+			self._idx_min = self._index
 		self._index += 1
 		self._store_value(value)
 
-	def get_current(self) -> Optional[Tensor]:
-		return self.get_min()
-
 	def is_empty(self) -> bool:
 		return self._min is None
+
+	def get_current(self) -> Optional[Tensor]:
+		return self.get_min()
 
 	def get_min(self) -> Optional[Tensor]:
 		return self._min
 
 	def get_index(self) -> int:
-		return self._index
+		return self._idx_min
 
 
 class MaxTracker(IncrementalMetric):
 	def __init__(self, store_values: bool = False):
 		super().__init__(store_values)
 		self._max = None
-		self._index = -1
+		self._idx_max = -1
+		self._index = 0
 
 	def reset(self):
 		self._max = None
-		self._index = -1
+		self._idx_max = -1
+		self._index = 0
 
 	def add(self, value: Tensor):
 		if self._max is None or self._max < value:
 			self._max = value
+			self._idx_max = self._index
 		self._index += 1
 		self._store_value(value)
 
-	def get_current(self) -> Optional[Tensor]:
-		return self.get_max()
-
 	def is_empty(self) -> bool:
 		return self._max is None
+
+	def get_current(self) -> Optional[Tensor]:
+		return self.get_max()
 
 	def get_max(self) -> Optional[Tensor]:
 		return self._max
 
 	def get_index(self) -> int:
-		return self._index
+		return self._idx_max

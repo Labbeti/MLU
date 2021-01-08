@@ -1,8 +1,8 @@
 
 import torch
 
-from mlu.metrics.precision import Precision
-from mlu.metrics.recall import Recall
+from mlu.metrics.classification.precision import Precision
+from mlu.metrics.classification.recall import Recall
 from unittest import TestCase, main
 
 

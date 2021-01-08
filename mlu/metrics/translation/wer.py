@@ -1,7 +1,7 @@
 
 from torch import Tensor
 
-from mlu.metrics.bleu import Metric
+from mlu.metrics.translation.bleu import Metric
 
 
 class WordErrorRate(Metric[Tensor, Tensor, Tensor]):
