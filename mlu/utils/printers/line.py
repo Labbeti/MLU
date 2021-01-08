@@ -22,14 +22,22 @@ class LinePrinter(PrinterABC):
 		self.print_exec_time = print_exec_time
 		self._epoch_start_date = time()
 
-	def print_current_values(self, current_means: Dict[str, float], iteration: int, nb_iterations: int, epoch: int):
+	def print_current_values(
+		self,
+		current_values: Dict[str, float],
+		iteration: int,
+		nb_iterations: int,
+		epoch: int,
+		name: str,
+	):
 		if iteration == 0:
 			self._epoch_start_date = time()
 
-		keys = list(current_means.keys())
-		name = "/".join(keys[0].split("/")[:-1]) if "/" in keys[0] else ""
+		keys = list(current_values.keys())
+		if name is None:
+			name = "/".join(keys[0].split("/")[:-1]) if "/" in keys[0] else ""
 		progression = int(100 * (iteration + 1) / nb_iterations)
-		current_means = {name.split("/")[-1]: value for name, value in current_means.items()}
+		current_means = {name.split("/")[-1]: value for name, value in current_values.items()}
 
 		content = ["{:s}: {:.4e}".format(name, value) for name, value in current_means.items()]
 		if self.print_exec_time:

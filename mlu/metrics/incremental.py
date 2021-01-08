@@ -1,18 +1,18 @@
 
 import torch
 
-from mlu.metrics.base import Metric, IncrementalMetric
+from mlu.metrics.base import IncrementalMetric
 
 from torch import Tensor
-from typing import List, Optional
+from typing import Optional
 
 
 class IncrementalMean(IncrementalMetric):
-	def __init__(self):
+	def __init__(self, store_values: bool = False):
 		"""
 			Compute the continue average of a values.
 		"""
-		super().__init__()
+		super().__init__(store_values)
 		self._sum = None
 		self._counter = 0
 
@@ -21,12 +21,16 @@ class IncrementalMean(IncrementalMetric):
 		self._counter = 0
 
 	def add(self, value: Tensor):
+		if isinstance(value, float):
+			value = torch.scalar_tensor(value)
+
 		if self._sum is None:
 			self._sum = value
 			self._counter = 1
 		else:
 			self._sum += value
 			self._counter += 1
+		self._store_value(value)
 
 	def get_current(self) -> Optional[Tensor]:
 		return self.get_mean()
@@ -39,8 +43,8 @@ class IncrementalMean(IncrementalMetric):
 
 
 class IncrementalStd(IncrementalMetric):
-	def __init__(self):
-		super().__init__()
+	def __init__(self, store_values: bool = False):
+		super().__init__(store_values)
 		self._items_sum = None
 		self._items_sq_sum = None
 		self._counter = 0
@@ -62,6 +66,7 @@ class IncrementalStd(IncrementalMetric):
 			self._items_sum += value
 			self._items_sq_sum += value ** 2
 			self._counter += 1
+		self._store_value(value)
 
 	def get_current(self) -> Optional[Tensor]:
 		return self.get_std()
@@ -77,8 +82,8 @@ class IncrementalStd(IncrementalMetric):
 
 
 class MinTracker(IncrementalMetric):
-	def __init__(self):
-		super().__init__()
+	def __init__(self, store_values: bool = False):
+		super().__init__(store_values)
 		self._min = None
 		self._index = -1
 
@@ -90,6 +95,7 @@ class MinTracker(IncrementalMetric):
 		if self._min is None or self._min > value:
 			self._min = value
 		self._index += 1
+		self._store_value(value)
 
 	def get_current(self) -> Optional[Tensor]:
 		return self.get_min()
@@ -105,8 +111,8 @@ class MinTracker(IncrementalMetric):
 
 
 class MaxTracker(IncrementalMetric):
-	def __init__(self):
-		super().__init__()
+	def __init__(self, store_values: bool = False):
+		super().__init__(store_values)
 		self._max = None
 		self._index = -1
 
@@ -118,6 +124,7 @@ class MaxTracker(IncrementalMetric):
 		if self._max is None or self._max < value:
 			self._max = value
 		self._index += 1
+		self._store_value(value)
 
 	def get_current(self) -> Optional[Tensor]:
 		return self.get_max()
