@@ -1,6 +1,9 @@
 
+import torch
+
 from mlu.metrics.base import Metric
 from torch import Tensor
+from typing import Callable
 
 
 class Precision(Metric):
@@ -10,6 +13,11 @@ class Precision(Metric):
 
 		Vectors must be 1D-tensors of shape (nb classes)
 	"""
+	def __init__(self, dim: int = 1, reduce_fn: Callable = torch.mean):
+		super().__init__()
+		self.dim = dim
+		self.reduce_fn = reduce_fn
+
 	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
 		"""
 			Compute score with one-hot or multi-hot inputs and targets.
@@ -19,7 +27,9 @@ class Precision(Metric):
 			:return: Shape (1,)
 		"""
 		assert input_.shape == target.shape, \
-			f"Mismatch between shapes {str(input_.shape)} and {str(target.shape)} for Precision metric."
-		true_positives = (input_ * target).sum()
-		false_positives = (input_ - target).ge(1.0).sum()
-		return true_positives / (true_positives + false_positives)
+			f"Mismatch between shapes {input_.shape} and {target.shape} for Precision metric."
+		true_positives = (input_ * target).sum(dim=self.dim)
+		false_positives = (input_ - target).ge(1.0).sum(dim=self.dim)
+		score = true_positives / (true_positives + false_positives)
+		score = self.reduce_fn(score)
+		return score

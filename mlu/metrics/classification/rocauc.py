@@ -33,7 +33,8 @@ class RocAuc(Metric):
 			score = torch.as_tensor(score)
 		elif len(input_.shape) == 2:
 			scores = [self.compute_score(input_[i], target[i]) for i in range(input_.shape[0])]
-			score = self.reduce_fn(torch.as_tensor(scores))
+			scores = torch.as_tensor(scores)
+			score = self.reduce_fn(scores)
 		else:
 			raise RuntimeError(f"Invalid tensor dimension {input_.shape} for ROC AUC score. Only 1D or 2D-tensors are supported.")
 
