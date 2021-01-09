@@ -25,7 +25,7 @@ class IncrementalMean(IncrementalMetric):
 			value = torch.scalar_tensor(value)
 
 		if self._sum is None:
-			self._sum = value
+			self._sum = value.clone()
 			self._counter = 1
 		else:
 			self._sum += value
@@ -38,7 +38,7 @@ class IncrementalMean(IncrementalMetric):
 		return self.get_mean()
 
 	def get_mean(self) -> Optional[Tensor]:
-		return self._sum / self._counter if self._sum is not None else None
+		return (self._sum / self._counter) if self._counter > 0 else None
 
 
 class IncrementalStd(IncrementalMetric):
@@ -58,7 +58,7 @@ class IncrementalStd(IncrementalMetric):
 			value = torch.scalar_tensor(value)
 
 		if self._items_sum is None or self._items_sq_sum is None:
-			self._items_sum = value
+			self._items_sum = value.clone()
 			self._items_sq_sum = value ** 2
 			self._counter = 1
 		else:
@@ -92,8 +92,11 @@ class MinTracker(IncrementalMetric):
 		self._index = 0
 
 	def add(self, value: Tensor):
+		if isinstance(value, float):
+			value = torch.scalar_tensor(value)
+
 		if self._min is None or self._min > value:
-			self._min = value
+			self._min = value.clone()
 			self._idx_min = self._index
 		self._index += 1
 
@@ -123,8 +126,11 @@ class MaxTracker(IncrementalMetric):
 		self._index = 0
 
 	def add(self, value: Tensor):
+		if isinstance(value, float):
+			value = torch.scalar_tensor(value)
+
 		if self._max is None or self._max < value:
-			self._max = value
+			self._max = value.clone()
 			self._idx_max = self._index
 		self._index += 1
 
