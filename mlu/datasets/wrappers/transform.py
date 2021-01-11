@@ -36,5 +36,11 @@ class TransformDataset(Dataset):
 	def __len__(self) -> int:
 		return len(self._dataset)
 
-	def unwrap(self) -> Dataset:
-		return self._dataset
+	def unwrap(self, recursive: bool = False) -> Dataset:
+		if not recursive:
+			return self._dataset
+		else:
+			dataset = self._dataset
+			while isinstance(dataset, TransformDataset):
+				dataset = dataset.unwrap(recursive=False)
+			return dataset
