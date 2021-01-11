@@ -14,7 +14,7 @@ class LinePrinter(PrinterABC):
 
 			Ex:
 			> printer = LinePrinter()
-			> printer.print_current_values({"train/accuracy": 0.89, "train/loss": 1.525}, 33, 100, 2)
+			> printer.print_current_values({"train/accuracy": 0.89, "train/loss": 1.525}, 33, 100, 2, "train")
 			train, epoch   2,  33%, accuracy: 8.9000e-01, loss: 1.5250e+00, took (s): 0.0
 
 			:param print_exec_time: Print time elapsed with the beginning of the loop (iteration == 0).

@@ -15,7 +15,7 @@ class ColumnPrinter(PrinterABC):
 
 			> printer = ColumnPrinter()
 
-			> printer.print_current_values({"train/accuracy": 0.89, "train/loss": 1.525}, 33, 100, 2)
+			> printer.print_current_values({"train/accuracy": 0.89, "train/loss": 1.525}, 33, 100, 2, "train")
 
 			\-      train       -  accuracy  -    loss    -  took (s)  -
 

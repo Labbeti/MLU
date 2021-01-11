@@ -1,6 +1,7 @@
 
 from .classification.average_precision import AveragePrecision
 from .classification.categorical import CategoricalAccuracy
+from .classification.dprime import DPrime
 from .classification.eq import EqMetric
 from .classification.fscore import FScore
 from .classification.precision import Precision
