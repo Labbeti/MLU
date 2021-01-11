@@ -9,11 +9,14 @@ from typing import Callable
 
 
 class DPrime(Metric):
-	"""
-		DPrime metric.
-		backend: sklearn and scipy.
-	"""
 	def __init__(self, average: str = "macro", reduce_fn: Callable = torch.mean):
+		"""
+			DPrime metric.
+			Backend: sklearn and scipy.
+
+			:param average: The type of D' score to compute. (default: \"macro\")
+			:param reduce_fn: The reduction function to apply.
+		"""
 		super().__init__()
 		self.average = average
 		self.reduce_fn = reduce_fn
@@ -34,9 +37,9 @@ class DPrime(Metric):
 			score = (2 ** 0.5) * norm.ppf(score)
 			score = torch.as_tensor(score)
 		elif len(input_.shape) == 2:
-			scores = [self.compute_score(input_[i], target[i]) for i in range(input_.shape[0])]
-			scores = torch.as_tensor(scores)
-			score = self.reduce_fn(scores)
+			score = [self.compute_score(input_[i], target[i]) for i in range(input_.shape[0])]
+			score = torch.as_tensor(score)
+			score = self.reduce_fn(score)
 		else:
 			raise RuntimeError(f"Invalid tensor dimension {input_.shape} for ROC AUC score. Only 1D or 2D-tensors are supported.")
 

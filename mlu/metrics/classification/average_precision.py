@@ -8,11 +8,13 @@ from typing import Callable
 
 
 class AveragePrecision(Metric):
-	"""
-		Compute mean Average Precision (mAP) score.
-		Backend: scikit-learn.
-	"""
 	def __init__(self, reduce_fn: Callable = torch.mean):
+		"""
+			Compute mean Average Precision (mAP) score.
+			Backend: scikit-learn.
+
+			:param reduce_fn: The reduction function to apply.
+		"""
 		super().__init__()
 		self.reduce_fn = reduce_fn
 

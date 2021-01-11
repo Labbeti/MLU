@@ -9,7 +9,7 @@ install_requires = ["torch", "torchaudio", "torchvision", "nltk", "matplotlib", 
 
 setup(
 	name="mlu",
-	version="0.2.2",
+	version="0.2.3",
 	packages=find_packages(),
 	url="https://github.com/Labbeti/MLU",
 	license="MIT",

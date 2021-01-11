@@ -16,7 +16,7 @@ class Normalize(ImageTransform):
 		self,
 		source_range: Tuple[Union[float, int], Union[float, int]] = (0, 255),
 		target_range: Tuple[Union[float, int], Union[float, int]] = (0, 1),
-		p: float = 1.0
+		p: float = 1.0,
 	):
 		super().__init__(p=p)
 		self.source_range = source_range

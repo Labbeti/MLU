@@ -7,7 +7,7 @@ from torch import Tensor
 from typing import List, Optional
 
 
-class BLEU(Metric[List[Tensor], List[List[Tensor]], Tensor]):
+class BLEU(Metric):
 	"""
 		BLEU metric score.
 

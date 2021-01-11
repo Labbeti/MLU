@@ -18,6 +18,7 @@ class MetricWrapper(Metric):
 			:param callable_: The callable object to wrap.
 			:param use_input: If True, the input_ argument will be passed as argument to the callable object wrapped.
 			:param use_target: If True, the target argument will be passed as argument to the callable object wrapped.
+			:param reduce_fn: The reduction function to apply.
 		"""
 		super().__init__()
 		self.reduce_fn = reduce_fn

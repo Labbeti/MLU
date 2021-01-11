@@ -7,7 +7,7 @@ from torch import Tensor
 from typing import List
 
 
-class RougeL(Metric[List[str], List[List[str]], Tensor]):
+class RougeL(Metric):
 	def __init__(self):
 		"""
 			Recall Oriented Understudy of Gisting Evaluation.

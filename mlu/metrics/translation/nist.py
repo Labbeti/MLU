@@ -5,7 +5,7 @@ from torch import Tensor
 from typing import List
 
 
-class NIST(Metric[List[str], List[List[str]], Tensor]):
+class NIST(Metric):
 	def __init__(self, ngram_order: int):
 		"""
 			Metric for evaluate the quality of a machine translation.

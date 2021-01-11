@@ -8,11 +8,14 @@ from typing import Callable
 
 
 class RocAuc(Metric):
-	"""
-		Compute mean Area Under the Receiver Operating Characteristic Curve (ROC AUC) score.
-		Backend: scikit-learn
-	"""
 	def __init__(self, average: str = "macro", reduce_fn: Callable = torch.mean):
+		"""
+			Compute mean Area Under the Receiver Operating Characteristic Curve (ROC AUC) score.
+			Backend: scikit-learn
+
+			:param average: The type of ROC AUC score to compute. (default: \"macro\")
+			:param reduce_fn: The reduction function to apply.
+		"""
 		super().__init__()
 		self.average = average
 		self.reduce_fn = reduce_fn

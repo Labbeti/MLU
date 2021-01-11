@@ -7,20 +7,25 @@ from typing import Callable, Optional
 
 
 class CategoricalAccuracy(Metric[Tensor, Tensor, Tensor]):
-	"""
-		Compute the categorical accuracy between a batch of prediction and labels.
-	"""
 	def __init__(
 		self,
+		dim: int = 1,
 		vector_input: bool = True,
 		vector_target: bool = True,
-		dim: int = 1,
 		reduce_fn: Optional[Callable] = torch.mean
 	):
+		"""
+			Compute the categorical accuracy between a batch of prediction and labels.
+
+			:param dim: The dimension to compute the score.
+			:param vector_input: If True, considers inputs as a vector otherwise it will be considered as class index.
+			:param vector_target: If True, considers target as a vector otherwise it will be considered as class index.
+			:param reduce_fn: The reduction function to apply.
+		"""
 		super().__init__()
+		self.dim = dim
 		self.vector_input = vector_input
 		self.vector_target = vector_target
-		self.dim = dim
 		self.reduce_fn = reduce_fn
 
 	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
