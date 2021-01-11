@@ -35,3 +35,6 @@ class TransformDataset(Dataset):
 
 	def __len__(self) -> int:
 		return len(self._dataset)
+
+	def unwrap(self) -> Dataset:
+		return self._dataset

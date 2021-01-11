@@ -25,3 +25,6 @@ class ZipDataset(Dataset):
 
 	def __len__(self) -> int:
 		return len(self._datasets[0]) if len(self._datasets) > 0 else 0
+
+	def unwrap(self) -> List[Dataset]:
+		return self._datasets
