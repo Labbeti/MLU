@@ -11,7 +11,7 @@ from .pil import (
 	IdentityImage,
 	Posterize,
 	Rescale,
-	Rotation,
+	Rotate,
 	Sharpness,
 	ShearX,
 	ShearY,

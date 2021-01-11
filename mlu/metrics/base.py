@@ -2,7 +2,7 @@
 from abc import ABC
 from torch import Tensor
 from torch.nn import Module
-from typing import Callable, Generic, Iterable, Optional, TypeVar
+from typing import Callable, Generic, Iterable, List, Optional, TypeVar
 
 T_Input = TypeVar("T_Input")
 T_Target = TypeVar("T_Target")
@@ -25,7 +25,7 @@ class Metric(Module, Callable, ABC, Generic[T_Input, T_Target, T_Output]):
 
 class IncrementalMetric(Module, Callable, ABC):
 	"""
-		Base class for continue metrics modules, which wrap a metric and compute a continue value on the scores.
+		Base class for incremental metrics modules, which wrap a metric and compute a continue value on the scores.
 
 		Abstract methods:
 			- reset(self):
@@ -42,24 +42,37 @@ class IncrementalMetric(Module, Callable, ABC):
 	def add(self, value: Tensor):
 		"""
 			Add a value to the incremental score.
+
+			:param value: The value to add to the current incremental metric value.
+		"""
+		raise NotImplementedError("Abstract method")
+
+	def is_empty(self) -> bool:
+		"""
+			:return: Return True if no value has been added to the incremental score.
 		"""
 		raise NotImplementedError("Abstract method")
 
 	def get_current(self) -> Optional[Tensor]:
 		"""
 			Get the current incremental score.
+
+			:return: The current incremental metric value.
 		"""
 		raise NotImplementedError("Abstract method")
 
-	def is_empty(self) -> bool:
-		"""
-			Return True if no value has been added to the incremental score.
-		"""
-		raise NotImplementedError("Abstract method")
-
-	def add_list(self, lst: Iterable[Tensor]):
+	def add_list(self, values: Iterable[Tensor]):
 		"""
 			Add a list of scores to the current incremental value.
+
+			:param values: Add a of values to incremental metric.
 		"""
-		for value in lst:
+		for value in values:
 			self.add(value)
+
+	def forward(self, value: Tensor) -> Optional[Tensor]:
+		"""
+			:param value: Add a value to the metric and returns the current incremental value.
+		"""
+		self.add(value)
+		return self.get_current()

@@ -8,7 +8,7 @@ from torch import Tensor
 from typing import List, Tuple, Union
 
 
-class Normalize(ImageTransform[Tensor, Tensor]):
+class Normalize(ImageTransform):
 	"""
 		Normalize an image in [0, 1].
 	"""
@@ -27,7 +27,7 @@ class Normalize(ImageTransform[Tensor, Tensor]):
 		return normalized * (self.target_range[1] - self.target_range[0]) + self.target_range[0]
 
 
-class Standardize(ImageTransform[Tensor, Tensor]):
+class Standardize(ImageTransform):
 	"""
 		Standardize image with a list of means and standard-deviations.
 	"""
@@ -49,7 +49,7 @@ class Standardize(ImageTransform[Tensor, Tensor]):
 		return output
 
 
-class Gray(ImageTransform[Tensor, Tensor]):
+class Gray(ImageTransform):
 	"""
 		Convert image to gray.
 	"""
@@ -65,7 +65,7 @@ class Gray(ImageTransform[Tensor, Tensor]):
 		return output
 
 
-class CutOutImg(ImageTransform[Tensor, Tensor]):
+class CutOutImg(ImageTransform):
 	"""
 		Put gray value in an area randomly placed.
 	"""
@@ -93,7 +93,7 @@ class CutOutImg(ImageTransform[Tensor, Tensor]):
 		return output
 
 
-class UniColor(ImageTransform[Tensor, Tensor]):
+class UniColor(ImageTransform):
 	"""
 		Delete 2 random channels in image for getting only 1 color.
 	"""
@@ -109,7 +109,7 @@ class UniColor(ImageTransform[Tensor, Tensor]):
 		return output
 
 
-class Inversion(ImageTransform[Tensor, Tensor]):
+class Inversion(ImageTransform):
 	"""
 		Invert pixel colors of an image.
 	"""

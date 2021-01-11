@@ -3,7 +3,7 @@ from mlu.transforms.base import SpectrogramTransform
 from torch import Tensor
 
 
-class RollSpec(SpectrogramTransform[Tensor, Tensor]):
+class RollSpec(SpectrogramTransform):
 	def __init__(self, roll: float = 0.1, p: float = 1.0):
 		super().__init__(p=p)
 		self.roll = roll

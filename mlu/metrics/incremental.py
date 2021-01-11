@@ -1,10 +1,10 @@
 
 import torch
 
-from mlu.metrics.base import Metric, IncrementalMetric
+from mlu.metrics.base import IncrementalMetric
 
 from torch import Tensor
-from typing import List, Optional
+from typing import Optional
 
 
 class IncrementalMean(IncrementalMetric):
@@ -21,21 +21,24 @@ class IncrementalMean(IncrementalMetric):
 		self._counter = 0
 
 	def add(self, value: Tensor):
+		if isinstance(value, float):
+			value = torch.scalar_tensor(value)
+
 		if self._sum is None:
-			self._sum = value
+			self._sum = value.clone()
 			self._counter = 1
 		else:
 			self._sum += value
 			self._counter += 1
 
-	def get_current(self) -> Optional[Tensor]:
-		return self.get_mean()
-
 	def is_empty(self) -> bool:
 		return self._counter == 0
 
+	def get_current(self) -> Optional[Tensor]:
+		return self.get_mean()
+
 	def get_mean(self) -> Optional[Tensor]:
-		return self._sum / self._counter if self._sum is not None else None
+		return (self._sum / self._counter) if self._counter > 0 else None
 
 
 class IncrementalStd(IncrementalMetric):
@@ -55,7 +58,7 @@ class IncrementalStd(IncrementalMetric):
 			value = torch.scalar_tensor(value)
 
 		if self._items_sum is None or self._items_sq_sum is None:
-			self._items_sum = value
+			self._items_sum = value.clone()
 			self._items_sq_sum = value ** 2
 			self._counter = 1
 		else:
@@ -63,11 +66,11 @@ class IncrementalStd(IncrementalMetric):
 			self._items_sq_sum += value ** 2
 			self._counter += 1
 
-	def get_current(self) -> Optional[Tensor]:
-		return self.get_std()
-
 	def is_empty(self) -> bool:
 		return self._counter == 0
+
+	def get_current(self) -> Optional[Tensor]:
+		return self.get_std()
 
 	def get_std(self) -> Optional[Tensor]:
 		if self._items_sum is not None and self._items_sq_sum is not None:
@@ -80,41 +83,65 @@ class MinTracker(IncrementalMetric):
 	def __init__(self):
 		super().__init__()
 		self._min = None
+		self._idx_min = -1
+		self._index = 0
 
 	def reset(self):
 		self._min = None
+		self._idx_min = -1
+		self._index = 0
 
 	def add(self, value: Tensor):
-		if self._min is None or self._min > value:
-			self._min = value
+		if isinstance(value, float):
+			value = torch.scalar_tensor(value)
 
-	def get_current(self) -> Optional[Tensor]:
-		return self.get_min()
+		if self._min is None or self._min > value:
+			self._min = value.clone()
+			self._idx_min = self._index
+		self._index += 1
 
 	def is_empty(self) -> bool:
 		return self._min is None
 
+	def get_current(self) -> Optional[Tensor]:
+		return self.get_min()
+
 	def get_min(self) -> Optional[Tensor]:
 		return self._min
+
+	def get_index(self) -> int:
+		return self._idx_min
 
 
 class MaxTracker(IncrementalMetric):
 	def __init__(self):
 		super().__init__()
 		self._max = None
+		self._idx_max = -1
+		self._index = 0
 
 	def reset(self):
 		self._max = None
+		self._idx_max = -1
+		self._index = 0
 
 	def add(self, value: Tensor):
-		if self._max is None or self._max < value:
-			self._max = value
+		if isinstance(value, float):
+			value = torch.scalar_tensor(value)
 
-	def get_current(self) -> Optional[Tensor]:
-		return self.get_max()
+		if self._max is None or self._max < value:
+			self._max = value.clone()
+			self._idx_max = self._index
+		self._index += 1
 
 	def is_empty(self) -> bool:
 		return self._max is None
 
+	def get_current(self) -> Optional[Tensor]:
+		return self.get_max()
+
 	def get_max(self) -> Optional[Tensor]:
 		return self._max
+
+	def get_index(self) -> int:
+		return self._idx_max

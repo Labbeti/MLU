@@ -12,10 +12,14 @@ class ColumnPrinter(PrinterABC):
 			Class for print current values of a training or validation by columns.
 
 			Ex:
+
 			> printer = ColumnPrinter()
+
 			> printer.print_current_values({"train/accuracy": 0.89, "train/loss": 1.525}, 33, 100, 2)
-			-      train       -  accuracy  -    loss    -  took (s)  -
-			- Epoch   2 -  33% - 8.9000e-01 - 1.5250e-00 -    0.00    -
+
+			\-      train       -  accuracy  -    loss    -  took (s)  -
+
+			\- Epoch   2 -  33% - 8.9000e-01 - 1.5250e-00 -    0.00    -
 
 			:param print_exec_time: Print time elapsed with the beginning of the loop (iteration == 0).
 		"""
@@ -24,10 +28,18 @@ class ColumnPrinter(PrinterABC):
 		self._epoch_start_date = time()
 		self._keys = []
 
-	def print_current_values(self, current_values: Dict[str, float], iteration: int, nb_iterations: int, epoch: int):
+	def print_current_values(
+		self,
+		current_values: Dict[str, float],
+		iteration: int,
+		nb_iterations: int,
+		epoch: int,
+		name: str,
+	):
 		if iteration == 0:
 			keys = list(sorted(current_values.keys()))
-			name = "/".join(keys[0].split("/")[:-1]) if len(keys) > 0 else ""
+			if name is None:
+				name = "/".join(keys[0].split("/")[:-1]) if len(keys) > 0 else ""
 			keys_names = [key.split("/")[-1] for key in keys]
 			self._keys = keys
 			self._print_header(name, keys_names)

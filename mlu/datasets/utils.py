@@ -2,7 +2,9 @@
 import numpy as np
 import random
 
+from mlu.datasets.samplers import SubsetSampler
 from torch.utils.data.dataset import Dataset, Subset
+from torch.utils.data.sampler import Sampler
 from typing import List
 
 
@@ -26,6 +28,11 @@ def split_dataset(
 	"""
 	indexes = generate_indexes(dataset, nb_classes, ratios, shuffle_idx, target_one_hot)
 	return [Subset(dataset, idx) for idx in indexes]
+
+
+def generate_split_samplers(dataset: Dataset, ratios: List[float], nb_classes: int) -> List[Sampler]:
+	indexes = generate_indexes(dataset, nb_classes, ratios, target_one_hot=True)
+	return [SubsetSampler(dataset, idx) for idx in indexes]
 
 
 def generate_indexes(

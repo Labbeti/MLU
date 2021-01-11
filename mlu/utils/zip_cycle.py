@@ -29,12 +29,13 @@ class ZipCycle(Iterable, Sized):
 
 				( 2 5 )
 
-			:param iterables: A list of Sized Iterables to browse.
-			:param policy: The policy to use during iteration.
+			:param iterables: A list of Sized Iterables to browse. Must not be an empty list.
+			:param policy: The policy to use during iteration. (default: "max")
 				If policy = "max", the output will stop when the last iterable is finished. (like in the example above)
 				If policy = "min", the class will stop when the first iterable is finished. (like in the built-in "zip" python)
 		"""
 		assert policy in ["min", "max"]
+		assert len(iterables) > 0
 		lens = [len(iterable) for iterable in iterables]
 		for len_ in lens:
 			if len_ == 0:
