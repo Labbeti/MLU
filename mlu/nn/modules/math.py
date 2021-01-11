@@ -51,6 +51,17 @@ class Mish(Module):
 		return mish(x)
 
 
+class Min(Module):
+	def __init__(self, dim: Optional[int] = 1):
+		super().__init__()
+		self.dim = dim
+
+	def forward(self, x: Tensor, dim: Optional[int] = None) -> Tensor:
+		if dim is None:
+			dim = self.dim
+		return x.min(dim=dim)[0]
+
+
 class Max(Module):
 	def __init__(self, dim: Optional[int] = 1):
 		super().__init__()
@@ -60,3 +71,14 @@ class Max(Module):
 		if dim is None:
 			dim = self.dim
 		return x.max(dim=dim)[0]
+
+
+class Mean(Module):
+	def __init__(self, dim: Optional[int] = 1):
+		super().__init__()
+		self.dim = dim
+
+	def forward(self, x: Tensor, dim: Optional[int] = None) -> Tensor:
+		if dim is None:
+			dim = self.dim
+		return x.mean(dim=dim)

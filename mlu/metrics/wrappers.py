@@ -5,7 +5,13 @@ from typing import Callable, List, Optional
 
 
 class MetricWrapper(Metric):
-	def __init__(self, callable_: Callable, use_input: bool = True, use_target: bool = True):
+	def __init__(
+		self,
+		callable_: Callable,
+		use_input: bool = True,
+		use_target: bool = True,
+		reduce_fn: Optional[Callable] = None,
+	):
 		"""
 			Wrapper of a callable function or class for comply with Metric typing.
 
@@ -14,6 +20,7 @@ class MetricWrapper(Metric):
 			:param use_target: If True, the target argument will be passed as argument to the callable object wrapped.
 		"""
 		super().__init__()
+		self.reduce_fn = reduce_fn
 
 		if use_input and use_target:
 			self.sub_call = lambda input_, target: callable_(input_, target)
@@ -25,11 +32,18 @@ class MetricWrapper(Metric):
 			self.sub_call = lambda input_, target: callable_()
 
 	def compute_score(self, input_: T_Input, target: T_Target) -> T_Output:
-		return self.sub_call(input_, target)
+		score = self.sub_call(input_, target)
+		if self.reduce_fn is not None:
+			score = self.reduce_fn(score)
+		return score
 
 
 class IncrementalWrapper(Metric):
-	def __init__(self, metric: Metric, continue_metric: IncrementalMetric = IncrementalMean()):
+	def __init__(
+		self,
+		metric: Metric,
+		continue_metric: IncrementalMetric = IncrementalMean()
+	):
 		"""
 			Compute an incremental score (mean or std) of a metric.
 
