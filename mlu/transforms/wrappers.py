@@ -1,22 +1,37 @@
 
-from mlu.transforms.base import ImageTransform, Transform, T_Input, T_Output
+from mlu.transforms.base import ImageTransform, Transform
 from mlu.transforms.conversion.conversion import ToPIL, ToTensor
 
 from PIL import Image
 
 from torch import Tensor
-from typing import Any, Callable, Optional, Generic
+from typing import Any, Callable, Optional
 
 
-class ConversionWrapper(Transform, Generic[T_Input, T_Output]):
-	def __init__(self, transform: ImageTransform, pre_convert: Callable, post_convert: Callable, p: float = 1.0):
+class ProcessTransformWrapper(Transform):
+	def __init__(
+		self,
+		transform: Optional[Transform],
+		pre_convert: Optional[Callable],
+		post_convert: Optional[Callable],
+		p: float = 1.0,
+	):
+		"""
+			:param transform:
+			:param pre_convert:
+			:param post_convert:
+			:param p: The probability to apply the transform.
+		"""
 		super().__init__(p=p)
 		self.transform = transform
 		self.pre_convert = pre_convert
 		self.post_convert = post_convert
+		self._update_callables()
 
 	def apply(self, x: Any) -> Any:
-		return self.post_convert(self.transform(self.pre_convert(x)))
+		for callable_ in self._callables:
+			x = callable_(x)
+		return x
 
 	def is_image_transform(self) -> bool:
 		return self.transform.is_image_transform()
@@ -27,13 +42,27 @@ class ConversionWrapper(Transform, Generic[T_Input, T_Output]):
 	def is_waveform_transform(self) -> bool:
 		return self.transform.is_waveform_transform()
 
+	def _update_callables(self):
+		self._callables = []
 
-class PILInternalWrapper(ConversionWrapper[Tensor, Tensor]):
-	"""
-		Class that convert tensor to PIL image internally for apply PIL transforms.
-		Tensors images must have the shape (width, height, 3).
-	"""
+		if self.pre_convert is not None:
+			self._callables.append(self.pre_convert)
+		if self.transform is not None:
+			self._callables.append(self.transform)
+		if self.post_convert is not None:
+			self._callables.append(self.post_convert)
+
+
+class PILInternalWrapper(ProcessTransformWrapper):
 	def __init__(self, pil_transform: ImageTransform, mode: Optional[str] = "RGB", p: float = 1.0):
+		"""
+			Class that convert tensor to PIL image internally for apply PIL transforms.
+			Tensors images must have the shape (width, height, 3).
+
+			:param pil_transform:
+			:param mode:
+			:param p: The probability to apply the transform.
+		"""
 		super().__init__(
 			transform=pil_transform,
 			pre_convert=ToPIL(mode=mode),
@@ -45,12 +74,15 @@ class PILInternalWrapper(ConversionWrapper[Tensor, Tensor]):
 		return super().apply(x)
 
 
-class TensorInternalWrapper(ConversionWrapper[Image.Image, Image.Image]):
-	"""
-		Class that convert PIL image to tensor internally for apply tensor transforms.
-		Tensors images will have the shape (width, height, 3).
-	"""
+class TensorInternalWrapper(ProcessTransformWrapper):
 	def __init__(self, pil_transform: ImageTransform, p: float = 1.0):
+		"""
+			Class that convert PIL image to tensor internally for apply tensor transforms.
+			Tensors images will have the shape (width, height, 3).
+
+			:param pil_transform:
+			:param p: The probability to apply the transform.
+		"""
 		super().__init__(
 			transform=pil_transform,
 			pre_convert=ToTensor(),
@@ -70,11 +102,15 @@ class TransformWrapper(Transform):
 		image_transform: bool = False,
 		waveform_transform: bool = False,
 		spectrogram_transform: bool = False,
-		p: float = 1.0
+		p: float = 1.0,
 	):
 		"""
 			Wrap a callable object to Transform.
 
+			:param callable_:
+			:param image_transform:
+			:param waveform_transform:
+			:param spectrogram_transform:
 			:param p: The probability to apply the transform.
 		"""
 		super().__init__(p=p)

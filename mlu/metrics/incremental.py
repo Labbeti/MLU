@@ -40,6 +40,9 @@ class IncrementalMean(IncrementalMetric):
 	def get_mean(self) -> Optional[Tensor]:
 		return (self._sum / self._counter) if self._counter > 0 else None
 
+	def get_nb_values_added(self) -> int:
+		return self._counter
+
 
 class IncrementalStd(IncrementalMetric):
 	def __init__(self):
@@ -78,17 +81,20 @@ class IncrementalStd(IncrementalMetric):
 		else:
 			return None
 
+	def get_nb_values_added(self) -> int:
+		return self._counter
+
 
 class MinTracker(IncrementalMetric):
 	def __init__(self):
 		super().__init__()
 		self._min = None
-		self._idx_min = -1
+		self._index_min = -1
 		self._index = 0
 
 	def reset(self):
 		self._min = None
-		self._idx_min = -1
+		self._index_min = -1
 		self._index = 0
 
 	def add(self, value: Tensor):
@@ -97,7 +103,7 @@ class MinTracker(IncrementalMetric):
 
 		if self._min is None or self._min > value:
 			self._min = value.clone()
-			self._idx_min = self._index
+			self._index_min = self._index
 		self._index += 1
 
 	def is_empty(self) -> bool:
@@ -110,19 +116,22 @@ class MinTracker(IncrementalMetric):
 		return self._min
 
 	def get_index(self) -> int:
-		return self._idx_min
+		return self._index_min
+
+	def get_nb_values_added(self) -> int:
+		return self._index
 
 
 class MaxTracker(IncrementalMetric):
 	def __init__(self):
 		super().__init__()
 		self._max = None
-		self._idx_max = -1
+		self._index_max = -1
 		self._index = 0
 
 	def reset(self):
 		self._max = None
-		self._idx_max = -1
+		self._index_max = -1
 		self._index = 0
 
 	def add(self, value: Tensor):
@@ -131,7 +140,7 @@ class MaxTracker(IncrementalMetric):
 
 		if self._max is None or self._max < value:
 			self._max = value.clone()
-			self._idx_max = self._index
+			self._index_max = self._index
 		self._index += 1
 
 	def is_empty(self) -> bool:
@@ -144,4 +153,7 @@ class MaxTracker(IncrementalMetric):
 		return self._max
 
 	def get_index(self) -> int:
-		return self._idx_max
+		return self._index_max
+
+	def get_nb_values_added(self) -> int:
+		return self._index

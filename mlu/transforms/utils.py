@@ -1,10 +1,10 @@
 
 import random
 
-from mlu.transforms.base import Transform, ImageTransform, T_Input, T_Output
+from mlu.transforms.base import Transform
 
 from torch import Tensor
-from typing import Any, Optional, Sequence
+from typing import Any, Callable, Optional, Sequence
 
 
 class Identity(Transform):
@@ -46,13 +46,16 @@ class Compose(Transform):
 		return x
 
 	def is_image_transform(self) -> bool:
-		return len(self.transforms) > 0 and self.transforms[0].is_image_transform()
+		return self._is_transform_type(lambda t: t.is_image_transform())
 
 	def is_waveform_transform(self) -> bool:
-		return len(self.transforms) > 0 and self.transforms[0].is_waveform_transform()
+		return self._is_transform_type(lambda t: t.is_waveform_transform())
 
 	def is_spectrogram_transform(self) -> bool:
-		return len(self.transforms) > 0 and self.transforms[0].is_spectrogram_transform()
+		return self._is_transform_type(lambda t: t.is_spectrogram_transform())
+
+	def _is_transform_type(self, is_type_fn: Callable[[Transform], bool]) -> bool:
+		return len(self.transforms) > 0 and isinstance(self.transforms[0], Transform) and is_type_fn(self.transforms[0])
 
 
 class RandomChoice(Transform):
@@ -66,8 +69,10 @@ class RandomChoice(Transform):
 		"""
 			Select randomly k transforms in a list and apply them sequentially.
 
+			An augmentation can be chosen multiple times if nb_choices > 1.
+
 			:param transforms: The list of transforms from we choose the apply a transform.
-			:param nb_choices: The number of transforms to choose. An augmentation can be chosen multiple times.
+			:param nb_choices: The number of transforms to choose.
 			:param weights: The probabilities to choose the transform.
 			:param p: The probability to apply the transform.
 		"""
@@ -83,13 +88,16 @@ class RandomChoice(Transform):
 		return x
 
 	def is_image_transform(self) -> bool:
-		return all([transform.is_image_transform() for transform in self.transforms])
+		return self._is_transform_type(lambda t: t.is_image_transform())
 
 	def is_waveform_transform(self) -> bool:
-		return all([transform.is_waveform_transform() for transform in self.transforms])
+		return self._is_transform_type(lambda t: t.is_waveform_transform())
 
 	def is_spectrogram_transform(self) -> bool:
-		return all([transform.is_spectrogram_transform() for transform in self.transforms])
+		return self._is_transform_type(lambda t: t.is_spectrogram_transform())
+
+	def _is_transform_type(self, is_type_fn: Callable[[Transform], bool]) -> bool:
+		return all([isinstance(transform, Transform) and is_type_fn(transform) for transform in self.transforms])
 
 
 class Permute(Transform):
