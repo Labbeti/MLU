@@ -30,7 +30,7 @@ class Identity(Transform):
 
 
 class Compose(Transform):
-	def __init__(self, *transforms: Transform, p: float = 1.0):
+	def __init__(self, *transforms: Callable, p: float = 1.0):
 		"""
 			Compose a list of transforms for apply them sequentially.
 
@@ -55,13 +55,17 @@ class Compose(Transform):
 		return self._is_transform_type(lambda t: t.is_spectrogram_transform())
 
 	def _is_transform_type(self, is_type_fn: Callable[[Transform], bool]) -> bool:
-		return len(self.transforms) > 0 and isinstance(self.transforms[0], Transform) and is_type_fn(self.transforms[0])
+		if len(self.transforms) == 0:
+			return False
+		else:
+			first_transform = self.transforms[0]
+			return isinstance(first_transform, Transform) and is_type_fn(first_transform)
 
 
 class RandomChoice(Transform):
 	def __init__(
 		self,
-		*transforms: Transform,
+		*transforms: Callable,
 		nb_choices: int = 1,
 		weights: Optional[Sequence[float]] = None,
 		p: float = 1.0,
@@ -98,13 +102,3 @@ class RandomChoice(Transform):
 
 	def _is_transform_type(self, is_type_fn: Callable[[Transform], bool]) -> bool:
 		return all([isinstance(transform, Transform) and is_type_fn(transform) for transform in self.transforms])
-
-
-class Permute(Transform):
-	def __init__(self, *dims, p: float = 1.0):
-		super().__init__(p=p)
-		self.dims = list(dims)
-
-	def apply(self, x: Tensor) -> Tensor:
-		out = x.permute(*self.dims)
-		return out

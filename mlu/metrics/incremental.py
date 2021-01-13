@@ -45,8 +45,12 @@ class IncrementalMean(IncrementalMetric):
 
 
 class IncrementalStd(IncrementalMetric):
-	def __init__(self):
+	def __init__(self, unbiased: bool = False):
+		"""
+			Compute the continue unbiased Standard Deviation (std).
+		"""
 		super().__init__()
+		self._unbiased = unbiased
 		self._items_sum = None
 		self._items_sq_sum = None
 		self._counter = 0
@@ -76,8 +80,11 @@ class IncrementalStd(IncrementalMetric):
 		return self.get_std()
 
 	def get_std(self) -> Optional[Tensor]:
-		if self._items_sum is not None and self._items_sq_sum is not None:
-			return torch.sqrt(self._items_sq_sum / self._counter - (self._items_sum / self._counter) ** 2)
+		if not self.is_empty():
+			std = torch.sqrt(self._items_sq_sum / self._counter - (self._items_sum / self._counter) ** 2)
+			if self._unbiased:
+				std = std * torch.scalar_tensor(self._counter / (self._counter - 1)).sqrt()
+			return std
 		else:
 			return None
 

@@ -14,7 +14,7 @@ class Metric(Module, Callable, ABC, Generic[T_Input, T_Target, T_Output]):
 		Base class for metric modules.
 
 		Abstract methods:
-			- compute_score(self, input_: T_Input, target: T_Target) -> T_Output:
+			- forward_impl_(self, input_: T_Input, target: T_Target) -> T_Output:
 	"""
 	def forward(self, input_: T_Input, target: T_Target) -> T_Output:
 		return self.compute_score(input_, target)

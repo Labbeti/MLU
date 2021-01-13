@@ -82,3 +82,13 @@ class Mean(Module):
 		if dim is None:
 			dim = self.dim
 		return x.mean(dim=dim)
+
+
+class Permute(Module):
+	def __init__(self, *dims):
+		super().__init__()
+		self.dims = list(dims)
+
+	def forward(self, x: Tensor) -> Tensor:
+		out = x.permute(*self.dims)
+		return out

@@ -12,6 +12,9 @@ class DPrime(Metric):
 	def __init__(self, average: str = "macro", reduce_fn: Callable = torch.mean):
 		"""
 			DPrime metric.
+
+			Note: If score == 0 : bad score, low difference between "noise" and inputs.
+
 			Backend: sklearn and scipy.
 
 			:param average: The type of D' score to compute. (default: \"macro\")
