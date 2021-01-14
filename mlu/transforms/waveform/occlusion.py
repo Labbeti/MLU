@@ -6,7 +6,7 @@ from torch import Tensor
 from typing import Tuple, Union
 
 
-class Occlusion(WaveformTransform[Tensor, Tensor]):
+class Occlusion(WaveformTransform):
 	"""
 		Occlusion waveform transform.
 	"""

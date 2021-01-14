@@ -1,2 +1,2 @@
 
-from .transforms import CutOutSpec
+from .cutoutspec import CutOutSpec

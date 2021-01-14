@@ -5,7 +5,7 @@ from mlu.transforms.base import WaveformTransform
 from torch import Tensor
 
 
-class TimeStretchNearest(WaveformTransform[Tensor, Tensor]):
+class TimeStretchNearest(WaveformTransform):
 	def __init__(self, orig_freq: int = 16000, new_freq: int = 16000, p: float = 1.0):
 		super().__init__(p=p)
 		self.orig_freq = orig_freq

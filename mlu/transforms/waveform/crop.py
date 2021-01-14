@@ -6,7 +6,7 @@ from mlu.transforms.base import WaveformTransform
 from torch import Tensor
 
 
-class CropLeft(WaveformTransform[Tensor, Tensor]):
+class CropLeft(WaveformTransform):
 	def __init__(self, target_length: int, p: float = 1.0):
 		super().__init__(p)
 		self.target_length = target_length
@@ -16,7 +16,7 @@ class CropLeft(WaveformTransform[Tensor, Tensor]):
 		return waveform
 
 
-class CropRight(WaveformTransform[Tensor, Tensor]):
+class CropRight(WaveformTransform):
 	def __init__(self, target_length: int, p: float = 1.0):
 		super().__init__(p)
 		self.target_length = target_length
@@ -26,7 +26,7 @@ class CropRight(WaveformTransform[Tensor, Tensor]):
 		return waveform
 
 
-class CropCenter(WaveformTransform[Tensor, Tensor]):
+class CropCenter(WaveformTransform):
 	def __init__(self, target_length: int, p: float = 1.0):
 		super().__init__(p)
 		self.target_length = target_length
@@ -36,7 +36,7 @@ class CropCenter(WaveformTransform[Tensor, Tensor]):
 		return waveform
 
 
-class CropRandom(WaveformTransform[Tensor, Tensor]):
+class CropRandom(WaveformTransform):
 	def __init__(self, target_length: int, p: float = 1.0):
 		super().__init__(p)
 		self.target_length = target_length

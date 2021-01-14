@@ -4,7 +4,15 @@
 from setuptools import setup, find_packages
 
 
-install_requires = ["torch", "torchaudio", "torchvision", "nltk", "matplotlib", "numpy"]
+install_requires = [
+	"torch==1.7.0",
+	"torchaudio==0.7.0",
+	"torchvision==0.8.1",
+	"tensorboard",
+	"nltk",
+	"matplotlib",
+	"numpy"
+]
 
 
 setup(
@@ -17,4 +25,5 @@ setup(
 	author_email="etienne.labbe31@gmail.com",
 	description="Set of personal classes, functions and tools for machine learning.",
 	install_requires=install_requires,
+	include_package_data=True,
 )

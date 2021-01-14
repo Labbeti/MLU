@@ -5,7 +5,7 @@ from mlu.transforms.waveform.pad import PadLeft, PadRight, PadCenter, PadRandom
 from torch import Tensor
 
 
-class PadCrop(WaveformTransform[Tensor, Tensor]):
+class PadCrop(WaveformTransform):
 	def __init__(self, target_length: int, fill_value: float = 0.0, align: str = "random", p: float = 1.0):
 		super().__init__(p)
 

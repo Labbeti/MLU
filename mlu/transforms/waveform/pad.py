@@ -6,7 +6,7 @@ from mlu.transforms.base import WaveformTransform
 from torch import Tensor
 
 
-class PadLeft(WaveformTransform[Tensor, Tensor]):
+class PadLeft(WaveformTransform):
 	def __init__(self, target_length: int, fill_value: float = 0.0, p: float = 1.0):
 		super().__init__(p)
 		self.target_length = target_length
@@ -17,7 +17,7 @@ class PadLeft(WaveformTransform[Tensor, Tensor]):
 		return waveform
 
 
-class PadRight(WaveformTransform[Tensor, Tensor]):
+class PadRight(WaveformTransform):
 	def __init__(self, target_length: int, fill_value: float = 0.0, p: float = 1.0):
 		super().__init__(p)
 		self.target_length = target_length
@@ -28,7 +28,7 @@ class PadRight(WaveformTransform[Tensor, Tensor]):
 		return waveform
 
 
-class PadCenter(WaveformTransform[Tensor, Tensor]):
+class PadCenter(WaveformTransform):
 	def __init__(self, target_length: int, fill_value: float = 0.0, p: float = 1.0):
 		super().__init__(p)
 		self.target_length = target_length
@@ -39,7 +39,7 @@ class PadCenter(WaveformTransform[Tensor, Tensor]):
 		return waveform
 
 
-class PadRandom(WaveformTransform[Tensor, Tensor]):
+class PadRandom(WaveformTransform):
 	def __init__(self, target_length: int, fill_value: float = 0.0, p: float = 1.0):
 		super().__init__(p)
 		self.target_length = target_length
