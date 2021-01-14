@@ -49,23 +49,26 @@ def random_rect(
 	assert 0.0 <= width_range[0] <= width_range[1] <= 1.0
 	assert 0.0 <= height_range[0] <= height_range[1] <= 1.0
 
-	width_min = max(int(width_range[0] * width_img), 1)
-	width_max = max(int(width_range[1] * width_img), 2)
-	height_min = max(int(height_range[0] * height_img), 1)
-	height_max = max(int(height_range[1] * height_img), 2)
+	min_width = max(int(width_range[0] * width_img), 1)
+	max_width = max(int(width_range[1] * width_img), 2)
+	min_height = max(int(height_range[0] * height_img), 1)
+	max_height = max(int(height_range[1] * height_img), 2)
 
-	if width_min != width_max:
-		width = torch.randint(low=width_min, high=width_max, size=()).item()
+	if min_width != max_width:
+		width = torch.randint(low=min_width, high=max_width, size=()).item()
 	else:
-		width = width_min
+		width = min_width
 
-	if height_min != height_max:
-		height = torch.randint(low=height_min, high=height_max, size=()).item()
+	if min_height != max_height:
+		height = torch.randint(low=min_height, high=max_height, size=()).item()
 	else:
-		height = height_min
+		height = min_height
 
-	left = torch.randint(low=0, high=width_img - width, size=()).item()
-	top = torch.randint(low=0, high=height_img - height, size=()).item()
+	max_left = max(width_img - width, 1)
+	max_top = max(height_img - height, 1)
+
+	left = torch.randint(low=0, high=max_left, size=()).item()
+	top = torch.randint(low=0, high=max_top, size=()).item()
 	right = left + width
 	down = top + height
 
