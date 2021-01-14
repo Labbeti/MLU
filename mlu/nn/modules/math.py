@@ -92,3 +92,12 @@ class Permute(Module):
 	def forward(self, x: Tensor) -> Tensor:
 		out = x.permute(*self.dims)
 		return out
+
+
+class To(Module):
+	def __init__(self, *args):
+		super().__init__()
+		self.args = list(args)
+
+	def forward(self, x: Tensor) -> Tensor:
+		return x.to(*self.args)
