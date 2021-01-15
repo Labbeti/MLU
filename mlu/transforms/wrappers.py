@@ -1,6 +1,6 @@
 
 from mlu.transforms.base import ImageTransform, Transform
-from transforms.converters import ToPIL, ToTensor
+from mlu.transforms.converters import ToPIL, ToTensor
 
 from PIL import Image
 

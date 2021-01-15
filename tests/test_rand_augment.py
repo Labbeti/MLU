@@ -5,7 +5,7 @@ import torch
 from matplotlib import pyplot as plt
 from mlu.transforms.image import RandAugment
 from mlu.transforms.image.rand_augment import RAND_AUGMENT_DEFAULT_POOL
-from transforms.converters import ToTensor
+from mlu.transforms.converters import ToTensor
 from torchvision.datasets import CIFAR10
 from unittest import main, TestCase
 
