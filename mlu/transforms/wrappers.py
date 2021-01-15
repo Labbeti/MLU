@@ -8,7 +8,7 @@ from torch import Tensor
 from typing import Any, Callable, Optional
 
 
-class ProcessTransformWrapper(Transform):
+class ProcessTransformWrap(Transform):
 	def __init__(
 		self,
 		transform: Optional[Transform],
@@ -42,6 +42,9 @@ class ProcessTransformWrapper(Transform):
 	def is_waveform_transform(self) -> bool:
 		return self.transform.is_waveform_transform()
 
+	def unwrap(self) -> Optional[Transform]:
+		return self.transform
+
 	def _update_callables(self):
 		self._callables = []
 
@@ -53,7 +56,7 @@ class ProcessTransformWrapper(Transform):
 			self._callables.append(self.post_convert)
 
 
-class PILInternalWrapper(ProcessTransformWrapper):
+class PILInternalWrap(ProcessTransformWrap):
 	def __init__(self, pil_transform: ImageTransform, mode: Optional[str] = "RGB", p: float = 1.0):
 		"""
 			Class that convert tensor to PIL image internally for apply PIL transforms.
@@ -74,7 +77,7 @@ class PILInternalWrapper(ProcessTransformWrapper):
 		return super().apply(x)
 
 
-class TensorInternalWrapper(ProcessTransformWrapper):
+class TensorInternalWrap(ProcessTransformWrap):
 	def __init__(self, pil_transform: ImageTransform, p: float = 1.0):
 		"""
 			Class that convert PIL image to tensor internally for apply tensor transforms.
@@ -95,7 +98,7 @@ class TensorInternalWrapper(ProcessTransformWrapper):
 		return self.post_convert(self.transform(self.pre_convert(x)))
 
 
-class TransformWrapper(Transform):
+class TransformWrap(Transform):
 	def __init__(
 		self,
 		callable_: Callable,
@@ -130,3 +133,6 @@ class TransformWrapper(Transform):
 
 	def is_spectrogram_transform(self) -> bool:
 		return self.spectrogram_transform
+
+	def unwrap(self) -> Callable:
+		return self.callable_
