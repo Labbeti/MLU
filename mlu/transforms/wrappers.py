@@ -142,3 +142,24 @@ class TransformWrap(Transform):
 			return self.callable_.__class__.__name__
 		else:
 			return ""
+
+
+class Duplicate(Transform):
+	def __init__(self, transform: Transform, n: int, p: float = 1.0):
+		super().__init__(p=p)
+		self.transform = transform
+		self.n = n
+
+	def apply(self, x: Any) -> Any:
+		for _ in range(self.n):
+			x = self.transform(x)
+		return x
+
+	def is_image_transform(self) -> bool:
+		return self.transform.is_image_transform()
+
+	def is_spectrogram_transform(self) -> bool:
+		return self.transform.is_spectrogram_transform()
+
+	def is_waveform_transform(self) -> bool:
+		return self.transform.is_waveform_transform()
