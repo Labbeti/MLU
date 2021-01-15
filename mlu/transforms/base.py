@@ -26,10 +26,20 @@ class Transform(Module, Callable, ABC, Generic[T_Input, T_Output]):
 		else:
 			return x
 
-	def set_probability(self, p: float):
+	def set_p(self, p: float):
+		"""
+			Set the internal probability to apply the transform.
+
+			:param p: The new probability to apply the transform in range [0, 1].
+		"""
 		self.p = p
 
-	def get_probability(self) -> float:
+	def get_p(self) -> float:
+		"""
+			Get the probability to apply the transform.
+
+			:return: The current probability to apply the transform in range [0, 1].
+		"""
 		return self.p
 
 	def is_image_transform(self) -> bool:

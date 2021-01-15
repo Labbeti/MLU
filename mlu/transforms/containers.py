@@ -2,7 +2,7 @@
 import random
 
 from mlu.transforms.base import Transform
-
+from torch.nn import Module
 from typing import Any, Callable, Optional, Sequence
 
 
@@ -16,6 +16,10 @@ class Compose(Transform):
 		"""
 		super().__init__(p=p)
 		self.transforms = list(transforms)
+
+		for i, transform in enumerate(self.transforms):
+			if isinstance(transform, Module):
+				self.add_module(str(i), transform)
 
 	def apply(self, x: Any) -> Any:
 		for transform in self.transforms:
@@ -57,6 +61,10 @@ class RandomChoice(Transform):
 		self.transforms = list(transforms)
 		self.nb_choices = nb_choices
 		self.weights = weights
+
+		for i, transform in enumerate(self.transforms):
+			if isinstance(transform, Module):
+				self.add_module(str(i), transform)
 
 	def apply(self, x: Any) -> Any:
 		transforms = random.choices(self.transforms, weights=self.weights, k=self.nb_choices)
