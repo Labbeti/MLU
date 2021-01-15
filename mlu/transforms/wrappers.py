@@ -136,3 +136,9 @@ class TransformWrap(Transform):
 
 	def unwrap(self) -> Callable:
 		return self.callable_
+
+	def extra_repr(self) -> str:
+		if hasattr(self.callable_, "__class__"):
+			return self.callable_.__class__.__name__
+		else:
+			return ""

@@ -13,6 +13,8 @@ class ToNumpy(Module):
 	def __init__(self, dtype: Optional[object] = None):
 		"""
 			Convert a python list, pytorch tensor or PIL image to numpy array.
+
+			:param dtype: The optional dtype of the numpy array.
 		"""
 		super().__init__()
 		self.dtype = dtype
@@ -22,7 +24,7 @@ class ToNumpy(Module):
 
 
 class ToTensor(Module):
-	def __init__(self, dtype: Optional[torch.dtype] = None, device: torch.device = torch.device("cpu")):
+	def __init__(self, dtype: Optional[torch.dtype] = None, device: Optional[torch.device] = None):
 		"""
 			Convert a python list, numpy array or PIL image to pytorch tensor.
 		"""
@@ -62,6 +64,10 @@ def to_numpy(
 	x: Union[list, np.ndarray, Tensor, Image.Image],
 	dtype: Optional[object] = None
 ) -> np.ndarray:
+	"""
+		:param x: The list, numpy array, pytorch tensor or pillow image to convert.
+		:param dtype: The optional dtype of the numpy array.
+	"""
 
 	if isinstance(x, list) or isinstance(x, Image.Image):
 		return np.asarray(x, dtype=dtype)
@@ -76,7 +82,7 @@ def to_numpy(
 def to_tensor(
 	x: Union[list, np.ndarray, Tensor, Image.Image],
 	dtype: Optional[torch.dtype] = None,
-	device: torch.device = torch.device("cpu")
+	device: Optional[torch.device] = torch.device("cpu")
 ) -> Tensor:
 
 	if isinstance(x, list):
