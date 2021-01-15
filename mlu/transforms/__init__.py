@@ -1,5 +1,6 @@
 
 from .base import Transform, ImageTransform, SpectrogramTransform, WaveformTransform
-from .conversion.conversion import *
-from .utils import Identity, Compose, RandomChoice
+from .containers import Compose, RandomChoice
+from .converters import *
+from .utils import Identity
 from .wrappers import PILInternalWrap, TensorInternalWrap, TransformWrap

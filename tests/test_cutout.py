@@ -1,7 +1,7 @@
 
 import torch
 
-from mlu.transforms.conversion.conversion import ToPIL
+from transforms.converters import ToPIL
 from mlu.transforms.image.pil import CutOutImgPIL
 from mlu.transforms.image.tensor import CutOutImg as CutOutImgTen
 from unittest import TestCase, main
