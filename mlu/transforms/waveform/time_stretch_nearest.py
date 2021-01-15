@@ -13,7 +13,7 @@ class TimeStretchNearest(WaveformTransform):
 
 	def apply(self, data: Tensor) -> Tensor:
 		length = data.shape[-1]
-		indexes_orig = torch.arange(start=0, end=length, step=self.orig_freq / self.new_freq)
-		indexes_orig = indexes_orig.round().long().clamp(max=length - 1)
-		slices = [slice(None)] * (len(data.shape) - 1) + [indexes_orig]
+		indexes = torch.arange(start=0, end=length, step=self.orig_freq / self.new_freq)
+		indexes = indexes.round().long().clamp(max=length - 1)
+		slices = [slice(None)] * (len(data.shape) - 1) + [indexes]
 		return data[slices]
