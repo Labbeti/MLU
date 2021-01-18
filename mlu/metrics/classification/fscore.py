@@ -8,7 +8,7 @@ from torch import Tensor
 from typing import Callable
 
 
-class FScore(Metric[Tensor, Tensor, Tensor]):
+class FScore(Metric):
 	def __init__(self, dim: int = 1, reduce_fn: Callable = torch.mean):
 		"""
 			FScore metric.

@@ -35,7 +35,7 @@ class TestCutOut(TestCase):
 		self.assertNotEqual(img_pil, img_pil_res)
 
 	def test_cut_out_spec(self):
-		transform = CutOutSpec(width_scale_range=1.0, height_scale_range=0.1, fill_value=0.0)
+		transform = CutOutSpec(width_scales=1.0, height_scales=0.1, fill_value=0.0)
 
 		t = torch.rand(3, 32, 16)
 		o = transform(t)
