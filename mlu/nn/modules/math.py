@@ -101,3 +101,11 @@ class To(Module):
 
 	def forward(self, x: Tensor) -> Tensor:
 		return x.to(*self.args)
+
+
+class Item(Module):
+	def __init__(self):
+		super().__init__()
+
+	def forward(self, x: Tensor) -> float:
+		return x.item()

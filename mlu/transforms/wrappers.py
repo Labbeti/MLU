@@ -163,3 +163,6 @@ class Duplicate(Transform):
 
 	def is_waveform_transform(self) -> bool:
 		return self.transform.is_waveform_transform()
+
+	def unwrap(self) -> Transform:
+		return self.transform

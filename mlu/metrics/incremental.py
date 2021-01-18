@@ -48,6 +48,8 @@ class IncrementalStd(IncrementalMetric):
 	def __init__(self, unbiased: bool = False):
 		"""
 			Compute the continue unbiased Standard Deviation (std).
+
+			:param unbiased: If True, apply the bessel correction to continue std (like in the default std of pytorch).
 		"""
 		super().__init__()
 		self._unbiased = unbiased
@@ -94,6 +96,9 @@ class IncrementalStd(IncrementalMetric):
 
 class MinTracker(IncrementalMetric):
 	def __init__(self):
+		"""
+			Keep the minimum of the values stored.
+		"""
 		super().__init__()
 		self._min = None
 		self._index_min = -1
@@ -131,6 +136,9 @@ class MinTracker(IncrementalMetric):
 
 class MaxTracker(IncrementalMetric):
 	def __init__(self):
+		"""
+			Keep the maximum of the values stored.
+		"""
 		super().__init__()
 		self._max = None
 		self._index_max = -1

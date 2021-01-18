@@ -1,5 +1,5 @@
 
-from mlu.metrics.base import Metric, IncrementalMetric, T_Input, T_Target, T_Output
+from mlu.metrics.base import Metric, IncrementalMetric, Input, Target, Output
 from mlu.metrics.incremental import IncrementalMean
 from typing import Callable, List, Optional
 
@@ -32,7 +32,7 @@ class MetricWrapper(Metric):
 		else:
 			self.sub_call = lambda input_, target: callable_()
 
-	def compute_score(self, input_: T_Input, target: T_Target) -> T_Output:
+	def compute_score(self, input_: Input, target: Target) -> Output:
 		score = self.sub_call(input_, target)
 		if self.reduce_fn is not None:
 			score = self.reduce_fn(score)
@@ -43,37 +43,37 @@ class IncrementalWrapper(Metric):
 	def __init__(
 		self,
 		metric: Metric,
-		continue_metric: IncrementalMetric = IncrementalMean()
+		incremental_metric: IncrementalMetric = IncrementalMean()
 	):
 		"""
 			Compute an incremental score (mean or std) of a metric.
 
 			:param metric: The metric used to compute each score.
-			:param continue_metric: The incremental (continue) way to compute the mean or std.
+			:param incremental_metric: The incremental (continue) way to compute the mean or std.
 		"""
 		super().__init__()
 		self.metric = metric
-		self.continue_metric = continue_metric
+		self.continue_metric = incremental_metric
 
-	def compute_score(self, input_: T_Input, target: T_Target) -> T_Output:
+	def compute_score(self, input_: Input, target: Target) -> Output:
 		score = self.metric(input_, target)
 		self.continue_metric.add(score)
 		return self.continue_metric.get_current()
 
 
 class IncrementalListWrapper(Metric):
-	def __init__(self, metric: Metric, continue_metric_list: Optional[List[IncrementalMetric]] = None):
+	def __init__(self, metric: Metric, incremental_metric_list: Optional[List[IncrementalMetric]] = None):
 		"""
 			Compute a list of incremental scores (mean or std) of a metric.
 
 			:param metric: The metric used to compute each score.
-			:param continue_metric_list: The list of incremental (continue) metrics for compute the mean or std.
+			:param incremental_metric_list: The list of incremental (continue) metrics for compute the mean or std.
 		"""
 		super().__init__()
 		self.metric = metric
-		self.continue_metric_list = continue_metric_list if continue_metric_list is not None else []
+		self.continue_metric_list = incremental_metric_list if incremental_metric_list is not None else []
 
-	def compute_score(self, input_: T_Input, target: T_Target) -> List[T_Output]:
+	def compute_score(self, input_: Input, target: Target) -> List[Output]:
 		score = self.metric(input_, target)
 		for continue_metric in self.continue_metric_list:
 			continue_metric.add(score)

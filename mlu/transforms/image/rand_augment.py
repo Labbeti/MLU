@@ -1,7 +1,8 @@
 
 import random
 
-from mlu.transforms.base import ImageTransform, T_Input, T_Output
+from mlu.transforms.base import ImageTransform, Input, Output
+from mlu.transforms.image.pools import RAND_AUGMENT_DEFAULT_POOL
 from typing import List, Optional, Tuple, Type
 
 
@@ -29,9 +30,8 @@ class RandAugment(ImageTransform):
 		"""
 		assert magnitude is None or 0.0 <= magnitude <= 1.0
 		assert magnitude_policy in ["constant", "random"]
-		assert magnitude is not None or magnitude_policy == "random"
 
-		super().__init__(p)
+		super().__init__(p=p)
 		self._nb_augm_apply = nb_augm_apply
 		self._magnitude = magnitude if magnitude is not None else random.random()
 		self._augm_pool = augm_pool if augm_pool is not None else RAND_AUGMENT_DEFAULT_POOL
@@ -39,7 +39,7 @@ class RandAugment(ImageTransform):
 
 		self._augms = _build_augms(self._augm_pool, self._magnitude)
 
-	def apply(self, x: T_Input) -> T_Output:
+	def apply(self, x: Input) -> Output:
 		if self._magnitude_policy == "random":
 			new_magnitude = random.random()
 			self.set_magnitude(new_magnitude)
@@ -58,6 +58,9 @@ class RandAugment(ImageTransform):
 
 	def get_magnitude_policy(self) -> str:
 		return self._magnitude_policy
+
+	def get_nb_augm_apply(self) -> int:
+		return self._nb_augm_apply
 
 
 def _build_augms(

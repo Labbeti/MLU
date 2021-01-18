@@ -75,6 +75,28 @@ def random_rect(
 	return left, right, top, down
 
 
+def random_cuboid(shapes: List[int], ratios: List[Tuple[float, float]]) -> List[Tuple[int, int]]:
+	assert all((0.0 <= min_ <= max_ <= 1.0 for min_, max_ in ratios))
+	assert len(shapes) == len(ratios)
+
+	limits = []
+	for length, (min_, max_) in zip(shapes, ratios):
+		min_len = int(min_ * length)
+		max_len = int(max_ * length)
+
+		if min_len != max_len:
+			rand_len = torch.randint(low=min_len, high=max_len, size=()).item()
+		else:
+			rand_len = min_len
+
+		rand_max = max(length - rand_len, 1)
+		rand_left = torch.randint(low=0, high=rand_max, size=()).item()
+		rand_right = rand_left + rand_len
+		limits.append((rand_left, rand_right))
+
+	return limits
+
+
 def get_lrs(optim: Optimizer) -> List[float]:
 	""" Get the learning rates of an optimizer. """
 	return [group["lr"] for group in optim.param_groups]
