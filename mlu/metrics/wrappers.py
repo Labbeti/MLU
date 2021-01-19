@@ -1,6 +1,7 @@
 
 from mlu.metrics.base import Metric, IncrementalMetric, Input, Target, Output
 from mlu.metrics.incremental import IncrementalMean
+from torch.nn import Module
 from typing import Callable, List, Optional
 
 
@@ -31,6 +32,9 @@ class MetricWrapper(Metric):
 			self.sub_call = lambda input_, target: callable_(target)
 		else:
 			self.sub_call = lambda input_, target: callable_()
+
+		if isinstance(callable_, Module):
+			self.add_module("callable", callable_)
 
 	def compute_score(self, input_: Input, target: Target) -> Output:
 		score = self.sub_call(input_, target)
