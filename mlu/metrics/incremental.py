@@ -21,8 +21,8 @@ class IncrementalMean(IncrementalMetric):
 		self._counter = 0
 
 	def add(self, value: Tensor):
-		if isinstance(value, float):
-			value = torch.scalar_tensor(value)
+		if not isinstance(value, Tensor):
+			value = torch.as_tensor(value)
 
 		if self._sum is None:
 			self._sum = value.clone()
@@ -49,7 +49,8 @@ class IncrementalStd(IncrementalMetric):
 		"""
 			Compute the continue unbiased Standard Deviation (std).
 
-			:param unbiased: If True, apply the bessel correction to continue std (like in the default std of pytorch).
+			:param unbiased: If True, apply the bessel correction to std (like in the default std of pytorch).
+				Otherwise return the classic std (like the default std of numpy). (default: False)
 		"""
 		super().__init__()
 		self._unbiased = unbiased
@@ -63,8 +64,8 @@ class IncrementalStd(IncrementalMetric):
 		self._counter = 0
 
 	def add(self, value: Tensor):
-		if isinstance(value, float):
-			value = torch.scalar_tensor(value)
+		if not isinstance(value, Tensor):
+			value = torch.as_tensor(value)
 
 		if self._items_sum is None or self._items_sq_sum is None:
 			self._items_sum = value.clone()
@@ -102,21 +103,21 @@ class MinTracker(IncrementalMetric):
 		super().__init__()
 		self._min = None
 		self._index_min = -1
-		self._index = 0
+		self._counter = 0
 
 	def reset(self):
 		self._min = None
 		self._index_min = -1
-		self._index = 0
+		self._counter = 0
 
 	def add(self, value: Tensor):
-		if isinstance(value, float):
-			value = torch.scalar_tensor(value)
+		if not isinstance(value, Tensor):
+			value = torch.as_tensor(value)
 
 		if self._min is None or self._min > value:
 			self._min = value.clone()
-			self._index_min = self._index
-		self._index += 1
+			self._index_min = self._counter
+		self._counter += 1
 
 	def is_empty(self) -> bool:
 		return self._min is None
@@ -131,7 +132,7 @@ class MinTracker(IncrementalMetric):
 		return self._index_min
 
 	def get_nb_values_added(self) -> int:
-		return self._index
+		return self._counter
 
 
 class MaxTracker(IncrementalMetric):
@@ -142,21 +143,21 @@ class MaxTracker(IncrementalMetric):
 		super().__init__()
 		self._max = None
 		self._index_max = -1
-		self._index = 0
+		self._counter = 0
 
 	def reset(self):
 		self._max = None
 		self._index_max = -1
-		self._index = 0
+		self._counter = 0
 
 	def add(self, value: Tensor):
-		if isinstance(value, float):
-			value = torch.scalar_tensor(value)
+		if not isinstance(value, Tensor):
+			value = torch.as_tensor(value)
 
 		if self._max is None or self._max < value:
 			self._max = value.clone()
-			self._index_max = self._index
-		self._index += 1
+			self._index_max = self._counter
+		self._counter += 1
 
 	def is_empty(self) -> bool:
 		return self._max is None
@@ -171,4 +172,4 @@ class MaxTracker(IncrementalMetric):
 		return self._index_max
 
 	def get_nb_values_added(self) -> int:
-		return self._index
+		return self._counter

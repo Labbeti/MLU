@@ -17,6 +17,7 @@ pip install git+https://github.com/Labbeti/MLU
 - nltk>=3.5,
 - matplotlib>=3.3.2,
 - numpy>=1.19.2
+- rouge-metric>=1.0.1
 
 # Content
 ## Neural Network utils
