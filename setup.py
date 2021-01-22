@@ -11,7 +11,8 @@ install_requires = [
 	"tensorboard",
 	"nltk",
 	"matplotlib",
-	"numpy"
+	"numpy",
+	"rouge-metric"
 ]
 
 
