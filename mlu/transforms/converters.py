@@ -9,6 +9,16 @@ from torch.nn import Module
 from typing import Optional, Union
 
 
+# --- MODULES ---
+
+class ToList(Module):
+	"""
+		Convert a pytorch tensor, numpy array or PIL image to python list.
+	"""
+	def forward(self, x: Union[list, np.ndarray, Tensor, Image.Image]) -> list:
+		return to_list(x)
+
+
 class ToNumpy(Module):
 	def __init__(self, dtype: Optional[object] = None):
 		"""
@@ -36,14 +46,6 @@ class ToTensor(Module):
 		return to_tensor(x, self.dtype, self.device)
 
 
-class ToList(Module):
-	"""
-		Convert a pytorch tensor, numpy array or PIL image to python list.
-	"""
-	def forward(self, x: Union[list, np.ndarray, Tensor, Image.Image]) -> list:
-		return to_list(x)
-
-
 class ToPIL(Module):
 	def __init__(self, mode: Optional[str] = "RGB", permute_tensor: bool = True):
 		"""
@@ -58,6 +60,22 @@ class ToPIL(Module):
 
 	def forward(self, x: Union[list, np.ndarray, Tensor, Image.Image]) -> Image.Image:
 		return to_pil(x, self.mode, self.permute_tensor)
+
+
+# --- FUNCTIONS ---
+
+def to_list(
+	x: Union[list, np.ndarray, Tensor, Image.Image]
+) -> list:
+
+	if isinstance(x, list):
+		return x
+	elif isinstance(x, np.ndarray) or isinstance(x, Tensor):
+		return x.tolist()
+	elif isinstance(x, Image.Image):
+		return np.asarray(x).tolist()
+	else:
+		return list(x)
 
 
 def to_numpy(
@@ -95,20 +113,6 @@ def to_tensor(
 		return to_tensor(to_numpy(x), dtype=dtype, device=device)
 	else:
 		return torch.as_tensor(x, dtype=dtype, device=device)
-
-
-def to_list(
-	x: Union[list, np.ndarray, Tensor, Image.Image]
-) -> list:
-
-	if isinstance(x, list):
-		return x
-	elif isinstance(x, np.ndarray) or isinstance(x, Tensor):
-		return x.tolist()
-	elif isinstance(x, Image.Image):
-		return np.asarray(x).tolist()
-	else:
-		return list(x)
 
 
 def to_pil(

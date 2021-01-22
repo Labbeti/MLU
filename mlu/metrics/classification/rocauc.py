@@ -32,7 +32,7 @@ class RocAuc(Metric):
 		assert 1 <= len(input_.shape) <= 2
 
 		if len(input_.shape) == 1:
-			score = roc_auc_score(y_score=input_.numpy(), y_true=target.numpy(), average=self.average)
+			score = roc_auc_score(y_score=input_.cpu().numpy(), y_true=target.cpu().numpy(), average=self.average)
 			score = torch.as_tensor(score)
 		elif len(input_.shape) == 2:
 			scores = [self.compute_score(input_[i], target[i]) for i in range(input_.shape[0])]

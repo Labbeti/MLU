@@ -1,12 +1,13 @@
 
 import random
 
+from abc import ABC
 from mlu.transforms.base import Transform
 from torch.nn import Module
 from typing import Any, Callable, List, Optional, Sequence
 
 
-class Container(Transform):
+class Container(Transform, ABC):
 	def __init__(self, *transforms: Callable, p: float = 1.0):
 		super().__init__(p=p)
 		self._transforms = list(transforms)
@@ -14,9 +15,6 @@ class Container(Transform):
 		for i, transform in enumerate(self._transforms):
 			if isinstance(transform, Module):
 				self.add_module(str(i), transform)
-
-	def apply(self, x: Any) -> Any:
-		raise NotImplementedError("Abstract method")
 
 	def __getitem__(self, index: int) -> Callable:
 		return self._transforms[index]

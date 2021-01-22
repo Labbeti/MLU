@@ -36,7 +36,7 @@ class DPrime(Metric):
 		assert 1 <= len(input_.shape) <= 2
 
 		if len(input_.shape) == 1:
-			score = roc_auc_score(y_score=input_.numpy(), y_true=target.numpy(), average=self.average)
+			score = roc_auc_score(y_score=input_.cpu().numpy(), y_true=target.cpu().numpy(), average=self.average)
 			score = (2 ** 0.5) * norm.ppf(score)
 			score = torch.as_tensor(score)
 		elif len(input_.shape) == 2:

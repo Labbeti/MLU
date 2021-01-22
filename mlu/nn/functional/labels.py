@@ -19,7 +19,7 @@ def nums_to_onehot(nums: Union[np.ndarray, Tensor], nb_classes: int) -> Union[np
 	if isinstance(nums, Tensor):
 		onehot_vectors = one_hot(nums, nb_classes)
 	elif isinstance(nums, np.ndarray):
-		onehot_vectors = nums_to_onehot(torch.from_numpy(nums), nb_classes).numpy()
+		onehot_vectors = nums_to_onehot(torch.from_numpy(nums), nb_classes).cpu().numpy()
 	else:
 		onehot_vectors = nums_to_onehot(torch.as_tensor(nums), nb_classes)
 	return onehot_vectors
