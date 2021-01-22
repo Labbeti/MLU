@@ -4,7 +4,7 @@ from torch import Tensor
 from mlu.metrics.translation.bleu import Metric
 
 
-class WordErrorRate(Metric[Tensor, Tensor, Tensor]):
+class WordErrorRate(Metric):
 	"""
 		Word Error Rate metric. The score is good if close to 0.0.
 		TODO : test

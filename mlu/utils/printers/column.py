@@ -7,7 +7,7 @@ from typing import Dict, List
 class ColumnPrinter(PrinterABC):
 	KEY_MAX_LENGTH = 10
 
-	def __init__(self, print_exec_time: bool = True):
+	def __init__(self, print_exec_time: bool = True, double_new_line_at_end: bool = False):
 		"""
 			Class for print current values of a training or validation by columns.
 
@@ -15,7 +15,7 @@ class ColumnPrinter(PrinterABC):
 
 			> printer = ColumnPrinter()
 
-			> printer.print_current_values({"train/accuracy": 0.89, "train/loss": 1.525}, 33, 100, 2)
+			> printer.print_current_values({"train/accuracy": 0.89, "train/loss": 1.525}, 33, 100, 2, "train")
 
 			\-      train       -  accuracy  -    loss    -  took (s)  -
 
@@ -24,6 +24,7 @@ class ColumnPrinter(PrinterABC):
 			:param print_exec_time: Print time elapsed with the beginning of the loop (iteration == 0).
 		"""
 		self.print_exec_time = print_exec_time
+		self.double_new_line_at_end = double_new_line_at_end
 
 		self._epoch_start_date = time()
 		self._keys = []
@@ -63,7 +64,9 @@ class ColumnPrinter(PrinterABC):
 		print("- {:s} -".format(" - ".join(content)), end="\r")
 
 		if iteration == nb_iterations - 1:
-			print("")
+			print()
+			if self.double_new_line_at_end:
+				print()
 
 	def _print_header(self, name: str, keys: List[str]):
 		def filter_name(key_name: str) -> str:

@@ -1,6 +1,7 @@
 
 import numpy as np
 import random
+import subprocess
 import torch
 
 from datetime import datetime
@@ -48,25 +49,52 @@ def random_rect(
 	assert 0.0 <= width_range[0] <= width_range[1] <= 1.0
 	assert 0.0 <= height_range[0] <= height_range[1] <= 1.0
 
-	width_min, width_max = max(int(width_range[0] * width_img), 1), max(int(width_range[1] * width_img), 2)
-	height_min, height_max = max(int(height_range[0] * height_img), 1), max(int(height_range[1] * height_img), 2)
+	min_width = max(int(width_range[0] * width_img), 1)
+	max_width = max(int(width_range[1] * width_img), 2)
+	min_height = max(int(height_range[0] * height_img), 1)
+	max_height = max(int(height_range[1] * height_img), 2)
 
-	if width_min != width_max:
-		width = torch.randint(low=width_min, high=width_max, size=[1]).item()
+	if min_width != max_width:
+		width = torch.randint(low=min_width, high=max_width, size=()).item()
 	else:
-		width = width_min
+		width = min_width
 
-	if height_min != height_max:
-		height = torch.randint(low=height_min, high=height_max, size=[1]).item()
+	if min_height != max_height:
+		height = torch.randint(low=min_height, high=max_height, size=()).item()
 	else:
-		height = height_min
+		height = min_height
 
-	left = torch.randint(low=0, high=width_img - width, size=[1]).item()
-	top = torch.randint(low=0, high=height_img - height, size=[1]).item()
+	max_left = max(width_img - width, 1)
+	max_top = max(height_img - height, 1)
+
+	left = torch.randint(low=0, high=max_left, size=()).item()
+	top = torch.randint(low=0, high=max_top, size=()).item()
 	right = left + width
 	down = top + height
 
 	return left, right, top, down
+
+
+def random_cuboid(shapes: List[int], ratios: List[Tuple[float, float]]) -> List[Tuple[int, int]]:
+	assert all((0.0 <= min_ <= max_ <= 1.0 for min_, max_ in ratios))
+	assert len(shapes) == len(ratios)
+
+	limits = []
+	for length, (min_, max_) in zip(shapes, ratios):
+		min_len = int(min_ * length)
+		max_len = int(max_ * length)
+
+		if min_len != max_len:
+			rand_len = torch.randint(low=min_len, high=max_len, size=()).item()
+		else:
+			rand_len = min_len
+
+		rand_max = max(length - rand_len, 1)
+		rand_left = torch.randint(low=0, high=rand_max, size=()).item()
+		rand_right = rand_left + rand_len
+		limits.append((rand_left, rand_right))
+
+	return limits
 
 
 def get_lrs(optim: Optimizer) -> List[float]:
@@ -110,3 +138,17 @@ def add_dict_to_writer(dic: Dict[str, Any], writer: SummaryWriter):
 			return str(v)
 	dic = {k: filter_(v) for k, v in dic.items()}
 	writer.add_hparams(hparam_dict=dic, metric_dict={})
+
+
+def get_current_git_hash() -> str:
+	"""
+		Return the current git hash in the current directory.
+
+		:returns: The git hash. If an error occurs, returns \"UNKNOWN\".
+	"""
+	try:
+		git_hash = subprocess.check_output(["git", "describe", "--always"])
+		git_hash = git_hash.decode("UTF-8").replace("\n", "")
+		return git_hash
+	except subprocess.CalledProcessError:
+		return "UNKNOWN"

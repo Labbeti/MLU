@@ -8,7 +8,7 @@ from torch.distributions import Uniform
 from typing import Tuple, Union
 
 
-class StretchPadCrop(WaveformTransform[Tensor, Tensor]):
+class StretchPadCrop(WaveformTransform):
 	def __init__(
 		self,
 		rate: Union[Tuple[float, float], float] = (0.9, 1.1),

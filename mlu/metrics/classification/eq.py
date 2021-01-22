@@ -5,6 +5,11 @@ from torch import Tensor
 
 class EqMetric(Metric):
 	def __init__(self, dim: int):
+		"""
+			Equal metric along a dimension.
+
+			:param dim: The dimension to compute the score.
+		"""
 		super().__init__()
 		self.dim = dim
 

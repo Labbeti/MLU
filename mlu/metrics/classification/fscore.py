@@ -8,8 +8,14 @@ from torch import Tensor
 from typing import Callable
 
 
-class FScore(Metric[Tensor, Tensor, Tensor]):
+class FScore(Metric):
 	def __init__(self, dim: int = 1, reduce_fn: Callable = torch.mean):
+		"""
+			FScore metric.
+
+			:param dim: The dimension to compute the score.
+			:param reduce_fn: The reduction function to apply.
+		"""
 		super().__init__()
 		self.reduce_fn = reduce_fn
 		self.recall = Recall(dim, lambda x: x)

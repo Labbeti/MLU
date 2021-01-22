@@ -7,13 +7,16 @@ from typing import Callable
 
 
 class Precision(Metric):
-	"""
-		Compute Precision score between binary vectors.
-		Recall = TP / (TP + FP) where TP = True Positives, FP = False Positives
-
-		Vectors must be 1D-tensors of shape (nb classes)
-	"""
 	def __init__(self, dim: int = 1, reduce_fn: Callable = torch.mean):
+		"""
+			Compute Precision score between binary vectors.
+
+			Recall = TP / (TP + FP) where TP = True Positives, FP = False Positives.
+			Vectors must be 1D-tensors of shape (nb classes).
+
+			:param dim: The dimension to compute the score.
+			:param reduce_fn: The reduction function to apply.
+		"""
 		super().__init__()
 		self.dim = dim
 		self.reduce_fn = reduce_fn

@@ -5,20 +5,7 @@ Set of classes, functions and tools for machine learning in Pytorch.
 ## Installation
 - Clone the repository :
 ```bash
-git clone https://github.com/Labbeti/MLU
-```
-- Create a conda environment with the YAML file (passwords can be required during installation) :
-```bash
-cd MLU
-conda env create -f environment.yml
-```
-- Activate the new environment :
-```bash
-conda activate env_mlu
-```
-- Setup the main repository :
-```bash
-pip install -e .
+pip install git+https://github.com/Labbeti/MLU
 ```
 
 # Content
@@ -33,7 +20,8 @@ pip install -e .
 - Squeeze,
 - UnSqueeze,
 - OneHot,
-- Mish
+- Mish,
+- EMA (Exponential Moving Average of modules),
 
 ## Schedulers
 - CosineLRScheduler,
@@ -74,25 +62,41 @@ pip install -e .
 
 ### Spectrogram transforms
 - CutOutSpec
+- RollSpec,
 
 ### Waveform transforms
 - Crop,
 - Occlusion,
 - Pad,
-- PadCrop,
 - TimeStretchNearest,
 - StretchPadCrop
 
+### Other transforms
+- ToTensor, ToNumpy, ToList, ToPIL,
+- Compose, RandomChoice
+
 ## Metrics
-- BLEU,
+### Classification
+- Average Precision (AP),
+- BinaryAccuracy,  
 - CategoricalAccuracy,
+- D-prime,
 - FScore,
+- Precision,
+- Recall,
+- RocAuc (AUC),
+
+### Translation
+- BLEU,
 - LCS,
 - METEOR,
 - NIST,
-- Precision,
-- Recall,
+- Rouge-L  
 - WER
 
+## Utilities
+- ColumnPrinter, LinePrinter,
+- ZipCycle
+
 ## TODO
-- ROUGE, SPICE and SPIDEr metrics
+- Other ROUGEs, SPICE and SPIDEr metrics

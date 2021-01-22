@@ -4,22 +4,22 @@ from torch import Tensor
 from torch.nn import Module
 from typing import Callable, Generic, Iterable, List, Optional, TypeVar
 
-T_Input = TypeVar("T_Input")
-T_Target = TypeVar("T_Target")
-T_Output = TypeVar("T_Output")
+Input = TypeVar("Input")
+Target = TypeVar("Target")
+Output = TypeVar("Output")
 
 
-class Metric(Module, Callable, ABC, Generic[T_Input, T_Target, T_Output]):
+class Metric(Module, Callable, ABC, Generic[Input, Target, Output]):
 	"""
 		Base class for metric modules.
 
 		Abstract methods:
-			- compute_score(self, input_: T_Input, target: T_Target) -> T_Output:
+			- compute_score(self, input_: Input, target: Target) -> Output:
 	"""
-	def forward(self, input_: T_Input, target: T_Target) -> T_Output:
+	def forward(self, input_: Input, target: Target) -> Output:
 		return self.compute_score(input_, target)
 
-	def compute_score(self, input_: T_Input, target: T_Target) -> T_Output:
+	def compute_score(self, input_: Input, target: Target) -> Output:
 		raise NotImplementedError("Abstract method")
 
 
@@ -61,7 +61,7 @@ class IncrementalMetric(Module, Callable, ABC):
 		"""
 		raise NotImplementedError("Abstract method")
 
-	def add_list(self, values: Iterable[Tensor]):
+	def add_values(self, values: Iterable[Tensor]):
 		"""
 			Add a list of scores to the current incremental value.
 
@@ -73,6 +73,7 @@ class IncrementalMetric(Module, Callable, ABC):
 	def forward(self, value: Tensor) -> Optional[Tensor]:
 		"""
 			:param value: Add a value to the metric and returns the current incremental value.
+			:return: The current incremental metric value.
 		"""
 		self.add(value)
 		return self.get_current()

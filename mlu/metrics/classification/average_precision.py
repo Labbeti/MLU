@@ -8,11 +8,13 @@ from typing import Callable
 
 
 class AveragePrecision(Metric):
-	"""
-		Compute mean Average Precision (mAP) score.
-		Backend: scikit-learn.
-	"""
 	def __init__(self, reduce_fn: Callable = torch.mean):
+		"""
+			Compute mean Average Precision (mAP) score.
+			Backend: scikit-learn.
+
+			:param reduce_fn: The reduction function to apply.
+		"""
 		super().__init__()
 		self.reduce_fn = reduce_fn
 
@@ -28,11 +30,12 @@ class AveragePrecision(Metric):
 		assert 1 <= len(input_.shape) <= 2
 
 		if len(input_.shape) == 1:
-			score = average_precision_score(y_score=input_.numpy(), y_true=target.numpy())
+			score = average_precision_score(y_score=input_.cpu().numpy(), y_true=target.cpu().numpy())
 			score = torch.as_tensor(score)
 		elif len(input_.shape) == 2:
 			scores = [self.compute_score(input_[i], target[i]) for i in range(input_.shape[0])]
-			score = self.reduce_fn(torch.as_tensor(scores))
+			scores = torch.as_tensor(scores)
+			score = self.reduce_fn(scores)
 		else:
 			raise RuntimeError(f"Invalid tensor dimension {input_.shape} for MAP score. Only 1D or 2D-tensors are supported.")
 

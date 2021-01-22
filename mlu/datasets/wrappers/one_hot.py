@@ -1,7 +1,7 @@
 
 from mlu.datasets.wrappers.transform import TransformDataset
 from mlu.nn.modules.math import OneHot
-from torch.utils.data import Dataset
+from torch.utils.data.dataset import Dataset
 from typing import Optional
 
 

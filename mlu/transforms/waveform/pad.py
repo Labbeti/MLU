@@ -6,7 +6,7 @@ from mlu.transforms.base import WaveformTransform
 from torch import Tensor
 
 
-class PadLeft(WaveformTransform[Tensor, Tensor]):
+class PadAlignLeft(WaveformTransform):
 	def __init__(self, target_length: int, fill_value: float = 0.0, p: float = 1.0):
 		super().__init__(p)
 		self.target_length = target_length
@@ -17,7 +17,7 @@ class PadLeft(WaveformTransform[Tensor, Tensor]):
 		return waveform
 
 
-class PadRight(WaveformTransform[Tensor, Tensor]):
+class PadAlignRight(WaveformTransform):
 	def __init__(self, target_length: int, fill_value: float = 0.0, p: float = 1.0):
 		super().__init__(p)
 		self.target_length = target_length
@@ -28,7 +28,7 @@ class PadRight(WaveformTransform[Tensor, Tensor]):
 		return waveform
 
 
-class PadCenter(WaveformTransform[Tensor, Tensor]):
+class PadAlignCenter(WaveformTransform):
 	def __init__(self, target_length: int, fill_value: float = 0.0, p: float = 1.0):
 		super().__init__(p)
 		self.target_length = target_length
@@ -39,7 +39,7 @@ class PadCenter(WaveformTransform[Tensor, Tensor]):
 		return waveform
 
 
-class PadRandom(WaveformTransform[Tensor, Tensor]):
+class PadAlignRandom(WaveformTransform):
 	def __init__(self, target_length: int, fill_value: float = 0.0, p: float = 1.0):
 		super().__init__(p)
 		self.target_length = target_length
@@ -47,6 +47,18 @@ class PadRandom(WaveformTransform[Tensor, Tensor]):
 
 	def apply(self, waveform: Tensor) -> Tensor:
 		waveform = pad_align_random(waveform, self.target_length, self.fill_value)
+		return waveform
+
+
+class Pad(WaveformTransform):
+	def __init__(self, target_length: int, fill_value: float = 0.0, align: str = "left", p: float = 1.0):
+		super().__init__(p)
+		self.target_length = target_length
+		self.fill_value = fill_value
+		self.align = align
+
+	def apply(self, waveform: Tensor) -> Tensor:
+		waveform = pad(waveform, self.target_length, self.fill_value, self.align)
 		return waveform
 
 
@@ -112,3 +124,16 @@ def pad_align_random(waveform: Tensor, target_length: int, fill_value: float) ->
 			torch.full(shape_zeros_right, fill_value, dtype=waveform.dtype, device=waveform.device),
 		), dim=-1)
 	return waveform
+
+
+def pad(waveform: Tensor, target_length: int, fill_value: float, align: str) -> Tensor:
+	if align == "left":
+		return pad_align_left(waveform, target_length, fill_value)
+	elif align == "right":
+		return pad_align_right(waveform, target_length, fill_value)
+	elif align == "center":
+		return pad_align_center(waveform, target_length, fill_value)
+	elif align == "random":
+		return pad_align_random(waveform, target_length, fill_value)
+	else:
+		raise ValueError(f"Unknown alignment \"{align}\". Must be one of {str(['left', 'right', 'center', 'random'])}.")

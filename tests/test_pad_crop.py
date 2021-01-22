@@ -1,15 +1,15 @@
 
 import torch
 
-from mlu.transforms.waveform.crop import CropLeft, CropRight, CropCenter
-from mlu.transforms.waveform.pad import PadLeft, PadRight, PadCenter, PadRandom
+from mlu.transforms.waveform.crop import CropAlignLeft, CropAlignRight, CropAlignCenter
+from mlu.transforms.waveform.pad import PadAlignLeft, PadAlignRight, PadAlignCenter, PadAlignRandom
 from unittest import TestCase, main
 
 
 class TestPad(TestCase):
 	def test_1(self):
 		target = 10
-		pad = PadCenter(target)
+		pad = PadAlignCenter(target)
 
 		x = torch.ones(7)
 		out = pad(x)
@@ -18,7 +18,7 @@ class TestPad(TestCase):
 
 	def test_2(self):
 		target = 100
-		pad = PadRandom(target)
+		pad = PadAlignRandom(target)
 
 		x = torch.ones(1, 2, 80)
 		out = pad(x)
@@ -27,7 +27,7 @@ class TestPad(TestCase):
 
 	def test_3(self):
 		target = 200
-		pad = PadLeft(target)
+		pad = PadAlignLeft(target)
 
 		x = torch.ones(16, 5, 60)
 		out = pad(x)
@@ -36,7 +36,7 @@ class TestPad(TestCase):
 
 	def test_4(self):
 		target = 7
-		pad = PadRight(target)
+		pad = PadAlignRight(target)
 
 		x = torch.ones(2, 1, 4)
 		out = pad(x)
@@ -47,7 +47,7 @@ class TestPad(TestCase):
 class TestCut(TestCase):
 	def test_1(self):
 		target = 100
-		cut = CropLeft(target)
+		cut = CropAlignLeft(target)
 
 		x = torch.zeros(120)
 		out = cut(x)
@@ -56,7 +56,7 @@ class TestCut(TestCase):
 
 	def test_2(self):
 		target = 100
-		cut = CropRight(target)
+		cut = CropAlignRight(target)
 
 		x = torch.zeros(1, 1, 120)
 		out = cut(x)
@@ -65,7 +65,7 @@ class TestCut(TestCase):
 
 	def test_3(self):
 		target = 100
-		cut = CropCenter(target)
+		cut = CropAlignCenter(target)
 
 		x = torch.zeros(4, 2, 130)
 		out = cut(x)
