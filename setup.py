@@ -17,13 +17,14 @@ install_requires = [
 
 setup(
 	name="mlu",
-	version="0.2.3",
+	version="0.3.0",
 	packages=find_packages(),
 	url="https://github.com/Labbeti/MLU",
 	license="MIT",
 	author="Etienne Labbe 'Labbeti'",
 	author_email="etienne.labbe31@gmail.com",
 	description="Set of personal classes, functions and tools for machine learning.",
+	python_requires=">=3.8.5",
 	install_requires=install_requires,
 	include_package_data=True,
 )
