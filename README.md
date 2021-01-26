@@ -9,13 +9,13 @@ pip install git+https://github.com/Labbeti/MLU
 ```
 
 ## Requirements
-- python>=3.8.5,
-- torch==1.7.0,
-- torchaudio==0.7.0, 
-- torchvision==0.8.1,
-- tensorboard>=2.4.0,
-- nltk>=3.5,
-- matplotlib>=3.3.2,
+- python>=3.8.5
+- torch==1.7.0
+- torchaudio==0.7.0
+- torchvision==0.8.1
+- tensorboard>=2.4.0
+- nltk>=3.5
+- matplotlib>=3.3.2
 - numpy>=1.19.2
 - rouge-metric>=1.0.1
 
