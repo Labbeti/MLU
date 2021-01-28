@@ -1,10 +1,12 @@
 
+import numpy as np
+
 from mlu.nn.functional.labels import nums_to_smooth_onehot
 from mlu.nn.functional.math import mish
 
 from torch import Tensor
 from torch.nn import Module
-from typing import Optional
+from typing import Any, Optional, Union
 
 
 DEFAULT_EPSILON = 2e-20
@@ -22,7 +24,7 @@ class OneHot(Module):
 		self.nb_classes = nb_classes
 		self.smooth = smooth if smooth is not None else 0.0
 
-	def forward(self, x: Tensor) -> Tensor:
+	def forward(self, x: Union[np.ndarray, Tensor]) -> Union[np.ndarray, Tensor]:
 		return nums_to_smooth_onehot(x, self.nb_classes, self.smooth)
 
 
@@ -44,9 +46,6 @@ class Mish(Module):
 	"""
 		Mish class for apply mish function.
 	"""
-	def __init__(self):
-		super().__init__()
-
 	def forward(self, x: Tensor) -> Tensor:
 		return mish(x)
 
@@ -85,7 +84,7 @@ class Mean(Module):
 
 
 class Permute(Module):
-	def __init__(self, *dims):
+	def __init__(self, *dims: int):
 		super().__init__()
 		self.dims = list(dims)
 
@@ -95,7 +94,7 @@ class Permute(Module):
 
 
 class To(Module):
-	def __init__(self, *args):
+	def __init__(self, *args: Any):
 		super().__init__()
 		self.args = list(args)
 
@@ -104,8 +103,5 @@ class To(Module):
 
 
 class Item(Module):
-	def __init__(self):
-		super().__init__()
-
 	def forward(self, x: Tensor) -> float:
 		return x.item()

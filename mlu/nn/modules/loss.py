@@ -32,6 +32,9 @@ class CrossEntropyWithVectors(Module):
 		loss = -torch.sum(input_ * targets, dim=dim)
 		return self.reduce_fn(loss)
 
+	def extra_repr(self) -> str:
+		return f"reduce_fn={self.reduce_fn.__name__}, dim={self.dim}, log_input={self.log_input}"
+
 
 class Entropy(Module):
 	def __init__(
@@ -70,6 +73,9 @@ class Entropy(Module):
 		else:
 			entropy = - torch.sum(torch.exp(input_) * input_, dim=dim)
 		return self.reduce_fn(entropy)
+
+	def extra_repr(self) -> str:
+		return f"reduce_fn={self.reduce_fn.__name__}, dim={self.dim}, epsilon={self.epsilon}, log_input={self.log_input}"
 
 
 class JSDivLoss(Module):
@@ -127,3 +133,6 @@ class KLDivLossWithProbabilities(KLDivLoss):
 		if not self.log_target:
 			q = torch.log(q + self.epsilon)
 		return super().forward(input=p, target=q)
+
+	def extra_repr(self) -> str:
+		return f"epsilon={self.epsilon}, log_input={self.log_input}, log_target={self.log_target}"

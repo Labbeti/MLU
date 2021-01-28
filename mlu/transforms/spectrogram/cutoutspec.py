@@ -15,9 +15,9 @@ class CutOutSpec(SpectrogramTransform):
 		p: float = 1.0,
 	):
 		"""
-			CutOut transforms for spectrograms.
+			CutOut transforms for spectrogram.
 
-			Input must be of shape (..., height, width).
+			Input must be of shape (..., freq, time).
 
 			:param width_scales: The range of ratios of the rectangle cut width.
 			:param height_scales: The range of ratios of the rectangle cut height.
