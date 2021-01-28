@@ -34,7 +34,7 @@ class StretchNearestFreq(WaveformTransform):
 		indexes = indexes.floor().long().clamp(max=length - 1)
 		slices = [slice(None)] * len(data.shape)
 		slices[self.dim] = indexes
-		return data[slices]
+		return data[slices].clone()
 
 
 class StretchNearestRate(WaveformTransform):
@@ -47,9 +47,9 @@ class StretchNearestRate(WaveformTransform):
 		"""
 			StretchNearestRate transform.
 
-			:param rates: The rate of the stretch. Ex: use 2.0 for multiply the signal length by 2.
-			:param dim: The dimension to modify.
-			:param p: The probability to apply the transform.
+			:param rates: The rate of the stretch. Ex: use 2.0 for multiply the signal length by 2. (default: (0.5, 1.5))
+			:param dim: The dimension to modify. (default: -1)
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
 		self.dim = dim
@@ -64,4 +64,8 @@ class StretchNearestRate(WaveformTransform):
 		indexes = indexes.floor().long().clamp(max=length - 1)
 		slices = [slice(None)] * len(data.shape)
 		slices[self.dim] = indexes
-		return data[slices]
+		return data[slices].clone()
+
+	def set_rates(self, rates: Union[float, Tuple[float, float]]):
+		self._rates = rates if isinstance(rates, tuple) else (rates, rates)
+		self._uniform = Uniform(low=self._rates[0], high=self._rates[1])

@@ -26,7 +26,7 @@ class RandAugment(ImageTransform):
 			:param augm_pool: The list of augmentations with their optional range.
 			:param magnitude_policy: The policy to apply for control magnitude of augmentations.
 				Available policies are "constant" and "random".
-			:param p: The probability to apply the augmentation.
+			:param p: The probability to apply the transform.
 		"""
 		assert magnitude is None or 0.0 <= magnitude <= 1.0
 		assert magnitude_policy in ["constant", "random"]

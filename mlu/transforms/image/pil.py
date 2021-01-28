@@ -17,7 +17,7 @@ class _Enhance(ImageTransform):
 
 			:param method: The enhance method to use.
 			:param levels: A constant level or a range of levels. Values should be in [-1, 1]
-			:param p: The probability to apply the augmentation.
+			:param p: The probability to apply the transform.
 		"""
 		super().__init__(p=p)
 		self.method = method
