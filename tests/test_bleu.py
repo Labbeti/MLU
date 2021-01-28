@@ -1,5 +1,5 @@
 
-from mlu.metrics.translation.bleu import BLEU
+from mlu.metrics.text.bleu import BLEU
 from mlu.utils.sentence import add_to_vocabulary, build_conversions_tables, sentence_to_tensor
 from unittest import TestCase, main
 

@@ -1,5 +1,5 @@
 
-from mlu.metrics.translation.meteor import METEOR, get_nb_chunks
+from metrics.text.meteor.meteor import METEOR, get_nb_chunks
 from mlu.utils.sentence import add_to_vocabulary, list_sentence_to_list_tensor, build_conversions_tables
 from unittest import TestCase, main
 

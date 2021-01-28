@@ -41,10 +41,11 @@ class Standardize(ImageTransform):
 			raise RuntimeError("Means and stds lists must have the same size.")
 
 	def apply(self, x: Tensor) -> Tensor:
-		output = torch.zeros_like(x)
+		output = torch.empty_like(x)
 
 		for channel, (mean, std) in enumerate(zip(self.means, self.stds)):
-			slices = [slice(None) if j != self.dim_channel else channel for j in range(len(x.shape))]
+			slices: list = [slice(None)] * len(x.shape)
+			slices[self.dim_channel] = channel
 			output[slices] = (x[slices] - mean) / std
 		return output
 
