@@ -1,3 +1,11 @@
+"""
+
+The code is based on the following codes :
+	- https://github.com/Mjkim88/Pytorch-Torchtext-Seq2Seq/blob/master/bleu.py
+	- https://github.com/neural-dialogue-metrics/BLEU/blob/master/bleu/metrics.py
+	- https://github.com/tylin/coco-caption/blob/master/pycocoevalcap/bleu/bleu_scorer.py
+	- https://github.com/amjha/BLEUCalculation/blob/master/calculatebleu3.py
+"""
 
 import torch
 
@@ -21,12 +29,6 @@ class BLEU(Metric):
 	def compute_score(self, candidate_corpus: List[Tensor], references_corpus: List[List[Tensor]]) -> Tensor:
 		"""
 			Compute the BLEU score metric.
-
-			The code is based on the following codes :
-				- https://github.com/Mjkim88/Pytorch-Torchtext-Seq2Seq/blob/master/bleu.py
-				- https://github.com/neural-dialogue-metrics/BLEU/blob/master/bleu/metrics.py
-				- https://github.com/tylin/coco-caption/blob/master/pycocoevalcap/bleu/bleu_scorer.py
-				- https://github.com/amjha/BLEUCalculation/blob/master/calculatebleu3.py
 
 			:param candidate_corpus: (N, candidate_corpus)
 			:param references_corpus: (N, nb references, reference size)
