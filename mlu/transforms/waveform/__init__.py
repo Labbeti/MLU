@@ -3,5 +3,5 @@ from .crop import CropAlignLeft, CropAlignRight, CropAlignCenter, CropAlignRando
 from .occlusion import Occlusion
 from .pad import PadAlignLeft, PadAlignRight, PadAlignCenter, PadAlignRandom
 from .pad_crop import PadCrop
-from .time_stretch_nearest import TimeStretchNearest
+from .stretch import StretchNearestFreq, StretchNearestRate
 from .stretch_pad_crop import StretchPadCrop

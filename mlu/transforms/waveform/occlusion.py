@@ -23,18 +23,17 @@ class Occlusion(WaveformTransform):
 			:param p: The probability to apply the transform.
 		"""
 		super().__init__(p)
-		self.scales = scales
+		self.scales = scales if isinstance(scales, tuple) else (scales, scales)
 		self.fill_value = fill_value
 		self.dim = dim
 
 	def apply(self, waveform: Tensor) -> Tensor:
 		length = waveform.shape[self.dim]
-		if isinstance(self.scales, float):
-			occlusion_size = round(self.scales * length)
-		else:
-			min_scale, max_scale = self.scales
-			occlusion_min, occlusion_max = round(min_scale * length), round(max_scale * length)
-			occlusion_size = torch.randint(low=occlusion_min, high=occlusion_max, size=()).item()
+		min_scale, max_scale = self.scales
+
+		occlusion_min, occlusion_max = round(min_scale * length), round(max_scale * length)
+		occlusion_max = max(occlusion_max, occlusion_min + 1)
+		occlusion_size = torch.randint(low=occlusion_min, high=occlusion_max, size=()).item()
 
 		start_max = max(length - occlusion_size, 1)
 		start = torch.randint(low=0, high=start_max, size=()).item()
