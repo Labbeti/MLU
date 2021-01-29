@@ -96,7 +96,7 @@ class IncrementalStd(IncrementalMetric):
 
 
 class MinTracker(IncrementalMetric):
-	def __init__(self):
+	def __init__(self, *args):
 		"""
 			Keep the minimum of the values stored.
 		"""
@@ -104,6 +104,8 @@ class MinTracker(IncrementalMetric):
 		self._min = None
 		self._index_min = -1
 		self._counter = 0
+
+		self.add_values(list(args))
 
 	def reset(self):
 		self._min = None
@@ -136,7 +138,7 @@ class MinTracker(IncrementalMetric):
 
 
 class MaxTracker(IncrementalMetric):
-	def __init__(self):
+	def __init__(self, *args):
 		"""
 			Keep the maximum of the values stored.
 		"""
@@ -144,6 +146,8 @@ class MaxTracker(IncrementalMetric):
 		self._max = None
 		self._index_max = -1
 		self._counter = 0
+
+		self.add_values(list(args))
 
 	def reset(self):
 		self._max = None

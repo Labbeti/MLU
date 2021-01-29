@@ -10,7 +10,7 @@ from .classification.rocauc import RocAuc
 
 from .text.bleu import BLEU
 from .text.lcs import LCS
-from metrics.text.meteor.meteor import METEOR
+from .text.meteor.meteor import METEOR
 from .text.nist import NIST
 from .text.rouge import RougeL
 from .text.wer import WordErrorRate
