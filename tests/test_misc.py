@@ -1,5 +1,4 @@
 
-import torch
 from mlu.utils.misc import random_rect, random_cuboid
 from unittest import TestCase, main
 
