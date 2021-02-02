@@ -1,16 +1,16 @@
 
 import math
 
-from typing import Optional, Union, Callable
+from typing import Callable, Optional, Union
 
 
 def str_to_bool() -> Callable[[str], bool]:
 	"""
 		Convert a string to bool. Case insensitive.
 
-			x in ["true", "1", "yes", "y"] => True
-			x in ["false", "0", "no", "n"] => False
-			_ => RuntimeError
+		- x in ["true", "1", "yes", "y"] => True,
+		- x in ["false", "0", "no", "n"] => False,
+		- _ => RuntimeError
 
 		:returns: The function for convert a value to the corresponding boolean value.
 	"""
@@ -29,10 +29,10 @@ def str_to_optional_bool() -> Callable[[str], Optional[bool]]:
 	"""
 		Convert a string to optional bool value. Case insensitive.
 
-			x in ["none"] => None
-			x in ["true", "1", "yes", "y"] => True
-			x in ["false", "0", "no", "n"] => False
-			_ => RuntimeError
+		- x in ["none"] => None
+		- x in ["true", "1", "yes", "y"] => True
+		- x in ["false", "0", "no", "n"] => False
+		- _ => RuntimeError
 
 		:returns: The function for convert a value to the corresponding boolean or None value.
 	"""
@@ -142,7 +142,7 @@ def positive_float() -> Callable[[str], float]:
 
 def strict_positive_float() -> Callable[[str], float]:
 	"""
-		Convert string to float value and check the range [0, inf[.
+		Convert string to float value and check the range ]0, inf[.
 
 		:returns: The function for checking the float range.
 	"""

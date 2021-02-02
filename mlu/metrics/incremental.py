@@ -8,13 +8,15 @@ from typing import Optional
 
 
 class IncrementalMean(IncrementalMetric):
-	def __init__(self):
+	def __init__(self, *args: Tensor):
 		"""
 			Compute the continue average of a values.
 		"""
 		super().__init__()
 		self._sum = None
 		self._counter = 0
+
+		self.add_values(list(args))
 
 	def reset(self):
 		self._sum = None
@@ -45,7 +47,7 @@ class IncrementalMean(IncrementalMetric):
 
 
 class IncrementalStd(IncrementalMetric):
-	def __init__(self, unbiased: bool = False):
+	def __init__(self, *args: Tensor, unbiased: bool = False):
 		"""
 			Compute the continue unbiased Standard Deviation (std).
 
@@ -57,6 +59,8 @@ class IncrementalStd(IncrementalMetric):
 		self._items_sum = None
 		self._items_sq_sum = None
 		self._counter = 0
+
+		self.add_values(list(args))
 
 	def reset(self):
 		self._items_sum = None
@@ -96,7 +100,7 @@ class IncrementalStd(IncrementalMetric):
 
 
 class MinTracker(IncrementalMetric):
-	def __init__(self, *args):
+	def __init__(self, *args: Tensor):
 		"""
 			Keep the minimum of the values stored.
 		"""
@@ -138,7 +142,7 @@ class MinTracker(IncrementalMetric):
 
 
 class MaxTracker(IncrementalMetric):
-	def __init__(self, *args):
+	def __init__(self, *args: Tensor):
 		"""
 			Keep the maximum of the values stored.
 		"""

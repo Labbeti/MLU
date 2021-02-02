@@ -49,6 +49,11 @@ class TestIncremental(TestCase):
 		tracker.add_values(values)
 		self.assertAlmostEqual(tracker.get_max().item(), values.max(), places=self.PLACES)
 
+	def test_tracker_min_rand(self):
+		values = torch.rand(100)
+		tracker = MinTracker(*values)
+		self.assertAlmostEqual(tracker.get_min().item(), values.min(), places=self.PLACES)
+
 
 if __name__ == "__main__":
 	main()

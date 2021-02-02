@@ -9,7 +9,7 @@ from torch import Tensor
 from torch.nn import Module
 from torch.optim import Optimizer
 from torch.utils.tensorboard import SummaryWriter
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Sequence, Tuple, Union
 
 
 def get_datetime() -> str:
@@ -50,19 +50,13 @@ def random_rect(
 	assert 0.0 <= height_range[0] <= height_range[1] <= 1.0
 
 	min_width = max(int(width_range[0] * width_img), 1)
-	max_width = max(int(width_range[1] * width_img), 2)
 	min_height = max(int(height_range[0] * height_img), 1)
-	max_height = max(int(height_range[1] * height_img), 2)
 
-	if min_width != max_width:
-		width = torch.randint(low=min_width, high=max_width, size=()).item()
-	else:
-		width = min_width
+	max_width = max(int(width_range[1] * width_img), min_width + 1)
+	max_height = max(int(height_range[1] * height_img), min_height + 1)
 
-	if min_height != max_height:
-		height = torch.randint(low=min_height, high=max_height, size=()).item()
-	else:
-		height = min_height
+	width = torch.randint(low=min_width, high=max_width, size=()).item()
+	height = torch.randint(low=min_height, high=max_height, size=()).item()
 
 	max_left = max(width_img - width, 1)
 	max_top = max(height_img - height, 1)
@@ -75,22 +69,18 @@ def random_rect(
 	return left, right, top, down
 
 
-def random_cuboid(shapes: List[int], ratios: List[Tuple[float, float]]) -> List[Tuple[int, int]]:
+def random_cuboid(shapes: Sequence[int], ratios: Sequence[Tuple[float, float]]) -> List[Tuple[int, int]]:
 	assert all((0.0 <= min_ <= max_ <= 1.0 for min_, max_ in ratios))
 	assert len(shapes) == len(ratios)
 
 	limits = []
 	for length, (min_, max_) in zip(shapes, ratios):
 		min_len = int(min_ * length)
-		max_len = int(max_ * length)
+		max_len = max(int(max_ * length), min_len + 1)
+		rand_len = torch.randint(low=min_len, high=max_len, size=()).item()
 
-		if min_len != max_len:
-			rand_len = torch.randint(low=min_len, high=max_len, size=()).item()
-		else:
-			rand_len = min_len
-
-		rand_max = max(length - rand_len, 1)
-		rand_left = torch.randint(low=0, high=rand_max, size=()).item()
+		rand_left_max = max(length - rand_len, 1)
+		rand_left = torch.randint(low=0, high=rand_left_max, size=()).item()
 		rand_right = rand_left + rand_len
 		limits.append((rand_left, rand_right))
 
