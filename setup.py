@@ -5,9 +5,9 @@ from setuptools import setup, find_packages
 
 
 install_requires = [
-	"torch==1.7.0",
-	"torchaudio==0.7.0",
-	"torchvision==0.8.1",
+	"torch~=1.7.0",
+	"torchaudio~=0.7.0",
+	"torchvision~=0.8.1",
 	"tensorboard",
 	"nltk",
 	"matplotlib",
