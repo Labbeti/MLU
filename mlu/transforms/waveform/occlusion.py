@@ -17,10 +17,10 @@ class Occlusion(WaveformTransform):
 		"""
 			Occlusion waveform transform.
 
-			:param scales: The scale of the occlusion size.
-			:param fill_value: The fill value for occlusion.
-			:param dim: The dimension to apply the occlusion.
-			:param p: The probability to apply the transform.
+			:param scales: The scale of the occlusion size. (default: 0.1)
+			:param fill_value: The fill value for occlusion. (default: 0.0)
+			:param dim: The dimension to apply the occlusion. (default: -1)
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p)
 		self.scales = scales if isinstance(scales, tuple) else (scales, scales)

@@ -14,7 +14,7 @@ class Transform(Module, Callable, ABC, Generic[Input, Output]):
 		"""
 			Base class for all Transforms.
 
-			:param p: The probability to apply the transform.
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__()
 		assert 0.0 <= p <= 1.0, "Probability must be a float in range [0, 1]."

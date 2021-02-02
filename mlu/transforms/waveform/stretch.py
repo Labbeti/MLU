@@ -18,10 +18,10 @@ class StretchNearestFreq(WaveformTransform):
 		"""
 			StretchNearestFreq transform.
 
-			:param orig_freq: The original freq of the signal.
-			:param new_freq: The new freq of the signal.
-			:param dim: The dimension to modify.
-			:param p: The probability to apply the transform.
+			:param orig_freq: The original freq of the signal. (default: 16000)
+			:param new_freq: The new freq of the signal. (default: 16000)
+			:param dim: The dimension to modify. (default: -1)
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
 		self.orig_freq = orig_freq
@@ -54,8 +54,8 @@ class StretchNearestRate(WaveformTransform):
 		super().__init__(p=p)
 		self.dim = dim
 
-		self._rates = rates if isinstance(rates, tuple) else (rates, rates)
-		self._uniform = Uniform(low=self._rates[0], high=self._rates[1])
+		rates = rates if isinstance(rates, tuple) else (rates, rates)
+		self._uniform = Uniform(low=rates[0], high=rates[1])
 
 	def apply(self, data: Tensor) -> Tensor:
 		length = data.shape[self.dim]
@@ -67,5 +67,5 @@ class StretchNearestRate(WaveformTransform):
 		return data[slices].clone().contiguous()
 
 	def set_rates(self, rates: Union[float, Tuple[float, float]]):
-		self._rates = rates if isinstance(rates, tuple) else (rates, rates)
-		self._uniform = Uniform(low=self._rates[0], high=self._rates[1])
+		rates = rates if isinstance(rates, tuple) else (rates, rates)
+		self._uniform = Uniform(low=rates[0], high=rates[1])

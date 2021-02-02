@@ -16,8 +16,8 @@ class _Enhance(ImageTransform):
 			Enhance a PIL image with a specific method.
 
 			:param method: The enhance method to use.
-			:param levels: A constant level or a range of levels. Values should be in [-1, 1]
-			:param p: The probability to apply the transform.
+			:param levels: A constant level or a range of levels. Values should be in [-1, 1].
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
 		self.method = method
@@ -184,8 +184,8 @@ class Rotate(ImageTransform):
 			Rotate an image using PIL methods.
 
 			:param angles: The float or range values for the angle of rotation.
-				Angles must be in degrees and in range [-180, 180].
-			:param p: The probability to apply the transform.
+				Angles must be in degrees and in range [-180, 180]. (default: 0.0)
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
 		self.angles = angles if isinstance(angles, tuple) else (angles, angles)
@@ -211,8 +211,8 @@ class Sharpness(ImageTransform):
 class ShearX(ImageTransform):
 	def __init__(self, shears: Union[float, Tuple[float, float]] = 0.0, p: float = 1.0):
 		"""
-			:param shears: The float or range values for the shear parameter.
-			:param p: The probability to apply the transform.
+			:param shears: The float or range values for the shear parameter. (default: 0.0)
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
 		self.shears = shears if isinstance(shears, tuple) else (shears, shears)
@@ -225,8 +225,8 @@ class ShearX(ImageTransform):
 class ShearY(ImageTransform):
 	def __init__(self, shears: Union[float, Tuple[float, float]] = 0.0, p: float = 1.0):
 		"""
-			:param shears: The float or range values for the shear parameter.
-			:param p: The probability to apply the transform.
+			:param shears: The float or range values for the shear parameter. (default: 0.0)
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
 		self.shears = shears if isinstance(shears, tuple) else (shears, shears)
@@ -248,8 +248,8 @@ class Solarize(ImageTransform):
 
 			:param thresholds: The int or range values for the threshold parameter.
 				All pixel below this value are inverted.
-				Must be in range [0, 256].
-			:param p: The probability to apply the transform.
+				Must be in range [0, 256]. (default: (0, 256))
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
 		self.thresholds = thresholds if isinstance(thresholds, tuple) else (thresholds, thresholds)

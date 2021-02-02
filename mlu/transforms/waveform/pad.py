@@ -14,6 +14,14 @@ class PadAlignLeft(WaveformTransform):
 		dim: int = -1,
 		p: float = 1.0,
 	):
+		"""
+			Pad with left-alignment by adding zeros to right.
+
+			:param target_length: The target length of the waveform.
+			:param fill_value: The value used to pad the waveform. (default: 0.0)
+			:param dim: The dimension to apply the padding. (default: -1)
+			:param p: The probability to apply the transform. (default: 1.0)
+		"""
 		super().__init__(p)
 		self.target_length = target_length
 		self.fill_value = fill_value
@@ -32,6 +40,14 @@ class PadAlignRight(WaveformTransform):
 		dim: int = -1,
 		p: float = 1.0,
 	):
+		"""
+			Pad with right-alignment by adding zeros to left.
+
+			:param target_length: The target length of the waveform.
+			:param fill_value: The value used to pad the waveform. (default: 0.0)
+			:param dim: The dimension to apply the padding. (default: -1)
+			:param p: The probability to apply the transform. (default: 1.0)
+		"""
 		super().__init__(p)
 		self.target_length = target_length
 		self.fill_value = fill_value
@@ -50,6 +66,14 @@ class PadAlignCenter(WaveformTransform):
 		dim: int = -1,
 		p: float = 1.0,
 	):
+		"""
+			Pad with center-alignment by adding half of zeros to left and the other half to right.
+
+			:param target_length: The target length of the waveform.
+			:param fill_value: The value used to pad the waveform. (default: 0.0)
+			:param dim: The dimension to apply the padding. (default: -1)
+			:param p: The probability to apply the transform. (default: 1.0)
+		"""
 		super().__init__(p)
 		self.target_length = target_length
 		self.fill_value = fill_value
@@ -68,6 +92,14 @@ class PadAlignRandom(WaveformTransform):
 		dim: int = -1,
 		p: float = 1.0,
 	):
+		"""
+			Pad with right-alignment by adding zeros randomly to left and right.
+
+			:param target_length: The target length of the waveform.
+			:param fill_value: The value used to pad the waveform. (default: 0.0)
+			:param dim: The dimension to apply the padding. (default: -1)
+			:param p: The probability to apply the transform. (default: 1.0)
+		"""
 		super().__init__(p)
 		self.target_length = target_length
 		self.fill_value = fill_value
@@ -87,6 +119,17 @@ class Pad(WaveformTransform):
 		align: str = "left",
 		p: float = 1.0,
 	):
+		"""
+			Pad with alignment by adding zeros to left or right.
+
+			:param target_length: The target length of the waveform.
+			:param fill_value: The value used to pad the waveform. (default: 0.0)
+			:param dim: The dimension to apply the padding. (default: -1)
+			:param align: The waveform alignment. Determine if zeros will be added to left or right.
+				(available alignment are : 'left', 'right', 'center' and 'random').
+				(default: 'left')
+			:param p: The probability to apply the transform. (default: 1.0)
+		"""
 		super().__init__(p)
 		self.target_length = target_length
 		self.fill_value = fill_value
@@ -99,7 +142,14 @@ class Pad(WaveformTransform):
 
 
 def pad_align_left(waveform: Tensor, target_length: int, fill_value: float, dim: int) -> Tensor:
-	""" Align to left by adding zeros to right. """
+	"""
+		Pad with left-alignment by adding zeros to right.
+
+		:param waveform: The original waveform.
+		:param target_length: The target length of the waveform.
+		:param fill_value: The value used to pad the waveform.
+		:param dim: The dimension to apply the padding.
+	"""
 	if target_length > waveform.shape[dim]:
 		missing = target_length - waveform.shape[dim]
 
@@ -114,7 +164,14 @@ def pad_align_left(waveform: Tensor, target_length: int, fill_value: float, dim:
 
 
 def pad_align_right(waveform: Tensor, target_length: int, fill_value: float, dim: int) -> Tensor:
-	""" Align to right by adding zeros to left. """
+	"""
+		Pad with right-alignment by adding zeros to left.
+
+		:param waveform: The original waveform.
+		:param target_length: The target length of the waveform.
+		:param fill_value: The value used to pad the waveform.
+		:param dim: The dimension to apply the padding.
+	"""
 	if target_length > waveform.shape[dim]:
 		missing = target_length - waveform.shape[dim]
 
@@ -129,7 +186,14 @@ def pad_align_right(waveform: Tensor, target_length: int, fill_value: float, dim
 
 
 def pad_align_center(waveform: Tensor, target_length: int, fill_value: float, dim: int) -> Tensor:
-	""" Align to center by adding half of zeros to left and the other half to right. """
+	"""
+		Pad with center-alignment by adding half of zeros to left and the other half to right.
+
+		:param waveform: The original waveform.
+		:param target_length: The target length of the waveform.
+		:param fill_value: The value used to pad the waveform.
+		:param dim: The dimension to apply the padding.
+	"""
 	if target_length > waveform.shape[dim]:
 		missing = target_length - waveform.shape[dim]
 
@@ -151,7 +215,14 @@ def pad_align_center(waveform: Tensor, target_length: int, fill_value: float, di
 
 
 def pad_align_random(waveform: Tensor, target_length: int, fill_value: float, dim: int) -> Tensor:
-	""" Randomly add zeros to left and right for having the size of target_length. """
+	"""
+		Pad with right-alignment by adding zeros randomly to left and right.
+
+		:param waveform: The original waveform.
+		:param target_length: The target length of the waveform.
+		:param fill_value: The value used to pad the waveform.
+		:param dim: The dimension to apply the padding.
+	"""
 	if target_length > waveform.shape[dim]:
 		missing = target_length - waveform.shape[dim]
 
@@ -173,6 +244,16 @@ def pad_align_random(waveform: Tensor, target_length: int, fill_value: float, di
 
 
 def pad(waveform: Tensor, target_length: int, fill_value: float, dim: int, align: str) -> Tensor:
+	"""
+		Pad with alignment by adding zeros to left or right.
+
+		:param waveform: The original waveform.
+		:param target_length: The target length of the waveform.
+		:param fill_value: The value used to pad the waveform.
+		:param dim: The dimension to apply the padding.
+		:param align: The waveform alignment. Determine if zeros will be added to left or right.
+			(available alignment are : 'left', 'right', 'center' and 'random').
+	"""
 	if align == "left":
 		return pad_align_left(waveform, target_length, fill_value, dim)
 	elif align == "right":

@@ -19,10 +19,10 @@ class CutOutSpec(SpectrogramTransform):
 
 			Input must be of shape (..., freq, time).
 
-			:param width_scales: The range of ratios of the rectangle cut width.
-			:param height_scales: The range of ratios of the rectangle cut height.
-			:param fill_value: The value used for fill.
-			:param p: The probability to apply the transform.
+			:param width_scales: The range of ratios of the rectangle cut width. (default: (0.1, 0.5))
+			:param height_scales: The range of ratios of the rectangle cut height. (default: (0.1, 0.5))
+			:param fill_value: The value used for fill. (default: -80.0)
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
 		self.width_scale_range = width_scales \
