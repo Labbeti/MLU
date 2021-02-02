@@ -2,7 +2,7 @@
 import random
 
 from mlu.transforms.base import ImageTransform, Input, Output
-from mlu.transforms.image.pools import RAND_AUGMENT_DEFAULT_POOL
+from mlu.transforms.image.ra_pools import RAND_AUGMENT_DEFAULT_POOL
 from typing import List, Optional, Tuple, Type
 
 

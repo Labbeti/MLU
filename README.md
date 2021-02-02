@@ -84,7 +84,7 @@ pip install git+https://github.com/Labbeti/MLU
 
 ### Other transforms
 - ToTensor, ToNumpy, ToList, ToPIL,
-- Compose, RandomChoice
+- Compose, RandomChoice, Identity
 
 ## Metrics
 ### Classification
@@ -95,19 +95,18 @@ pip install git+https://github.com/Labbeti/MLU
 - FScore,
 - Precision,
 - Recall,
-- RocAuc (AUC),
+- RocAuc (AUC)
 
-### Translation
+### Text
 - BLEU,
+- CIDER,
 - LCS,
 - METEOR,
 - NIST,
-- Rouge-L  
+- Rouge-L,
+- SPICE,
+- SPIDER,
 - WER
-
-## Utilities
-- ColumnPrinter, LinePrinter,
-- ZipCycle
 
 ## TODO
 - Other ROUGEs, SPICE and SPIDEr metrics

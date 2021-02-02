@@ -13,7 +13,7 @@ class RocAuc(Metric):
 			Compute mean Area Under the Receiver Operating Characteristic Curve (ROC AUC) score.
 			Backend: scikit-learn
 
-			:param average: The type of ROC AUC score to compute. (default: \"macro\")
+			:param average: The type of ROC AUC score to compute. (default: 'macro')
 			:param reduce_fn: The reduction function to apply.
 		"""
 		super().__init__()

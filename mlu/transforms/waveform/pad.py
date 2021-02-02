@@ -182,4 +182,4 @@ def pad(waveform: Tensor, target_length: int, fill_value: float, dim: int, align
 	elif align == "random":
 		return pad_align_random(waveform, target_length, fill_value, dim)
 	else:
-		raise ValueError(f"Unknown alignment \"{align}\". Must be one of {str(['left', 'right', 'center', 'random'])}.")
+		raise ValueError(f"Unknown alignment '{align}'. Must be one of {str(['left', 'right', 'center', 'random'])}.")

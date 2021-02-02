@@ -115,4 +115,4 @@ def crop(waveform: Tensor, target_length: int, dim: int, align: str) -> Tensor:
 	elif align == "random":
 		return crop_align_random(waveform, target_length, dim)
 	else:
-		raise ValueError(f"Unknown alignment \"{align}\". Must be one of {str(['left', 'right', 'center', 'random'])}.")
+		raise ValueError(f"Unknown alignment '{align}'. Must be one of {str(['left', 'right', 'center', 'random'])}.")

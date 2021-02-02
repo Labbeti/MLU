@@ -21,7 +21,7 @@ def str_to_bool() -> Callable[[str], bool]:
 		elif x_low in ["false", "0", "no", "n"]:
 			return False
 		else:
-			raise RuntimeError("Invalid boolean argument \"{:s}\".".format(x))
+			raise RuntimeError("Invalid boolean argument '{:s}'.".format(x))
 	return str_to_bool_impl
 
 
@@ -126,7 +126,7 @@ def float_in_range(
 		if min_ < x < max_ or (include_min and x == min_) or (include_max and x == max_):
 			return x
 		else:
-			raise ValueError("Value \"{:s}\" is not a float in range {:s}{:f},{:f}{:s}".format(
+			raise ValueError("Value '{:s}' is not a float in range {:s}{:f},{:f}{:s}".format(
 				str(x), "[" if include_min else "]", min_, max_, "]" if include_max else "["))
 	return float_in_range_impl
 

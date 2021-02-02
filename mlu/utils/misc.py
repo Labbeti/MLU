@@ -134,7 +134,7 @@ def get_current_git_hash() -> str:
 	"""
 		Return the current git hash in the current directory.
 
-		:returns: The git hash. If an error occurs, returns \"UNKNOWN\".
+		:returns: The git hash. If an error occurs, returns 'UNKNOWN'.
 	"""
 	try:
 		git_hash = subprocess.check_output(["git", "describe", "--always"])

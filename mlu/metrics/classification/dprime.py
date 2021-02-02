@@ -17,7 +17,7 @@ class DPrime(Metric):
 
 			Backend: sklearn and scipy.
 
-			:param average: The type of D' score to compute. (default: \"macro\")
+			:param average: The type of D' score to compute. (default: 'macro')
 			:param reduce_fn: The reduction function to apply.
 		"""
 		super().__init__()
