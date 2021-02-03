@@ -13,6 +13,14 @@ class BinaryAccuracy(Metric):
 		threshold_target: Optional[float] = None,
 		reduce_fn: Callable = torch.mean
 	):
+		"""
+			Binary Accuracy metric.
+			Compute the accuracy between two multihot vectors.
+
+			:param threshold_input: The optional threshold to apply to inputs.
+			:param threshold_target: The optional threshold to apply to targets.
+			:param reduce_fn: The reduction function to apply to score.
+		"""
 		super().__init__()
 		self.threshold_input = threshold_input
 		self.threshold_target = threshold_target

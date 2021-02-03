@@ -4,7 +4,7 @@ import torch
 from mlu.metrics.base import IncrementalMetric
 
 from torch import Tensor
-from typing import Optional
+from typing import Callable, List, Optional
 
 
 class IncrementalMean(IncrementalMetric):
@@ -178,6 +178,102 @@ class MaxTracker(IncrementalMetric):
 
 	def get_index(self) -> int:
 		return self._index_max
+
+	def get_nb_values_added(self) -> int:
+		return self._counter
+
+
+class BestTracker(IncrementalMetric):
+	def __init__(self, *args: Tensor, is_better: Callable[[Tensor, Tensor], bool]):
+		"""
+			Keep the best of the values stored.
+		"""
+		super().__init__()
+		self._is_better = is_better
+
+		self._best = None
+		self._index_best = -1
+		self._counter = 0
+
+		self.add_values(list(args))
+
+	def reset(self):
+		self._best = None
+		self._index_best = -1
+		self._counter = 0
+
+	def add(self, value: Tensor):
+		if not isinstance(value, Tensor):
+			value = torch.as_tensor(value)
+
+		if self._best is None or self._is_better(value, self._best):
+			self._best = value.clone()
+			self._index_best = self._counter
+		self._counter += 1
+
+	def is_empty(self) -> bool:
+		return self._best is None
+
+	def get_current(self) -> Optional[Tensor]:
+		return self._best
+
+	def get_index(self) -> int:
+		return self._index_best
+
+	def get_nb_values_added(self) -> int:
+		return self._counter
+
+
+class NBestsTracker(IncrementalMetric):
+	def __init__(self, *args: Tensor, is_better: Callable[[Tensor, Tensor], bool], n: int = 1):
+		super().__init__()
+		self._is_better = is_better
+		self._n = n
+
+		self._max_list = []
+		self._index_max_list = []
+		self._counter = 0
+
+		self.add_values(list(args))
+
+	def reset(self):
+		self._max_list = []
+		self._index_max_list = []
+		self._counter = 0
+
+	def add(self, value: Tensor):
+		if not isinstance(value, Tensor):
+			value = torch.as_tensor(value)
+
+		insert_index = len(self._max_list)
+		for i, max_value in enumerate(self._max_list):
+			if self._is_better(value, max_value):
+				insert_index = i
+				break
+
+		self._max_list.insert(insert_index, value)
+		self._index_max_list.insert(insert_index, self._counter)
+
+		while len(self._max_list) > self._n:
+			self._max_list.pop()
+			self._index_max_list.pop()
+
+		self._counter += 1
+
+	def is_empty(self) -> bool:
+		return len(self._max_list) == 0
+
+	def get_current(self) -> Optional[Tensor]:
+		return self.get_max()
+
+	def get_max(self) -> Optional[Tensor]:
+		if self.is_empty():
+			return None
+		else:
+			return torch.as_tensor(self._max_list)
+
+	def get_index(self) -> List[int]:
+		return self._index_max_list
 
 	def get_nb_values_added(self) -> int:
 		return self._counter

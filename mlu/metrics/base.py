@@ -7,6 +7,7 @@ from typing import Callable, Generic, Iterable, Optional, TypeVar
 Input = TypeVar("Input")
 Target = TypeVar("Target")
 Output = TypeVar("Output")
+T = TypeVar("T")
 
 
 class Metric(Module, Callable, ABC, Generic[Input, Target, Output]):
@@ -39,7 +40,7 @@ class IncrementalMetric(Module, Callable, ABC):
 		"""
 		raise NotImplementedError("Abstract method")
 
-	def add(self, value: Tensor):
+	def add(self, value: T):
 		"""
 			Add a value to the incremental score.
 
@@ -53,7 +54,7 @@ class IncrementalMetric(Module, Callable, ABC):
 		"""
 		raise NotImplementedError("Abstract method")
 
-	def get_current(self) -> Optional[Tensor]:
+	def get_current(self) -> Optional[T]:
 		"""
 			Get the current incremental score.
 
@@ -61,7 +62,7 @@ class IncrementalMetric(Module, Callable, ABC):
 		"""
 		raise NotImplementedError("Abstract method")
 
-	def add_values(self, values: Iterable[Tensor]):
+	def add_values(self, values: Iterable[T]):
 		"""
 			Add a list of scores to the current incremental value.
 
@@ -70,7 +71,7 @@ class IncrementalMetric(Module, Callable, ABC):
 		for value in values:
 			self.add(value)
 
-	def forward(self, value: Tensor) -> Optional[Tensor]:
+	def forward(self, value: T) -> Optional[T]:
 		"""
 			:param value: Add a value to the metric and returns the current incremental value.
 			:return: The current incremental metric value.

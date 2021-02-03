@@ -11,7 +11,7 @@ from typing import Callable
 class FScore(Metric):
 	def __init__(self, dim: int = 1, reduce_fn: Callable = torch.mean):
 		"""
-			FScore metric.
+			FScore metric. (micro).
 
 			:param dim: The dimension to compute the score.
 			:param reduce_fn: The reduction function to apply.
