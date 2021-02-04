@@ -5,11 +5,11 @@ from mlu.metrics.base import Metric
 from scipy.stats import norm
 from sklearn.metrics import roc_auc_score
 from torch import Tensor
-from typing import Callable
+from typing import Callable, Optional
 
 
 class DPrime(Metric):
-	def __init__(self, average: str = "macro", reduce_fn: Callable = torch.mean):
+	def __init__(self, average: Optional[str] = None, reduce_fn: Callable = torch.mean):
 		"""
 			DPrime metric.
 
@@ -33,17 +33,19 @@ class DPrime(Metric):
 			:return: The DPrime score as scalar tensor.
 		"""
 		assert input_.shape == target.shape
-		assert 1 <= len(input_.shape) <= 2
+		assert len(input_.shape) == 2
 
-		if len(input_.shape) == 1:
-			score = roc_auc_score(y_score=input_.cpu().numpy(), y_true=target.cpu().numpy(), average=self.average)
-			score = (2 ** 0.5) * norm.ppf(score)
-			score = torch.as_tensor(score)
-		elif len(input_.shape) == 2:
-			score = [self.compute_score(input_[i], target[i]) for i in range(input_.shape[0])]
-			score = torch.as_tensor(score)
-			score = self.reduce_fn(score)
-		else:
-			raise RuntimeError(f"Invalid tensor dimension {input_.shape} for ROC AUC score. Only 1D or 2D-tensors are supported.")
+		input_ = input_.cpu().numpy()
+		target = target.cpu().numpy()
+
+		roc_auc = roc_auc_score(y_true=target, y_score=input_, average=self.average)
+		score = (2 ** 0.5) * norm.ppf(roc_auc)
+		score = torch.as_tensor(score)
+		score = self.reduce_fn(score)
 
 		return score
+
+
+def d_prime_from_auc(auc: float) -> float:
+	result = norm.ppf(auc) * 2 ** 0.5
+	return result
