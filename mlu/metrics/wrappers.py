@@ -2,7 +2,7 @@
 from mlu.metrics.base import Metric, IncrementalMetric, Input, Target, Output
 from mlu.metrics.incremental import IncrementalMean
 from torch.nn import Module
-from typing import Callable, List, Optional
+from typing import Callable, Dict, List, Optional
 
 
 class MetricWrapper(Metric):
@@ -82,3 +82,11 @@ class IncrementalListWrapper(Metric):
 		for continue_metric in self.continue_metric_list:
 			continue_metric.add(score)
 		return [continue_metric.get_current() for continue_metric in self.continue_metric_list]
+
+
+class MetricDict(Dict[str, Metric], Metric):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+	def compute_score(self, input_: Input, target: Target) -> Dict[str, Output]:
+		return {metric_name: metric(input_, target) for metric_name, metric in self.items()}

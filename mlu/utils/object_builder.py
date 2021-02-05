@@ -103,11 +103,12 @@ class ObjectBuilder:
 		self._classes_or_funcs[id_] = class_or_func
 		self._default_kwargs[id_] = default_kwargs
 
-	def build(self, name: str, *args, **kwargs) -> object:
+	def build(self, name: str, filter_kwargs: bool = True, *args, **kwargs) -> object:
 		"""
 			Build the object with a specific name.
 
 			:param name: The name of the object.
+			:param filter_kwargs: If True, kwargs keys will be filtered with parameters arguments for build the object.
 			:param args: The positional arguments for build the object.
 			:param kwargs: The named arguments for build the object.
 		"""
@@ -115,6 +116,17 @@ class ObjectBuilder:
 		# func.__defaults__ => Tuple[Any, ...]
 		name = self._process(name)
 		class_or_func = self._get_class_or_func(name)
+
+		if filter_kwargs:
+			if inspect.isfunction(class_or_func) and hasattr(class_or_func, "__code__"):
+				parameters_names = class_or_func.__code__.co_varnames
+			elif inspect.isclass(class_or_func) and hasattr(class_or_func, "__init__"):
+				parameters_names = class_or_func.__init__.__code__.co_varnames
+			else:
+				raise RuntimeError(f"Invalid class or func '{class_or_func.__name__}'.")
+
+			kwargs = {k: v for k, v in kwargs.items() if k in parameters_names}
+
 		default_kwargs = dict(self._get_default_kwargs(name))
 		default_kwargs.update(kwargs)
 		return class_or_func(*args, **default_kwargs)

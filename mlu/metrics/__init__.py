@@ -17,4 +17,4 @@ from .text.wer import WordErrorRate
 
 from .base import Metric, IncrementalMetric
 from .incremental import IncrementalMean, IncrementalStd, MinTracker, MaxTracker
-from .wrappers import MetricWrapper, IncrementalWrapper, IncrementalListWrapper
+from .wrappers import MetricWrapper, IncrementalWrapper, IncrementalListWrapper, MetricDict
