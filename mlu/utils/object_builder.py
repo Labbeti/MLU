@@ -1,11 +1,18 @@
 
 import inspect
 
-from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Union, Iterator
+from abc import ABC
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
 
 
 class ObjectBuilder:
 	def __init__(self, case_sensitive: bool = True, verbose: int = 0):
+		"""
+			ObjectBuilder for build objects by name.
+
+			:param case_sensitive: TODO (default: True)
+			:param verbose: TODO (default: 0)
+		"""
 		super().__init__()
 		self._case_sensitive = case_sensitive
 		self._verbose = verbose
@@ -14,12 +21,57 @@ class ObjectBuilder:
 		self._classes_or_funcs = {}
 		self._default_kwargs = {}
 
+	def register(self, obj: Any, predicate_class_or_func: Optional[Callable[[Any], bool]] = None):
+		"""
+			TODO
+
+			:param obj: TODO
+			:param predicate_class_or_func: TODO (default: None)
+		"""
+		if inspect.isclass(obj) or inspect.isfunction(obj):
+			# Register class or function
+			if self._verbose >= 1:
+				print(f"Register class or function '{obj.__name__}'.")
+			self.register_class_or_func(obj, predicate_class_or_func=predicate_class_or_func)
+
+		elif inspect.ismodule(obj):
+			# Get submodules, classes and functions defined in the module "obj"
+			if self._verbose >= 1:
+				print(f"Register module '{obj.__name__}'.")
+			predicate = (
+				lambda member: (
+					((inspect.isclass(member) or inspect.isfunction(member)) and member.__module__ == obj.__name__) or
+					(inspect.ismodule(member) and member.__name__.startswith(obj.__name__))
+				)
+			)
+			members = inspect.getmembers(obj, predicate)
+			members = [member for _name, member in members]
+			self.register(members, predicate_class_or_func)
+
+		elif isinstance(obj, Iterable):
+			# Recursive call on each element of the iterable
+			if self._verbose >= 1:
+				print(f"Register iterable '{type(obj)}'.")
+			for member in obj:
+				self.register(member, predicate_class_or_func)
+
 	def register_class_or_func(
 		self,
 		class_or_func: object,
 		aliases: Optional[Union[str, Iterable[str]]] = None,
 		default_kwargs: Optional[Dict[str, Any]] = None,
+		predicate_class_or_func: Optional[Callable[[Any], bool]] = None,
 	):
+		"""
+			TODO
+
+			:param class_or_func: TODO
+			:param aliases: TODO (default: None)
+			:param default_kwargs: TODO (default: None)
+			:param predicate_class_or_func: TODO (default: None)
+		"""
+		if predicate_class_or_func is not None and not predicate_class_or_func(class_or_func):
+			return
 		assert inspect.isclass(class_or_func) or inspect.isfunction(class_or_func)
 		if default_kwargs is None:
 			default_kwargs = {}
@@ -49,36 +101,14 @@ class ObjectBuilder:
 		self._classes_or_funcs[id_] = class_or_func
 		self._default_kwargs[id_] = default_kwargs
 
-	def register(self, obj: Any, predicate_class_or_func: Optional[Callable[[Any], bool]] = None):
-		if inspect.isclass(obj) or inspect.isfunction(obj):
-			# Register class or function
-			if self._verbose >= 1:
-				print(f"Register class or function '{obj.__name__}'.")
-			if predicate_class_or_func is None or predicate_class_or_func(obj):
-				self.register_class_or_func(obj)
-
-		elif inspect.ismodule(obj):
-			# Get submodules, classes and functions defined in the module "obj"
-			if self._verbose >= 1:
-				print(f"Register module '{obj.__name__}'.")
-			predicate = (
-				lambda member: (
-					((inspect.isclass(member) or inspect.isfunction(member)) and member.__module__ == obj.__name__) or
-					(inspect.ismodule(member) and member.__name__.startswith(obj.__name__))
-				)
-			)
-			members = inspect.getmembers(obj, predicate)
-			members = [member for _name, member in members]
-			self.register(members, predicate_class_or_func)
-
-		elif isinstance(obj, Iterable):
-			# Recursive call on each element of the iterable
-			if self._verbose >= 1:
-				print(f"Register iterable '{type(obj)}'.")
-			for member in obj:
-				self.register(member, predicate_class_or_func)
-
 	def build(self, name: str, *args, **kwargs) -> object:
+		"""
+			Build the object with a specific name.
+
+			:param name: TODO
+			:param args: TODO
+			:param kwargs: TODO
+		"""
 		name = self._process(name)
 		class_or_func = self._get_class_or_func(name)
 		# func.__code__.co_varnames => Tuple[str, ...]
@@ -87,18 +117,37 @@ class ObjectBuilder:
 		default_kwargs.update(kwargs)
 		return class_or_func(*args, **default_kwargs)
 
-	def add_alias(self, name: str, alias: str):
-		name = self._process(name)
-		alias = self._process(alias)
+	def add_alias(self, old_alias: str, new_alias: str):
+		"""
+			Add alias for building an object.
 
-		id_ = self._alias_to_id[name]
-		self._alias_to_id[alias] = id_
+			:param old_alias: The original name of the object. Can be an alias already stored.
+			:param new_alias: The alias to add.
+		"""
+		old_alias = self._process(old_alias)
+		new_alias = self._process(new_alias)
+
+		if old_alias not in self._alias_to_id.keys():
+			raise RuntimeError(f"Unknown object '{old_alias}'.")
+		id_ = self._alias_to_id[old_alias]
+		self._alias_to_id[new_alias] = id_
 
 	def add_aliases(self, name: str, aliases: Iterable[str]):
+		"""
+			Add aliases for building an object.
+
+			:param name: The original name of the object. Can be an alias already stored.
+			:param aliases: The aliases to add.
+		"""
 		for alias in aliases:
 			self.add_alias(name, alias)
 
 	def pop(self, alias: str) -> (Callable, Dict[str, Any], List[str]):
+		"""
+			Remove an object with a name or alias.
+
+			:param alias: The alias of the object to remove.
+		"""
 		alias = self._process(alias)
 		if alias not in self._alias_to_id.keys():
 			raise RuntimeError(f"Unknown object '{alias}'.")
@@ -113,19 +162,31 @@ class ObjectBuilder:
 		return class_or_func, default_kwargs, old_aliases
 
 	def clear(self):
+		"""
+			Clear all objects and aliases registered.
+		"""
 		self._alias_to_id.clear()
 		self._classes_or_funcs.clear()
 		self._default_kwargs.clear()
 
-	def keys(self) -> Iterator:
+	def keys(self) -> Iterator[str]:
+		"""
+			Returns an Iterator on object names.
+		"""
 		for key in self._classes_or_funcs.keys():
 			yield key
 
-	def values(self) -> Iterator:
+	def values(self) -> Iterator[Callable]:
+		"""
+			Returns an Iterator on classes and functions types.
+		"""
 		for value in self._classes_or_funcs.values():
 			yield value
 
-	def items(self) -> Iterator:
+	def items(self) -> Iterator[Tuple[str, Callable]]:
+		"""
+			Returns an Iterator on names and classes and functions types.
+		"""
 		for key, value in self._classes_or_funcs.items():
 			yield key, value
 
@@ -163,22 +224,30 @@ class ObjectBuilder:
 
 
 def get_metric_builder() -> ObjectBuilder:
-	from abc import ABC
+	"""
+		Returns a ObjectBuilder with MLU metrics registered.
+	"""
 	from mlu.metrics import classification, text
 	from mlu.metrics.base import Metric
 
-	builder = ObjectBuilder()
+	modules = [classification, text]
 	predicate = lambda obj: inspect.isclass(obj) and issubclass(obj, Metric) and not isinstance(obj, ABC)
-	builder.register([classification, text], predicate)
+	builder = ObjectBuilder()
+	builder.register(modules, predicate)
+
 	return builder
 
 
 def get_transform_builder() -> ObjectBuilder:
-	from abc import ABC
+	"""
+		Returns a ObjectBuilder with MLU transforms registered.
+	"""
 	from mlu.transforms import image, spectrogram, waveform
 	from mlu.transforms.base import Transform
 
-	builder = ObjectBuilder()
+	modules = [image, spectrogram, waveform]
 	predicate = lambda obj: inspect.isclass(obj) and issubclass(obj, Transform) and not isinstance(obj, ABC)
-	builder.register([image, spectrogram, waveform], predicate)
+	builder = ObjectBuilder()
+	builder.register(modules, predicate)
+
 	return builder
