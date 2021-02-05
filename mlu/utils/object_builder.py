@@ -10,8 +10,8 @@ class ObjectBuilder:
 		"""
 			ObjectBuilder for build objects by name.
 
-			:param case_sensitive: TODO (default: True)
-			:param verbose: TODO (default: 0)
+			:param case_sensitive: If True, the names registered will be in convert to lower case. (default: True)
+			:param verbose: Verbose level of the class. Use 1 for print information and warnings. (default: 0)
 		"""
 		super().__init__()
 		self._case_sensitive = case_sensitive
@@ -23,10 +23,10 @@ class ObjectBuilder:
 
 	def register(self, obj: Any, predicate_class_or_func: Optional[Callable[[Any], bool]] = None):
 		"""
-			TODO
+			Register a class, function, elements of a module or elements of an iterable recursively.
 
-			:param obj: TODO
-			:param predicate_class_or_func: TODO (default: None)
+			:param obj: The object to register.
+			:param predicate_class_or_func: The predicate to use for classes or functions. (default: None)
 		"""
 		if inspect.isclass(obj) or inspect.isfunction(obj):
 			# Register class or function
@@ -63,12 +63,14 @@ class ObjectBuilder:
 		predicate_class_or_func: Optional[Callable[[Any], bool]] = None,
 	):
 		"""
-			TODO
+			Register a class or function.
 
-			:param class_or_func: TODO
-			:param aliases: TODO (default: None)
-			:param default_kwargs: TODO (default: None)
-			:param predicate_class_or_func: TODO (default: None)
+			:param class_or_func: The object to register.
+			:param aliases: The optional aliases for the object. (default: None)
+			:param default_kwargs: The default kwargs for building the object. (default: None)
+			:param predicate_class_or_func: The predicate for the object to register.
+				If predicate returns False, the object is not registered.
+				(default: None)
 		"""
 		if predicate_class_or_func is not None and not predicate_class_or_func(class_or_func):
 			return
@@ -105,14 +107,14 @@ class ObjectBuilder:
 		"""
 			Build the object with a specific name.
 
-			:param name: TODO
-			:param args: TODO
-			:param kwargs: TODO
+			:param name: The name of the object.
+			:param args: The positional arguments for build the object.
+			:param kwargs: The named arguments for build the object.
 		"""
-		name = self._process(name)
-		class_or_func = self._get_class_or_func(name)
 		# func.__code__.co_varnames => Tuple[str, ...]
 		# func.__defaults__ => Tuple[Any, ...]
+		name = self._process(name)
+		class_or_func = self._get_class_or_func(name)
 		default_kwargs = dict(self._get_default_kwargs(name))
 		default_kwargs.update(kwargs)
 		return class_or_func(*args, **default_kwargs)
