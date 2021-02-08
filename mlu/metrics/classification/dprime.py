@@ -18,7 +18,7 @@ class DPrime(Metric):
 			Backend: sklearn and scipy.
 
 			:param average: The type of D' score to compute. (default: 'macro')
-			:param reduce_fn: The reduction function to apply.
+			:param reduce_fn: The reduction function to apply. (default: torch.mean)
 		"""
 		super().__init__()
 		self.average = average

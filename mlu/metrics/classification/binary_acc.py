@@ -31,10 +31,10 @@ class BinaryAccuracy(Metric):
 		assert 0 <= len(input_.shape) <= 2
 
 		if self.threshold_input is not None:
-			input_ = input_.ge(self.threshold_input)
+			input_ = input_.ge(self.threshold_input).float()
 
 		if self.threshold_target is not None:
-			target = target.ge(self.threshold_target)
+			target = target.ge(self.threshold_target).float()
 
 		score = input_.eq(target).float()
 		score = self.reduce_fn(score)

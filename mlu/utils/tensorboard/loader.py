@@ -20,16 +20,19 @@ class TensorboardLoader:
 		verbose: int = 0
 	):
 		"""
-			TODO
+			Build the loader of tensorboard event files.
 
-			:param path:
-			:param recursive:
-			:param skip_float:
-			:param skip_str:
-			:param verbose:
+			:param path: Filepath or dirpath to event files.
+				If path is a directory, all sub-files presents will be read.
+			:param recursive: Allows to check event files in subdirectories if path is a directory.
+			:param skip_float: Skip float values when reading event files.
+			:param skip_str: Skip string values when reading event files.
+			:param verbose: Verbose level.
+				If 0, no print will be done. If 1, some information will be print when reading files.
 		"""
 		super().__init__()
 		self._path = path
+		self._recursive = recursive
 		self._skip_float = skip_float
 		self._skip_str = skip_str
 		self._verbose = verbose
@@ -52,13 +55,9 @@ class TensorboardLoader:
 		self._event_fpaths = event_paths
 
 	def load(self) -> Dict[str, Dict[str, Union[str, List[float]]]]:
-		data = {}
-		for event_fpath in self._event_fpaths:
-			data.update(self._load_fpath(event_fpath))
-		return data
-
-	def _load_fpath(self, event_fpath: str) -> Dict[str, Dict[str, Any]]:
 		"""
+			Load data from event paths.
+
 			Ex:
 
 			>>> {
@@ -70,6 +69,16 @@ class TensorboardLoader:
 			...			}
 			...		}
 			... }
+
+			:return: A dictionary of floats and strings contained in event file, with values of each step.
+		"""
+		data = {}
+		for event_fpath in self._event_fpaths:
+			data.update(self._load_fpath(event_fpath))
+		return data
+
+	def _load_fpath(self, event_fpath: str) -> Dict[str, Dict[str, Any]]:
+		"""
 
 			:return: A dictionary of floats and strings contained in event file.
 		"""
@@ -86,7 +95,7 @@ class TensorboardLoader:
 
 				if tag.startswith("_"):
 					if self._verbose >= 1:
-						print(f"Skip value with tag '{tag}'.")
+						print(f"Skip value with tag '{tag}' which begins by an underscore.")
 					continue
 
 				if dtype == DT_FLOAT:
@@ -106,7 +115,7 @@ class TensorboardLoader:
 
 				else:
 					if self._verbose >= 1:
-						print(f"WARNING: Unknown dtype '{dtype}'. Skip this event value with tag '{tag}' on step '{step}'.")
+						print(f"WARNING: Unknown dtype '{dtype}'. Skip this event value with tag '{tag}' and step '{step}'.")
 					continue
 
 				if tag not in data.keys():

@@ -13,7 +13,7 @@ class AveragePrecision(Metric):
 			Compute mean Average Precision (mAP) score.
 			Backend: scikit-learn.
 
-			:param reduce_fn: The reduction function to apply.
+			:param reduce_fn: The reduction function to apply. (default: torch.mean)
 		"""
 		super().__init__()
 		self.average = average
