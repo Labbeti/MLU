@@ -52,8 +52,10 @@ class Recall(Metric):
 		assert target.eq(0.0).logical_or(target.eq(1.0)).all(), "Target must be binary tensor containing only 0 and 1."
 
 		true_positives = (input_ * target).sum(dim=self.dim)
+		# TODO : maybe simplify TP + FN = Possible positives, sum(target)
 		false_negatives = (target - input_).ge(1.0).sum(dim=self.dim)
 		score = true_positives / (true_positives + false_negatives)
 		score[score.isnan()] = 0.0
 		score = self.reduce_fn(score)
+
 		return score

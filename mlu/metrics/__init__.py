@@ -8,6 +8,8 @@ from .classification.precision import Precision
 from .classification.recall import Recall
 from .classification.rocauc import RocAuc
 
+from .debug.class_ratio import ClassRatio
+
 from .text.bleu import BLEU
 from .text.lcs import LCS
 from .text.meteor.meteor import METEOR
