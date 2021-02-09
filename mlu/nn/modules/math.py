@@ -1,12 +1,13 @@
 
 import numpy as np
+import torch
 
 from mlu.nn.functional.labels import nums_to_smooth_onehot
 from mlu.nn.functional.math import mish
 
 from torch import Tensor
 from torch.nn import Module
-from typing import Any, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 
 DEFAULT_EPSILON = 2e-20
@@ -28,9 +29,32 @@ class OneHot(Module):
 		return nums_to_smooth_onehot(x, self.nb_classes, self.smooth)
 
 
-class Squeeze(Module):
+class Thresholding(Module):
+	def __init__(self, threshold: Optional[float], bin_func: Callable = torch.ge):
+		"""
+			Convert label to multi-hot encoding.
+
+			:param threshold: The threshold used to binarize the input. If None, the forward will have no effect.
+			:param bin_func: The comparison function used to binarize the Tensor. (default: torch.ge)
+		"""
+		super().__init__()
+		self.threshold = threshold
+		self.bin_func = bin_func
+
 	def forward(self, x: Tensor) -> Tensor:
-		return x.squeeze()
+		if self.threshold is not None:
+			return self.bin_func(x, self.threshold).to(x.dtype)
+		else:
+			return x
+
+
+class Squeeze(Module):
+	def __init__(self, dim: Optional[int] = None):
+		super().__init__()
+		self.dim = dim
+
+	def forward(self, x: Tensor) -> Tensor:
+		return x.squeeze(self.dim)
 
 
 class UnSqueeze(Module):
