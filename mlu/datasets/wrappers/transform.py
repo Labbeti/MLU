@@ -1,9 +1,10 @@
 
+from mlu.datasets.wrappers.base import DatasetWrapper
 from torch.utils.data.dataset import Dataset
 from typing import Any, Callable, Optional, Sized
 
 
-class TransformDataset(Dataset):
+class TransformDataset(DatasetWrapper):
 	def __init__(self, dataset: Dataset, transform: Optional[Callable], index: Optional[int] = None):
 		"""
 			Wrap a dataset by applying a post-transform to item get by the method "__getitem__".
@@ -13,8 +14,7 @@ class TransformDataset(Dataset):
 			:param index: The index of the element to apply the transform.
 				If None, apply the transform to the complete item.
 		"""
-		super().__init__()
-		self._dataset = dataset
+		super().__init__(dataset)
 		self._transform = transform
 		self._index = index
 
@@ -32,21 +32,3 @@ class TransformDataset(Dataset):
 
 	def __getitem__(self, idx: Any) -> Any:
 		return self._post_fn(self._dataset[idx])
-
-	def __len__(self) -> int:
-		if not isinstance(self._dataset, Sized):
-			raise RuntimeError("Wrapped dataset is not Sized (i.e. does not have the method '__len__').")
-		return len(self._dataset)
-
-	def unwrap(self, recursive: bool = False) -> Dataset:
-		"""
-			:param recursive: If True and the dataset wrapped is another TransformDataset, unwrap until the wrapped
-				element is not a TransformDataset. (default: False)
-		"""
-		if not recursive:
-			return self._dataset
-		else:
-			dataset = self._dataset
-			while isinstance(dataset, TransformDataset):
-				dataset = dataset.unwrap(recursive=False)
-			return dataset

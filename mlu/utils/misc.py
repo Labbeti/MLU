@@ -97,14 +97,16 @@ def get_lr(optim: Optimizer, idx: int = 0) -> float:
 	return get_lrs(optim)[idx]
 
 
-def get_nb_parameters(model: Module) -> int:
+def get_nb_parameters(model: Module, trainable_param: bool = False) -> int:
 	"""
 		Return the number of parameters in a model.
 
 		:param model: Pytorch Module to check.
+		:param trainable_param: TODO
 		:returns: The number of parameters.
 	"""
-	return sum(p.numel() for p in model.parameters())
+	params = (p for p in model.parameters() if not trainable_param or p.requires_grad)
+	return sum([p.numel() for p in params])
 
 
 def get_nb_trainable_parameters(model: Module) -> int:
