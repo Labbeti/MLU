@@ -2,11 +2,11 @@
 import torch
 from mlu.metrics.base import Metric
 from torch import Tensor
-from typing import Callable
+from typing import Callable, Optional
 
 
 class Recall(Metric):
-	def __init__(self, dim: int = 1, reduce_fn: Callable = torch.mean):
+	def __init__(self, dim: Optional[int] = 1, reduce_fn: Callable = torch.mean):
 		"""
 			Compute Recall score between binary vectors.
 
@@ -17,21 +17,25 @@ class Recall(Metric):
 			:param reduce_fn: The reduction function to apply.
 		"""
 		super().__init__()
-		self.dim = dim
+		self.dim = dim if dim is not None else ()
 		self.reduce_fn = reduce_fn
 
 	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
 		"""
 			Compute score with one-hot or multi-hot inputs and targets.
 
-			:param input_: Shape (nb classes)
-			:param target: Shape (nb classes)
-			:return: Shape (1,)
+			:param input_: Shape (nb classes) or (nb samplers, nb classes) binary tensor.
+			:param target: Shape (nb classes) or (nb samplers, nb classes) binary tensor.
+			:return: Score(s) as tensor in range [0, 1].
 		"""
 		assert input_.shape == target.shape, \
 			f"Mismatch between shapes {str(input_.shape)} and {str(target.shape)} for Recall metric."
+		assert input_.eq(0.0).logical_or(input_.eq(1.0)).all(), "Input must be binary tensor."
+		assert target.eq(0.0).logical_or(target.eq(1.0)).all(), "Target must be binary tensor."
+
 		true_positives = (input_ * target).sum(dim=self.dim)
 		false_negatives = (target - input_).ge(1.0).sum(dim=self.dim)
 		score = true_positives / (true_positives + false_negatives)
+		score[score.isnan()] = 0.0
 		score = self.reduce_fn(score)
 		return score

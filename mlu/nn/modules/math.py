@@ -52,6 +52,11 @@ class Mish(Module):
 
 class Min(Module):
 	def __init__(self, dim: Optional[int] = 1):
+		"""
+			Minimum module.
+
+			:param dim: Optional dimension. (default: 1)
+		"""
 		super().__init__()
 		self.dim = dim
 
@@ -63,6 +68,11 @@ class Min(Module):
 
 class Max(Module):
 	def __init__(self, dim: Optional[int] = 1):
+		"""
+			Maximum module.
+
+			:param dim: Optional dimension. (default: 1)
+		"""
 		super().__init__()
 		self.dim = dim
 
@@ -74,6 +84,11 @@ class Max(Module):
 
 class Mean(Module):
 	def __init__(self, dim: Optional[int] = 1):
+		"""
+			Mean module.
+
+			:param dim: Optional dimension. (default: 1)
+		"""
 		super().__init__()
 		self.dim = dim
 

@@ -1,6 +1,6 @@
 
 from torch.utils.data.dataset import Dataset
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Sized
 
 
 class TransformDataset(Dataset):
@@ -34,9 +34,15 @@ class TransformDataset(Dataset):
 		return self._post_fn(self._dataset[idx])
 
 	def __len__(self) -> int:
+		if not isinstance(self._dataset, Sized):
+			raise RuntimeError("Wrapped dataset is not Sized (i.e. does not have the method '__len__').")
 		return len(self._dataset)
 
 	def unwrap(self, recursive: bool = False) -> Dataset:
+		"""
+			:param recursive: If True and the dataset wrapped is another TransformDataset, unwrap until the wrapped
+				element is not a TransformDataset. (default: False)
+		"""
 		if not recursive:
 			return self._dataset
 		else:
