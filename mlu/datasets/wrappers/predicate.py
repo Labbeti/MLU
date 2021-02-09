@@ -1,7 +1,7 @@
 
 from mlu.datasets.wrappers.base import DatasetWrapper
 from torch.utils.data.dataset import Dataset, Subset
-from typing import Callable
+from typing import Callable, Sized
 
 
 class PredicateSubset(DatasetWrapper):
@@ -12,6 +12,6 @@ class PredicateSubset(DatasetWrapper):
 			:param dataset: The dataset to wrap.
 			:param predicate: The predicate on item to keep.
 		"""
-		indices = [i for i, item in enumerate(dataset) if predicate(item)]
+		indices = [i for i in range(len(dataset)) if predicate(dataset[i])]
 		subset = Subset(dataset, indices)
 		super().__init__(subset)
