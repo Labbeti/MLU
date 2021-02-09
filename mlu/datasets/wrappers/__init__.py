@@ -1,4 +1,5 @@
 
+from .base import DatasetWrapper
 from .no_label import NoLabelDataset
 from .one_hot import OneHotDataset
 from .only_label import OnlyLabelDataset
