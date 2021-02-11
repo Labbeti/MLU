@@ -99,7 +99,7 @@ def nums_to_smooth_multihot(
 	dtype: torch.dtype = torch.float,
 ) -> Tensor:
 	"""
-		Convert a list of numbers (or indexes) of classes to multi-hot version.
+		Convert a list of indexes of classes to multi-hot version.
 
 		:param nums_lst: List of List of indexes of classes.
 		:param nb_classes: The maximum number of classes.
