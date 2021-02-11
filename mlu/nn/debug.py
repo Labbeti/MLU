@@ -14,7 +14,7 @@ class Print(Module):
 
 
 class Assert(Module):
-	def __init__(self, assertion: Callable, msg: str):
+	def __init__(self, assertion: Callable, msg: str = ""):
 		super().__init__()
 		self.assertion = assertion
 		self.msg = msg

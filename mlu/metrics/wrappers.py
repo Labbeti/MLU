@@ -1,4 +1,4 @@
-
+from metrics.base import T
 from mlu.metrics.base import Metric, IncrementalMetric, Input, Target, Output
 from mlu.metrics.incremental import IncrementalMean
 from torch.nn import Module
@@ -126,3 +126,29 @@ class MetricDict(Dict[str, Metric], Metric):
 			complete_name += self.default_suffix
 
 		self[complete_name] = metric
+
+
+class IncrementalList(IncrementalMetric):
+	def __init__(self, incremental_list: List[IncrementalMetric]):
+		super().__init__()
+		self.incremental_list = incremental_list
+
+	def reset(self):
+		for incremental in self.incremental_list:
+			incremental.reset()
+
+	def add(self, value: T):
+		for incremental in self.incremental_list:
+			incremental.add(value)
+
+	def is_empty(self) -> List[bool]:
+		return [
+			incremental.is_empty()
+			for incremental in self.incremental_list
+		]
+
+	def get_current(self) -> List[Optional[T]]:
+		return [
+			incremental.get_current()
+			for incremental in self.incremental_list
+		]

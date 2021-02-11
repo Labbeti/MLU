@@ -30,3 +30,9 @@ class EMA:
 
 	def set_decay(self, decay: float):
 		self.decay = decay
+
+	def get_model(self) -> Module:
+		return self.model
+
+	def get_decay(self) -> float:
+		return self.decay
