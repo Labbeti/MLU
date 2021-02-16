@@ -15,6 +15,7 @@ from typing import Any, Dict, List, Sequence, Tuple, Union
 def get_datetime() -> str:
 	"""
 		Returns the date in a specific format : "YYYY_MM_DD_hh:mm:ss".
+
 		:returns: The current date.
 	"""
 	now = str(datetime.now())
@@ -24,6 +25,7 @@ def get_datetime() -> str:
 def reset_seed(seed: int):
 	"""
 		Reset the seed of following packages : random, numpy, torch, torch.cuda, torch.backends.cudnn.
+
 		:param seed: The seed to set.
 	"""
 	random.seed(seed)
@@ -42,8 +44,10 @@ def random_rect(
 
 		:param width_img: The maximal width.
 		:param height_img: The maximal height.
-		:param width_range: The width ratio range of the rectangle. Ex: (0.1, 0.5) => width is sampled from (0.1 * width, 0.5 * width).
-		:param height_range: The height ratio range of the rectangle. Ex: (0.0, 0.9) => height is sampled from (0.0, 0.9 * height).
+		:param width_range: The width ratio range of the rectangle.
+			Ex: (0.1, 0.5) => width is sampled from (0.1 * width, 0.5 * width).
+		:param height_range: The height ratio range of the rectangle.
+			Ex: (0.0, 0.9) => height is sampled from (0.0, 0.9 * height).
 		:returns: The limits (left, right, top, down) of the rectangle created.
 	"""
 	assert 0.0 <= width_range[0] <= width_range[1] <= 1.0
@@ -70,6 +74,13 @@ def random_rect(
 
 
 def random_cuboid(shapes: Sequence[int], ratios: Sequence[Tuple[float, float]]) -> List[Tuple[int, int]]:
+	"""
+		Random cuboid generated using ratios.
+
+		:param shapes: The shape of the cuboid as sequence of ints. Size: (N,).
+		:param ratios: The list of min and max ratios for each dim for sampling the cuboid shape. Size: (N, 2)
+		:returns: The limits of the cuboid with limits on each dimension. Size: (N, 2)
+	"""
 	assert all((0.0 <= min_ <= max_ <= 1.0 for min_, max_ in ratios))
 	assert len(shapes) == len(ratios)
 
@@ -97,26 +108,16 @@ def get_lr(optim: Optimizer, idx: int = 0) -> float:
 	return get_lrs(optim)[idx]
 
 
-def get_nb_parameters(model: Module, trainable_param: bool = False) -> int:
+def get_nb_parameters(model: Module, trainable_param: bool = True) -> int:
 	"""
 		Return the number of parameters in a model.
 
 		:param model: Pytorch Module to check.
-		:param trainable_param: TODO
+		:param trainable_param: If True, count only parameter that requires gradient. (default: True)
 		:returns: The number of parameters.
 	"""
 	params = (p for p in model.parameters() if not trainable_param or p.requires_grad)
 	return sum([p.numel() for p in params])
-
-
-def get_nb_trainable_parameters(model: Module) -> int:
-	"""
-		Return the number of trainable parameters in a model.
-
-		:param model: Pytorch Module.
-		:returns: The number of trainable parameters.
-	"""
-	return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
 def add_dict_to_writer(dic: Dict[str, Any], writer: SummaryWriter):
