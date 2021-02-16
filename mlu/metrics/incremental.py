@@ -45,6 +45,10 @@ class IncrementalMean(IncrementalMetric):
 	def get_nb_values_added(self) -> int:
 		return self._counter
 
+	def set_mean(self, mean: Tensor, counter: int):
+		self._sum = mean * counter
+		self._counter = counter
+
 
 class IncrementalStd(IncrementalMetric):
 	def __init__(self, *args: Tensor, unbiased: bool = False):
@@ -140,6 +144,11 @@ class MinTracker(IncrementalMetric):
 	def get_nb_values_added(self) -> int:
 		return self._counter
 
+	def set_min(self, min_: Tensor, counter: int, index_min: int = -1):
+		self._min = min_
+		self._counter = counter
+		self._index_min = index_min
+
 
 class MaxTracker(IncrementalMetric):
 	def __init__(self, *args: Tensor):
@@ -182,9 +191,18 @@ class MaxTracker(IncrementalMetric):
 	def get_nb_values_added(self) -> int:
 		return self._counter
 
+	def set_max(self, max_: Tensor, counter: int, index_max: int = -1):
+		self._max = max_
+		self._counter = counter
+		self._index_max = index_max
+
 
 class BestTracker(IncrementalMetric):
-	def __init__(self, *args: Tensor, is_better: Callable[[Tensor, Tensor], bool]):
+	def __init__(
+		self,
+		*args: Tensor,
+		is_better: Callable[[Tensor, Tensor], bool] = lambda x, y: x > y,
+	):
 		"""
 			Keep the best of the values stored.
 		"""
@@ -225,7 +243,12 @@ class BestTracker(IncrementalMetric):
 
 
 class NBestsTracker(IncrementalMetric):
-	def __init__(self, *args: Tensor, is_better: Callable[[Tensor, Tensor], bool], n: int = 1):
+	def __init__(
+		self,
+		*args: Tensor,
+		is_better: Callable[[Tensor, Tensor], bool] = lambda x, y: x > y,
+		n: int = 1,
+	):
 		super().__init__()
 		self._is_better = is_better
 		self._n = n

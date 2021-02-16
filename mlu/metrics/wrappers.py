@@ -1,6 +1,7 @@
-from metrics.base import T
-from mlu.metrics.base import Metric, IncrementalMetric, Input, Target, Output
+
+from mlu.metrics.base import Metric, IncrementalMetric, Input, Target, Output, T
 from mlu.metrics.incremental import IncrementalMean
+
 from torch.nn import Module
 from typing import Callable, Dict, List, Optional
 
