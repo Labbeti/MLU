@@ -1,11 +1,11 @@
 
 import torch
 
-from mlu.nn.modules.math import DEFAULT_EPSILON
+from mlu.nn.modules.math import DEFAULT_EPSILON, Mean
 from mlu.nn.utils import get_reduction_from_name
 
 from torch import Tensor
-from torch.nn import Module, KLDivLoss, LogSoftmax
+from torch.nn import Module, KLDivLoss, LogSoftmax, BCELoss
 from typing import Optional
 
 
@@ -137,3 +137,15 @@ class KLDivLossWithProbabilities(KLDivLoss):
 
 	def extra_repr(self) -> str:
 		return f"epsilon={self.epsilon}, log_input={self.log_input}, log_target={self.log_target}"
+
+
+class BCELossBatchMean(Module):
+	def __init__(self, dim: Optional[int] = -1):
+		super().__init__()
+		self._bce = BCELoss(reduction="none")
+		self._mean = Mean(dim=dim)
+
+	def forward(self, input_: Tensor, target: Tensor) -> Tensor:
+		loss = self._bce(input_, target)
+		loss = self._mean(loss)
+		return loss
