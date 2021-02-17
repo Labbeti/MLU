@@ -9,25 +9,20 @@ class ZipCycle(Iterable, Sized):
 			Reset the iterators when there and finish iteration when the longest one is over.
 
 			Example :
-				r1 = range(1, 4)
 
-				r2 = range(1, 6)
-
-				cycle = ZipCycle([r1, r2])
-
-				for v1, v2 in cycle:
-					print("(", v1, v2, ")")
+			>>> r1 = range(1, 4)
+			>>>	r2 = range(1, 6)
+			>>> cycle = ZipCycle([r1, r2])
+			>>> for v1, v2 in cycle:
+			>>> 	print("(", v1, ",", v2, ")")
 
 			will print :
-				( 1 1 )
 
-				( 2 2 )
-
-				( 3 3 )
-
-				( 1 4 )
-
-				( 2 5 )
+			>>>	( 1 , 1 )
+			>>>	( 2 , 2 )
+			>>>	( 3 , 3 )
+			>>>	( 1 , 4 )
+			>>>	( 2 , 5 )
 
 			:param iterables: A list of Sized Iterables to browse. Must not be an empty list.
 			:param policy: The policy to use during iteration. (default: "max")

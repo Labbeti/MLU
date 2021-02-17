@@ -19,7 +19,7 @@ class TestConverts(TestCase):
 
 		for to in [to_ten, to_num, to_lis, to_pil]:
 			other = to_base(to(data))
-			self.assertTrue(data.eq(other).all(), "Assertion false for conversion \"{}({}(x)) == x\".".format(
+			self.assertTrue(data.eq(other).all(), "Assertion false for conversion '{}({}(x)) == x'.".format(
 				str(to_base.__class__.__name__), str(to.__class__.__name__)))
 
 	def test_numpy_conversions(self):
@@ -33,7 +33,7 @@ class TestConverts(TestCase):
 
 		for to in [to_ten, to_num, to_lis, to_pil]:
 			other = to_base(to(data))
-			self.assertTrue((data == other).all(), "Assertion false for conversion \"{}({}(x)) == x\".".format(
+			self.assertTrue((data == other).all(), "Assertion false for conversion '{}({}(x)) == x'.".format(
 				str(to_base.__class__.__name__), str(to.__class__.__name__)))
 
 	def test_list_conversions(self):
@@ -47,7 +47,7 @@ class TestConverts(TestCase):
 
 		for to in [to_ten, to_num, to_lis, to_pil]:
 			other = to_base(to(data))
-			self.assertTrue(data == other, "Assertion false for conversion \"{}({}(x)) == x\".".format(
+			self.assertTrue(data == other, "Assertion false for conversion '{}({}(x)) == x'.".format(
 				str(to_base.__class__.__name__), str(to.__class__.__name__)))
 
 	def test_pil_conversions(self):
@@ -61,7 +61,7 @@ class TestConverts(TestCase):
 
 		for to in [to_ten, to_num, to_lis, to_pil]:
 			other = to_base(to(data))
-			self.assertTrue(data == other, "Assertion false for conversion \"{}({}(x)) == x\".".format(
+			self.assertTrue(data == other, "Assertion false for conversion '{}({}(x)) == x'.".format(
 				str(to_base.__class__.__name__), str(to.__class__.__name__)))
 
 

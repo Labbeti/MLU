@@ -2,7 +2,7 @@
 import torch
 
 from torch import Tensor
-from typing import Dict, Iterable, List, Optional, Set, Union
+from typing import Dict, List, Optional
 
 
 def sentence_to_tensor(
@@ -33,27 +33,6 @@ def tensor_to_sentence(tensor: Tensor, cls_to_word_table: Dict[int, str]) -> Lis
 	for i, idx in enumerate(tensor):
 		sentence[i] = cls_to_word_table[idx.item()]
 	return sentence
-
-
-def add_to_vocabulary(text: Union[str, Iterable], vocabulary: Optional[Set[str]] = None) -> Set[str]:
-	if vocabulary is None:
-		vocabulary = set()
-
-	if isinstance(text, str):
-		vocabulary.add(text)
-	else:
-		for subtext in text:
-			add_to_vocabulary(subtext, vocabulary)
-
-	return vocabulary
-
-
-def build_conversions_tables(vocabulary: Set[str]) -> (Dict[str, int], Dict[int, str]):
-	word_to_cls_table, cls_to_word_table = {}, {}
-	for i, word in enumerate(vocabulary):
-		word_to_cls_table[word] = i
-		cls_to_word_table[i] = word
-	return word_to_cls_table, cls_to_word_table
 
 
 def list_tensor_to_tensor(lst: List[Tensor], fill_value: float) -> Tensor:

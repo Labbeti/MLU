@@ -2,7 +2,7 @@
 import random
 
 from mlu.transforms.base import ImageTransform, Input, Output
-from mlu.transforms.image.pools import RAND_AUGMENT_DEFAULT_POOL
+from mlu.transforms.image.ra_pools import RAND_AUGMENT_DEFAULT_POOL
 from typing import List, Optional, Tuple, Type
 
 
@@ -20,13 +20,17 @@ class RandAugment(ImageTransform):
 
 			Original paper : https://arxiv.org/pdf/1909.13719.pdf
 
-			:param nb_augm_apply: The number of augmentations "N" to apply on 1 image.
+			:param nb_augm_apply: The number of augmentations "N" to apply on 1 image. (default: 1)
 			:param magnitude: The magnitude "M" used in RandAugment in range [0, 1].
 				If magnitude_policy == "random", this parameter is ignored.
+				(default: 0.5)
 			:param augm_pool: The list of augmentations with their optional range.
+				If None, use the default pool.
+				(default: None)
 			:param magnitude_policy: The policy to apply for control magnitude of augmentations.
 				Available policies are "constant" and "random".
-			:param p: The probability to apply the augmentation.
+				(default: 'random')
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		assert magnitude is None or 0.0 <= magnitude <= 1.0
 		assert magnitude_policy in ["constant", "random"]

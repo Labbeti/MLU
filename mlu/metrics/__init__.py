@@ -8,13 +8,15 @@ from .classification.precision import Precision
 from .classification.recall import Recall
 from .classification.rocauc import RocAuc
 
-from .translation.bleu import BLEU
-from .translation.lcs import LCS
-from .translation.meteor import METEOR
-from .translation.nist import NIST
-from .translation.rouge import RougeL
-from .translation.wer import WordErrorRate
+from .debug.class_ratio import ClassRatio
+
+from .text.bleu import BLEU
+from .text.lcs import LCS
+from .text.meteor.meteor import METEOR
+from .text.nist import NIST
+from .text.rouge import RougeL
+from .text.wer import WordErrorRate
 
 from .base import Metric, IncrementalMetric
 from .incremental import IncrementalMean, IncrementalStd, MinTracker, MaxTracker
-from .wrappers import MetricWrapper, IncrementalWrapper, IncrementalListWrapper
+from .wrappers import MetricWrapper, IncrementalWrapper, IncrementalListWrapper, MetricDict

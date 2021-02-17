@@ -38,7 +38,7 @@ class Compose(Container):
 			Compose a list of transforms for apply them sequentially.
 
 			:param transforms: The list of transforms to apply.
-			:param p: The probability to apply the transform.
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(*transforms, p=p)
 
@@ -62,9 +62,9 @@ class RandomChoice(Container):
 			An transform can be chosen multiple times if nb_choices > 1. (with replacement)
 
 			:param transforms: The list of transforms from we choose the apply a transform.
-			:param nb_choices: The number of transforms to choose.
-			:param weights: The probabilities to choose the transform.
-			:param p: The probability to apply the transform.
+			:param nb_choices: The number of transforms to choose. (default: 1)
+			:param weights: The probabilities to choose the transform. (default: None)
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(*transforms, p=p)
 		self.nb_choices = nb_choices

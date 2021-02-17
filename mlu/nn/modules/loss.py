@@ -1,20 +1,20 @@
 
 import torch
 
-from mlu.nn.modules.math import DEFAULT_EPSILON
+from mlu.nn.modules.math import DEFAULT_EPSILON, Mean
 from mlu.nn.utils import get_reduction_from_name
 
 from torch import Tensor
-from torch.nn import Module, KLDivLoss, LogSoftmax
+from torch.nn import Module, KLDivLoss, LogSoftmax, BCELoss
 from typing import Optional
 
 
 class CrossEntropyWithVectors(Module):
-	"""
-		Compute Cross-Entropy between two distributions.
-		Input and targets must be a batch of probabilities distributions of shape (batch_size, nb_classes) tensor.
-	"""
-	def __init__(self, reduction: str = "mean", dim: Optional[int] = 1, log_input: bool = False):
+	def __init__(self, reduction: str = "mean", dim: Optional[int] = -1, log_input: bool = False):
+		"""
+			Compute Cross-Entropy between two distributions.
+			Input and targets must be a batch of probabilities distributions of shape (batch_size, nb_classes) tensor.
+		"""
 		super().__init__()
 		self.reduce_fn = get_reduction_from_name(reduction)
 		self.dim = dim
@@ -32,12 +32,15 @@ class CrossEntropyWithVectors(Module):
 		loss = -torch.sum(input_ * targets, dim=dim)
 		return self.reduce_fn(loss)
 
+	def extra_repr(self) -> str:
+		return f"reduce_fn={self.reduce_fn.__name__}, dim={self.dim}, log_input={self.log_input}"
+
 
 class Entropy(Module):
 	def __init__(
 		self,
 		reduction: str = "mean",
-		dim: int = 1,
+		dim: int = -1,
 		epsilon: float = DEFAULT_EPSILON,
 		base: Optional[float] = None,
 		log_input: bool = False,
@@ -45,10 +48,11 @@ class Entropy(Module):
 		"""
 			Compute the entropy of a distribution.
 
-			:param reduction: The reduction used between batch entropies.
-			:param dim: The dimension to apply the sum in entropy formula.
-			:param epsilon: The epsilon precision to use. Must be a small positive float.
-			:param base: The log-base used. If None, use the natural logarithm (i.e. base = torch.exp(1)).
+			:param reduction: The reduction used between batch entropies. (default: 'mean')
+			:param dim: The dimension to apply the sum in entropy formula. (default: -1)
+			:param epsilon: The epsilon precision to use. Must be a small positive float. (default: DEFAULT_EPSILON)
+			:param base: The log-base used. If None, use the natural logarithm (i.e. base = torch.exp(1)). (default: None)
+			:param log_input: If True, the input must be log-probabilities. (default: False)
 		"""
 		super().__init__()
 		self.reduce_fn = get_reduction_from_name(reduction)
@@ -71,6 +75,9 @@ class Entropy(Module):
 			entropy = - torch.sum(torch.exp(input_) * input_, dim=dim)
 		return self.reduce_fn(entropy)
 
+	def extra_repr(self) -> str:
+		return f"reduce_fn={self.reduce_fn.__name__}, dim={self.dim}, epsilon={self.epsilon}, log_input={self.log_input}"
+
 
 class JSDivLoss(Module):
 	"""
@@ -78,7 +85,7 @@ class JSDivLoss(Module):
 		Use Entropy as backend.
 	"""
 
-	def __init__(self, reduction: str = "mean", dim: int = 1, epsilon: float = DEFAULT_EPSILON):
+	def __init__(self, reduction: str = "mean", dim: int = -1, epsilon: float = DEFAULT_EPSILON):
 		super().__init__()
 		self.entropy = Entropy(reduction, dim, epsilon)
 
@@ -94,10 +101,10 @@ class JSDivLossWithLogits(Module):
 		Use KLDivLoss and LogSoftmax as backend.
 	"""
 
-	def __init__(self, reduction: str = "mean"):
+	def __init__(self, reduction: str = "mean", dim: int = -1):
 		super().__init__()
 		self.kl_div = KLDivLoss(reduction=reduction, log_target=True)
-		self.log_softmax = LogSoftmax(dim=1)
+		self.log_softmax = LogSoftmax(dim=dim)
 
 	def forward(self, logits_p: Tensor, logits_q: Tensor):
 		m = self.log_softmax(0.5 * (logits_p + logits_q))
@@ -127,3 +134,18 @@ class KLDivLossWithProbabilities(KLDivLoss):
 		if not self.log_target:
 			q = torch.log(q + self.epsilon)
 		return super().forward(input=p, target=q)
+
+	def extra_repr(self) -> str:
+		return f"epsilon={self.epsilon}, log_input={self.log_input}, log_target={self.log_target}"
+
+
+class BCELossBatchMean(Module):
+	def __init__(self, dim: Optional[int] = -1):
+		super().__init__()
+		self._bce = BCELoss(reduction="none")
+		self._mean = Mean(dim=dim)
+
+	def forward(self, input_: Tensor, target: Tensor) -> Tensor:
+		loss = self._bce(input_, target)
+		loss = self._mean(loss)
+		return loss

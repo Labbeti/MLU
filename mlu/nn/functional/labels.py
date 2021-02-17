@@ -60,45 +60,100 @@ def binarize_pred_to_onehot(pred: Tensor, dim: int = 1) -> Tensor:
 
 
 # --- MULTI-HOT ---
-def nums_to_multihot(nums: List[List[int]], nb_classes: int) -> Tensor:
+def nums_to_matrix(nums_lst: List[List[int]], fill_value: float = -1.0) -> Tensor:
+	bsize = len(nums_lst)
+	nb_classes = 0
+	for nums in nums_lst:
+		nb_classes = max(nb_classes, len(nums))
+	result = torch.full(size=(bsize, nb_classes), fill_value=fill_value)
+	for i, nums in enumerate(nums_lst):
+		for j, num in enumerate(nums):
+			result[i, j] = num
+	return result
+
+
+def nums_to_multihot(
+	nums_lst: List[List[Union[int, float]]],
+	nb_classes: int,
+	dtype: torch.dtype = torch.float,
+) -> Tensor:
 	"""
 		Convert a list of numbers (or indexes) of classes to multi-hot version.
 
-		:param nums: List of List of indexes of classes.
+		:param nums_lst: List of List of indexes of classes.
 		:param nb_classes: The maximum number of classes.
+		:param dtype: The tensor dtype of the multihot vectors. (default: torch.float)
+		:returns: Label with multi-hot vectors.
+	"""
+	result = torch.zeros(len(nums_lst), nb_classes, dtype=dtype)
+	for i, nums in enumerate(nums_lst):
+		for num in nums:
+			result[i, num] = 1
+	return result
+
+
+def nums_to_smooth_multihot(
+	nums_lst: Union[Tensor, List[List[Union[int, float]]], List[Union[int, float]]],
+	nb_classes: int,
+	smooth: float,
+	dtype: torch.dtype = torch.float,
+) -> Tensor:
+	"""
+		Convert a list of indexes of classes to multi-hot version.
+
+		:param nums_lst: List of List of indexes of classes.
+		:param nb_classes: The maximum number of classes.
+		:param smooth: The label smoothing coefficient.
+		:param dtype: The tensor dtype of the multihot vectors. (default: torch.float)
 		:returns: Label with multi-hot vectors
 	"""
-	res = torch.zeros((len(nums), nb_classes))
-	for i, nums in enumerate(nums):
-		res[i] = torch.sum(torch.stack([one_hot(torch.as_tensor(num), nb_classes) for num in nums]), dim=0)
-	return res
+	if len(nums_lst) == 0:
+		raise RuntimeError("Cannot build multihot vectors with empty nums lst.")
 
+	if isinstance(nums_lst, Tensor):
+		if len(nums_lst.shape) == 1:
+			nums_lst = [nums_lst.tolist()]
+		elif len(nums_lst.shape) == 2:
+			nums_lst = nums_lst.tolist()
+		else:
+			raise RuntimeError(
+				f"Invalid shape '{nums_lst.shape}' for nums_lst. "
+				f"Must be of shape (bsize, nb classes present) or (nb classes present) tensor."
+			)
+	elif isinstance(nums_lst, list):
+		if not isinstance(nums_lst[0], list):
+			nums_lst = [nums_lst]
 
-def multihot_to_nums(multihots: Union[np.ndarray, Tensor], threshold: float = 1.0) -> List[List[int]]:
-	"""
-		Convert multi-hot vectors to a list of list of classes indexes.
-
-		:param multihots: The multi-hot vectors.
-		:param threshold: The threshold used to determine if class is present or not.
-		:returns: The list of list of classes indexes. Each sub-list can have a different size.
-	"""
-	res = [
-		[j for j, coefficient in enumerate(label) if coefficient >= threshold]
-		for i, label in enumerate(multihots)
-	]
-	return res
+	multihot_vectors = nums_to_multihot(nums_lst, nb_classes, dtype)
+	return multihot_to_smooth_multihot(multihot_vectors, smooth)
 
 
 def multihot_to_smooth_multihot(
-	multihot_vectors: Union[np.ndarray, Tensor], nb_classes: int, smooth: float
+	multihot_vectors: Union[np.ndarray, Tensor],
+	smooth: float,
 ) -> Union[np.ndarray, Tensor]:
 	"""
 		Smooth multi-hot labels with a smoothing coefficient.
 
-		:param multihot_vectors: Multi-hot vectors.
-		:param nb_classes: The maximum number of classes.
+		:param multihot_vectors: Multi-hot vectors of shape (bsize, nb classes).
 		:param smooth: The label smoothing coefficient in [0, 1].
 		:returns: The smoothed multi-hot vectors.
 	"""
-	classes_smoothed = (1.0 - smooth) * multihot_vectors + smooth / nb_classes
-	return classes_smoothed
+	nb_classes = multihot_vectors.shape[-1]
+	result = (1.0 - smooth) * multihot_vectors + smooth / nb_classes
+	return result
+
+
+def multihot_to_nums(multihot_vectors: Union[np.ndarray, Tensor], threshold: float = 1.0) -> List[List[int]]:
+	"""
+		Convert multi-hot vectors to a list of list of classes indexes.
+
+		:param multihot_vectors: The multi-hot vectors of shape (bsize, nb classes).
+		:param threshold: The threshold used to determine if class is present or not.
+		:returns: The list of list of classes indexes. Each sub-list can have a different size.
+	"""
+	result = [
+		[j for j, coefficient in enumerate(label) if coefficient >= threshold]
+		for i, label in enumerate(multihot_vectors)
+	]
+	return result

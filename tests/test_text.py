@@ -1,7 +1,8 @@
 
 import torch
 
-from mlu.utils.sentence import sentence_to_tensor, add_to_vocabulary
+from mlu.utils.sentence import sentence_to_tensor
+from mlu.utils.vocabulary import add_to_vocabulary
 from unittest import TestCase, main
 
 

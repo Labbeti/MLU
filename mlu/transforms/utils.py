@@ -8,7 +8,7 @@ class Identity(Transform):
 		"""
 			Identity transform.
 
-			:param p: The probability to apply the transform.
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
 

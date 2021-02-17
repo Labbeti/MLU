@@ -1,8 +1,9 @@
 
-from mlu.metrics.base import Metric, IncrementalMetric, Input, Target, Output
+from mlu.metrics.base import Metric, IncrementalMetric, Input, Target, Output, T
 from mlu.metrics.incremental import IncrementalMean
+
 from torch.nn import Module
-from typing import Callable, List, Optional
+from typing import Callable, Dict, List, Optional
 
 
 class MetricWrapper(Metric):
@@ -82,3 +83,73 @@ class IncrementalListWrapper(Metric):
 		for continue_metric in self.continue_metric_list:
 			continue_metric.add(score)
 		return [continue_metric.get_current() for continue_metric in self.continue_metric_list]
+
+
+class MetricDict(Dict[str, Metric], Metric):
+	def __init__(
+		self,
+		default_prefix: Optional[str] = None,
+		default_suffix: Optional[str] = None,
+		**kwargs,
+	):
+		super().__init__(**kwargs)
+		self.default_prefix = default_prefix
+		self.default_suffix = default_suffix
+
+		if self.default_prefix is not None or self.default_suffix is not None:
+			for metric_name, metric in self.items():
+				self.add_metric(metric, metric_name)
+
+	def compute_score(self, input_: Input, target: Target) -> Dict[str, Output]:
+		return {metric_name: metric(input_, target) for metric_name, metric in self.items()}
+
+	def add_metric(
+		self,
+		metric: Metric,
+		name: Optional[str] = None,
+	):
+		"""
+			Add a metric to the MetricDict.
+
+			:param metric: The metric to add.
+			:param name: The name of the metric.
+				If None, the name of metric class will be used. (default: None)
+		"""
+		if name is None:
+			name = metric.__name__
+
+		if "/" in name or self.default_prefix is None:
+			complete_name = name
+		else:
+			complete_name = f"{self.default_prefix}/{name}"
+
+		if self.default_suffix is not None:
+			complete_name += self.default_suffix
+
+		self[complete_name] = metric
+
+
+class IncrementalList(IncrementalMetric):
+	def __init__(self, incremental_list: List[IncrementalMetric]):
+		super().__init__()
+		self.incremental_list = incremental_list
+
+	def reset(self):
+		for incremental in self.incremental_list:
+			incremental.reset()
+
+	def add(self, value: T):
+		for incremental in self.incremental_list:
+			incremental.add(value)
+
+	def is_empty(self) -> List[bool]:
+		return [
+			incremental.is_empty()
+			for incremental in self.incremental_list
+		]
+
+	def get_current(self) -> List[Optional[T]]:
+		return [
+			incremental.get_current()
+			for incremental in self.incremental_list
+		]

@@ -9,12 +9,13 @@ from torch import Tensor
 from torch.nn import Module
 from torch.optim import Optimizer
 from torch.utils.tensorboard import SummaryWriter
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Sequence, Tuple, Union
 
 
 def get_datetime() -> str:
 	"""
 		Returns the date in a specific format : "YYYY_MM_DD_hh:mm:ss".
+
 		:returns: The current date.
 	"""
 	now = str(datetime.now())
@@ -24,6 +25,7 @@ def get_datetime() -> str:
 def reset_seed(seed: int):
 	"""
 		Reset the seed of following packages : random, numpy, torch, torch.cuda, torch.backends.cudnn.
+
 		:param seed: The seed to set.
 	"""
 	random.seed(seed)
@@ -42,27 +44,23 @@ def random_rect(
 
 		:param width_img: The maximal width.
 		:param height_img: The maximal height.
-		:param width_range: The width ratio range of the rectangle. Ex: (0.1, 0.5) => width is sampled from (0.1 * width, 0.5 * width).
-		:param height_range: The height ratio range of the rectangle. Ex: (0.0, 0.9) => height is sampled from (0.0, 0.9 * height).
+		:param width_range: The width ratio range of the rectangle.
+			Ex: (0.1, 0.5) => width is sampled from (0.1 * width, 0.5 * width).
+		:param height_range: The height ratio range of the rectangle.
+			Ex: (0.0, 0.9) => height is sampled from (0.0, 0.9 * height).
 		:returns: The limits (left, right, top, down) of the rectangle created.
 	"""
 	assert 0.0 <= width_range[0] <= width_range[1] <= 1.0
 	assert 0.0 <= height_range[0] <= height_range[1] <= 1.0
 
 	min_width = max(int(width_range[0] * width_img), 1)
-	max_width = max(int(width_range[1] * width_img), 2)
 	min_height = max(int(height_range[0] * height_img), 1)
-	max_height = max(int(height_range[1] * height_img), 2)
 
-	if min_width != max_width:
-		width = torch.randint(low=min_width, high=max_width, size=()).item()
-	else:
-		width = min_width
+	max_width = max(int(width_range[1] * width_img), min_width + 1)
+	max_height = max(int(height_range[1] * height_img), min_height + 1)
 
-	if min_height != max_height:
-		height = torch.randint(low=min_height, high=max_height, size=()).item()
-	else:
-		height = min_height
+	width = torch.randint(low=min_width, high=max_width, size=()).item()
+	height = torch.randint(low=min_height, high=max_height, size=()).item()
 
 	max_left = max(width_img - width, 1)
 	max_top = max(height_img - height, 1)
@@ -75,22 +73,25 @@ def random_rect(
 	return left, right, top, down
 
 
-def random_cuboid(shapes: List[int], ratios: List[Tuple[float, float]]) -> List[Tuple[int, int]]:
+def random_cuboid(shapes: Sequence[int], ratios: Sequence[Tuple[float, float]]) -> List[Tuple[int, int]]:
+	"""
+		Random cuboid generated using ratios.
+
+		:param shapes: The shape of the cuboid as sequence of ints. Size: (N,).
+		:param ratios: The list of min and max ratios for each dim for sampling the cuboid shape. Size: (N, 2)
+		:returns: The limits of the cuboid with limits on each dimension. Size: (N, 2)
+	"""
 	assert all((0.0 <= min_ <= max_ <= 1.0 for min_, max_ in ratios))
 	assert len(shapes) == len(ratios)
 
 	limits = []
 	for length, (min_, max_) in zip(shapes, ratios):
 		min_len = int(min_ * length)
-		max_len = int(max_ * length)
+		max_len = max(int(max_ * length), min_len + 1)
+		rand_len = torch.randint(low=min_len, high=max_len, size=()).item()
 
-		if min_len != max_len:
-			rand_len = torch.randint(low=min_len, high=max_len, size=()).item()
-		else:
-			rand_len = min_len
-
-		rand_max = max(length - rand_len, 1)
-		rand_left = torch.randint(low=0, high=rand_max, size=()).item()
+		rand_left_max = max(length - rand_len, 1)
+		rand_left = torch.randint(low=0, high=rand_left_max, size=()).item()
 		rand_right = rand_left + rand_len
 		limits.append((rand_left, rand_right))
 
@@ -107,24 +108,16 @@ def get_lr(optim: Optimizer, idx: int = 0) -> float:
 	return get_lrs(optim)[idx]
 
 
-def get_nb_parameters(model: Module) -> int:
+def get_nb_parameters(model: Module, trainable_param: bool = True) -> int:
 	"""
 		Return the number of parameters in a model.
 
 		:param model: Pytorch Module to check.
+		:param trainable_param: If True, count only parameter that requires gradient. (default: True)
 		:returns: The number of parameters.
 	"""
-	return sum(p.numel() for p in model.parameters())
-
-
-def get_nb_trainable_parameters(model: Module) -> int:
-	"""
-		Return the number of trainable parameters in a model.
-
-		:param model: Pytorch Module.
-		:returns: The number of trainable parameters.
-	"""
-	return sum(p.numel() for p in model.parameters() if p.requires_grad)
+	params = (p for p in model.parameters() if not trainable_param or p.requires_grad)
+	return sum([p.numel() for p in params])
 
 
 def add_dict_to_writer(dic: Dict[str, Any], writer: SummaryWriter):
@@ -144,7 +137,7 @@ def get_current_git_hash() -> str:
 	"""
 		Return the current git hash in the current directory.
 
-		:returns: The git hash. If an error occurs, returns \"UNKNOWN\".
+		:returns: The git hash. If an error occurs, returns 'UNKNOWN'.
 	"""
 	try:
 		git_hash = subprocess.check_output(["git", "describe", "--always"])

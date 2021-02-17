@@ -1,16 +1,16 @@
 
 import math
 
-from typing import Optional, Union, Callable
+from typing import Callable, Optional, Union
 
 
 def str_to_bool() -> Callable[[str], bool]:
 	"""
 		Convert a string to bool. Case insensitive.
 
-			x in ["true", "1", "yes", "y"] => True
-			x in ["false", "0", "no", "n"] => False
-			_ => RuntimeError
+		- x in ["true", "1", "yes", "y"] => True,
+		- x in ["false", "0", "no", "n"] => False,
+		- _ => RuntimeError
 
 		:returns: The function for convert a value to the corresponding boolean value.
 	"""
@@ -21,7 +21,7 @@ def str_to_bool() -> Callable[[str], bool]:
 		elif x_low in ["false", "0", "no", "n"]:
 			return False
 		else:
-			raise RuntimeError("Invalid boolean argument \"{:s}\".".format(x))
+			raise RuntimeError("Invalid boolean argument '{:s}'.".format(x))
 	return str_to_bool_impl
 
 
@@ -29,10 +29,10 @@ def str_to_optional_bool() -> Callable[[str], Optional[bool]]:
 	"""
 		Convert a string to optional bool value. Case insensitive.
 
-			x in ["none"] => None
-			x in ["true", "1", "yes", "y"] => True
-			x in ["false", "0", "no", "n"] => False
-			_ => RuntimeError
+		- x in ["none"] => None
+		- x in ["true", "1", "yes", "y"] => True
+		- x in ["false", "0", "no", "n"] => False
+		- _ => RuntimeError
 
 		:returns: The function for convert a value to the corresponding boolean or None value.
 	"""
@@ -126,7 +126,7 @@ def float_in_range(
 		if min_ < x < max_ or (include_min and x == min_) or (include_max and x == max_):
 			return x
 		else:
-			raise ValueError("Value \"{:s}\" is not a float in range {:s}{:f},{:f}{:s}".format(
+			raise ValueError("Value '{:s}' is not a float in range {:s}{:f},{:f}{:s}".format(
 				str(x), "[" if include_min else "]", min_, max_, "]" if include_max else "["))
 	return float_in_range_impl
 
@@ -142,7 +142,7 @@ def positive_float() -> Callable[[str], float]:
 
 def strict_positive_float() -> Callable[[str], float]:
 	"""
-		Convert string to float value and check the range [0, inf[.
+		Convert string to float value and check the range ]0, inf[.
 
 		:returns: The function for checking the float range.
 	"""

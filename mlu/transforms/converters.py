@@ -24,7 +24,7 @@ class ToNumpy(Module):
 		"""
 			Convert a python list, pytorch tensor or PIL image to numpy array.
 
-			:param dtype: The optional dtype of the numpy array.
+			:param dtype: The optional dtype of the numpy array. (default: None)
 		"""
 		super().__init__()
 		self.dtype = dtype
@@ -37,6 +37,9 @@ class ToTensor(Module):
 	def __init__(self, dtype: Optional[torch.dtype] = None, device: Optional[torch.device] = None):
 		"""
 			Convert a python list, numpy array or PIL image to pytorch tensor.
+
+			:param dtype: The optional dtype of the pytorch tensor. (default: None)
+			:param device: The optional device of the pytorch tensor. (default: None)
 		"""
 		super().__init__()
 		self.dtype = dtype
@@ -52,7 +55,9 @@ class ToPIL(Module):
 			Convert a pytorch tensor, numpy array or python list to PIL image.
 
 			:param mode: Define the type and depth of a pixel in the image. (default: "RGB")
-				See https://pillow.readthedocs.io/en/5.1.x/handbook/concepts.html#modes for details.
+				See https://pillow.readthedocs.io/en/5.1.x/handbook/concepts.html#modes for details on PIL modes.
+			:param permute_tensor: Permute dimensions (height, width, channel) to (channel, height, width) for PIL image.
+				(default: True)
 		"""
 		super().__init__()
 		self.mode = mode

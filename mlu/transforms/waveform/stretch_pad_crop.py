@@ -1,7 +1,7 @@
 
 from mlu.transforms.base import WaveformTransform
 from mlu.transforms.waveform.pad_crop import PadCrop
-from mlu.transforms.waveform.time_stretch_nearest import TimeStretchNearest
+from mlu.transforms.waveform.stretch import StretchNearestFreq, StretchNearestRate
 
 from torch import Tensor
 from torch.distributions import Uniform
@@ -11,34 +11,70 @@ from typing import Tuple, Union
 class StretchPadCrop(WaveformTransform):
 	def __init__(
 		self,
-		rate: Union[Tuple[float, float], float] = (0.9, 1.1),
+		rates: Union[Tuple[float, float], float] = (0.9, 1.1),
 		align: str = "random",
+		dim: int = -1,
 		p: float = 1.0,
 	):
 		"""
-			:param rate: The ratio of the signal used for resize.
+			Stretch, pad and crop the signal.
+
+			:param rates: The ratio of the signal used for resize. (default: (0.9, 1.1))
 			:param align: Alignment to use for cropping or padding. Can be 'left', 'right', 'center' or 'random'.
-			:param p: The probability to apply the augmentation.
+				(default: 'random')
+			:param dim: The dimension to stretch and pad or crop. (default: -1)
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
-		self.rate = rate
+		self._rates = rates if isinstance(rates, tuple) else (rates, rates)
+		self._dim = dim
 
-		self.uniform = Uniform(low=rate[0], high=rate[1]) if not isinstance(rate, float) else None
-		self.time_stretch = TimeStretchNearest()
-		self.pad_crop = PadCrop(target_length=0, align=align)
+		self._uniform = Uniform(low=self._rates[0], high=self._rates[1])
+		self._stretch = StretchNearestFreq(dim=dim)
+		self._pad_crop = PadCrop(target_length=0, align=align, dim=dim)
 
 	def apply(self, x: Tensor) -> Tensor:
-		data_length = x.shape[-1]
-		self.time_stretch.orig_freq = data_length
-		self.time_stretch.new_freq = round(data_length * self._get_rate())
-		self.pad_crop.set_target_length(data_length)
+		length = x.shape[self._dim]
+		self._stretch.orig_freq = length
+		self._stretch.new_freq = round(length * self._uniform.sample().item())
+		self._pad_crop.set_target_length(length)
 
-		x = self.time_stretch(x)
-		x = self.pad_crop(x)
+		x = self._stretch(x)
+		x = self._pad_crop(x)
 
 		return x
 
-	def _get_rate(self) -> float:
-		if self.uniform is not None:
-			self.rate = self.uniform.sample().item()
-		return self.rate
+
+class StretchPadCrop2(WaveformTransform):
+	def __init__(
+		self,
+		rates: Union[Tuple[float, float], float] = (0.9, 1.1),
+		align: str = "random",
+		dim: int = -1,
+		p: float = 1.0,
+	):
+		"""
+			Stretch, pad and crop the signal.
+
+			:param rates: The ratio of the signal used for resize. (default: (0.9, 1.1))
+			:param align: Alignment to use for cropping or padding. Can be 'left', 'right', 'center' or 'random'.
+				(default: 'random')
+			:param dim: The dimension to stretch and pad or crop. (default: -1)
+			:param p: The probability to apply the transform. (default: 1.0)
+		"""
+		super().__init__(p=p)
+		self._rates = rates if isinstance(rates, tuple) else (rates, rates)
+		self._dim = dim
+
+		self._uniform = Uniform(low=self._rates[0], high=self._rates[1])
+		self._stretch = StretchNearestRate(rates=rates, dim=dim)
+		self._pad_crop = PadCrop(target_length=0, align=align, dim=dim)
+
+	def apply(self, x: Tensor) -> Tensor:
+		length = x.shape[self._dim]
+		self._pad_crop.set_target_length(length)
+
+		x = self._stretch(x)
+		x = self._pad_crop(x)
+
+		return x

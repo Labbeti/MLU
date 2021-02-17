@@ -7,10 +7,10 @@ class EMA:
 		"""
 			Compute the exponential moving average of a model.
 
-			model = decay * model + (1 - decay) * other_model
+			>>> 'model = decay * model + (1 - decay) * other_model'
 
 			:param model: The target model to update.
-			:param decay: The exponential decay (sometimes called "alpha") used to update the model.
+			:param decay: The exponential decay (sometimes called "alpha") used to update the model. (default: 0.99)
 		"""
 		super().__init__()
 		self.model = model
@@ -24,3 +24,15 @@ class EMA:
 
 		for param, other_param in zip(model_params, other_params):
 			param.set_(self.decay * param + (1.0 - self.decay) * other_param)
+
+	def set_model(self, model: Module):
+		self.model = model
+
+	def set_decay(self, decay: float):
+		self.decay = decay
+
+	def get_model(self) -> Module:
+		return self.model
+
+	def get_decay(self) -> float:
+		return self.decay

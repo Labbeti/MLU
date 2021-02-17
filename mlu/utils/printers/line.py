@@ -13,13 +13,15 @@ class LinePrinter(PrinterABC):
 			Class for print current values of a training or validation in one line.
 
 			Ex:
-			> printer = LinePrinter()
-			> printer.print_current_values({"train/accuracy": 0.89, "train/loss": 1.525}, 33, 100, 2, "train")
-			train, epoch   2,  33%, accuracy: 8.9000e-01, loss: 1.5250e+00, took (s): 0.0
+
+			>>> printer = LinePrinter()
+			>>> printer.print_current_values({"train/accuracy": 0.89, "train/loss": 1.525}, 33, 100, 2, "train")
+			... 'train, epoch   2,  33%, accuracy: 8.9000e-01, loss: 1.5250e+00, took (s): 0.0'
 
 			:param print_exec_time: Print time elapsed with the beginning of the loop (iteration == 0).
 		"""
 		self.print_exec_time = print_exec_time
+
 		self._epoch_start_date = time()
 
 	def print_current_values(

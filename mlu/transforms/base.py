@@ -14,17 +14,17 @@ class Transform(Module, Callable, ABC, Generic[Input, Output]):
 		"""
 			Base class for all Transforms.
 
-			:param p: The probability to apply the transform.
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__()
 		assert 0.0 <= p <= 1.0, "Probability must be a float in range [0, 1]."
 		self.p = p
 
-	def forward(self, x: Input) -> Output:
+	def forward(self, *x: Input) -> Output:
 		if self.p >= 1.0 or random() <= self.p:
-			return self.apply(x)
+			return self.apply(*x)
 		else:
-			return x
+			return x if len(x) > 1 else x[0]
 
 	def set_p(self, p: float):
 		"""
@@ -43,12 +43,21 @@ class Transform(Module, Callable, ABC, Generic[Input, Output]):
 		return self.p
 
 	def is_image_transform(self) -> bool:
+		"""
+			:return: True if the transform must be applied to images.
+		"""
 		return False
 
 	def is_waveform_transform(self) -> bool:
+		"""
+			:return: True if the transform must be applied to audio waveforms.
+		"""
 		return False
 
 	def is_spectrogram_transform(self) -> bool:
+		"""
+			:return: True if the transform must be applied to audio spectrogram.
+		"""
 		return False
 
 	def apply(self, x: Input) -> Output:

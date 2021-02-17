@@ -17,10 +17,10 @@ class ProcessTransformWrap(Transform):
 		p: float = 1.0,
 	):
 		"""
-			:param transform:
-			:param pre_convert:
-			:param post_convert:
-			:param p: The probability to apply the transform.
+			:param transform: The transform to wrap.
+			:param pre_convert: The function called before the transform.
+			:param post_convert: The function called after the transform.
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
 		self.transform = transform
@@ -62,9 +62,9 @@ class PILInternalWrap(ProcessTransformWrap):
 			Class that convert tensor to PIL image internally for apply PIL transforms.
 			Tensors images must have the shape (width, height, 3).
 
-			:param pil_transform:
-			:param mode:
-			:param p: The probability to apply the transform.
+			:param pil_transform: The PIL transform to wrap.
+			:param mode: The PIL image mode of the image. (default: 'RGB')
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(
 			transform=pil_transform,
@@ -83,8 +83,8 @@ class TensorInternalWrap(ProcessTransformWrap):
 			Class that convert PIL image to tensor internally for apply tensor transforms.
 			Tensors images will have the shape (width, height, 3).
 
-			:param pil_transform:
-			:param p: The probability to apply the transform.
+			:param pil_transform: The tensor transform to wrap.
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(
 			transform=pil_transform,
@@ -109,12 +109,13 @@ class TransformWrap(Transform):
 	):
 		"""
 			Wrap a callable object to Transform.
+			Useful for keep correct typing and adding transform type (image, waveform or spectrogram) information.
 
-			:param callable_:
-			:param image_transform:
-			:param waveform_transform:
-			:param spectrogram_transform:
-			:param p: The probability to apply the transform.
+			:param callable_: The callable object to wrap.
+			:param image_transform: Indicate if the object wrapped is an image transform or not. (default: False)
+			:param waveform_transform: Indicate if the object wrapped is an waveform transform or not. (default: False)
+			:param spectrogram_transform: Indicate if the object wrapped is an spectrogram transform or not. (default: False)
+			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
 		self.callable_ = callable_
