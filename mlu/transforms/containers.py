@@ -3,6 +3,7 @@ import random
 
 from abc import ABC
 from mlu.transforms.base import Transform
+from mlu.transforms.wrappers import TransformWrap
 from torch.nn import Module
 from typing import Any, Callable, List, Optional, Sequence
 
@@ -13,8 +14,9 @@ class Container(Transform, ABC):
 		self._transforms = list(transforms)
 
 		for i, transform in enumerate(self._transforms):
-			if isinstance(transform, Module):
-				self.add_module(str(i), transform)
+			if not isinstance(transform, Module):
+				transform = TransformWrap(transform)
+			self.add_module(str(i), transform)
 
 	def __getitem__(self, index: int) -> Callable:
 		return self._transforms[index]
