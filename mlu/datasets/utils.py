@@ -2,9 +2,8 @@
 import numpy as np
 import random
 
-from mlu.datasets.samplers import SubsetSampler
 from torch.utils.data.dataset import Dataset, Subset
-from torch.utils.data.sampler import Sampler
+from torch.utils.data.sampler import Sampler, SubsetRandomSampler
 from typing import List
 
 
@@ -30,17 +29,22 @@ def split_dataset(
 	return [Subset(dataset, idx) for idx in indexes]
 
 
-def generate_split_samplers(dataset: Dataset, ratios: List[float], nb_classes: int) -> List[Sampler]:
-	indexes = generate_indexes(dataset, nb_classes, ratios, target_one_hot=True)
-	return [SubsetSampler(dataset, idx) for idx in indexes]
+def generate_split_samplers(
+	dataset: Dataset,
+	ratios: List[float],
+	nb_classes: int,
+	target_one_hot: bool = True,
+) -> List[Sampler]:
+	indexes = generate_indexes(dataset, nb_classes, ratios, target_one_hot=target_one_hot)
+	return [SubsetRandomSampler(idx) for idx in indexes]
 
 
 def generate_indexes(
 	dataset: Dataset,
 	nb_classes: int,
 	ratios: List[float],
-	shuffle_idx: bool = True,
 	target_one_hot: bool = True,
+	shuffle_idx: bool = True,
 ) -> List[List[int]]:
 	"""
 		Split dataset in list of indexes for each ratio.
@@ -48,9 +52,9 @@ def generate_indexes(
 
 		:param dataset: The original dataset.
 		:param nb_classes: The number of classes in the original dataset.
-		:param ratios: Ratios used to split the dataset. The sum must be 1.
-		:param shuffle_idx: Shuffle classes indexes before split them.
-		:param target_one_hot: Consider labels as one-hot vectors. If False, consider labels as class indexes.
+		:param ratios: Ratios used to split the dataset. The sum must <= 1.
+		:param target_one_hot: Consider labels as one-hot vectors. If False, consider labels as class indexes. (default: True)
+		:param shuffle_idx: Shuffle classes indexes before split them. (default: True)
 		:returns: A list of indexes for each ratios.
 	"""
 	cls_idx_all = _get_classes_idx(dataset, nb_classes, target_one_hot)

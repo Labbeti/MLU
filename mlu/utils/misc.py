@@ -9,7 +9,7 @@ from torch import Tensor
 from torch.nn import Module
 from torch.optim import Optimizer
 from torch.utils.tensorboard import SummaryWriter
-from typing import Any, Dict, List, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 
 def get_datetime() -> str:
@@ -145,3 +145,39 @@ def get_current_git_hash() -> str:
 		return git_hash
 	except subprocess.CalledProcessError:
 		return "UNKNOWN"
+
+
+def to_dict_rec(obj: Any, class_name_key: Optional[str] = "__class__") -> Union[dict, list]:
+	"""
+		Convert an object to a dictionary.
+
+		Source code was imported from : (with few changes)
+			https://stackoverflow.com/questions/1036409/recursively-convert-python-object-graph-to-dictionary
+
+		:param obj: The object to convert.
+		:param class_name_key: Key used to save the class name if we convert an object.
+		:returns: The dictionary corresponding to the object.
+	"""
+	if isinstance(obj, dict):
+		return {
+			key: to_dict_rec(value, class_name_key)
+			for key, value in obj.items()
+		}
+	elif isinstance(obj, Tensor):
+		return to_dict_rec(obj.tolist(), class_name_key)
+	elif hasattr(obj, "_ast"):
+		return to_dict_rec(obj._ast())
+	elif hasattr(obj, "__iter__") and not isinstance(obj, str):
+		return [to_dict_rec(v, class_name_key) for v in obj]
+	elif hasattr(obj, "__dict__"):
+		data = {}
+		if class_name_key is not None and hasattr(obj, "__class__"):
+			data[class_name_key] = obj.__class__.__name__
+		data.update(dict([
+			(attr, to_dict_rec(value, class_name_key))
+			for attr, value in obj.__dict__.items()
+			if not callable(value) and not attr.startswith('_')
+		]))
+		return data
+	else:
+		return obj

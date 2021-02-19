@@ -77,3 +77,64 @@ class RandomChoice(Container):
 		for transform in transforms:
 			x = transform(x)
 		return x
+
+
+class PoolRandomChoice(Container):
+	def __init__(
+		self,
+		pool_transforms: List[Callable],
+		transform_to_spec: Optional[Callable],
+		is_spec_transform: Callable,
+		p: float = 1.0
+	):
+		"""
+			TODO
+		"""
+		super().__init__(*pool_transforms, p=p)
+		self._transform_to_spec = transform_to_spec
+		self._is_spec_transform = is_spec_transform
+		self._transform_composed = None
+
+		self._build()
+
+	def apply(self, x: Any) -> Any:
+		return self._transform_composed(x)
+
+	def _build(self):
+		pool = self.get_transforms()
+		transform_to_spec = self._transform_to_spec
+		is_spec_transform = self._is_spec_transform
+
+		pool_new = []
+		for augm in pool:
+			transforms = []
+
+			if augm is not None:
+				if transform_to_spec is not None:
+					# Add transform to spectrogram before or after each augment depending on his internal type.
+					if is_spec_transform(augm):
+						transforms.append(transform_to_spec)
+						transforms.append(augm)
+					else:
+						transforms.append(augm)
+						transforms.append(transform_to_spec)
+				else:
+					transforms.append(augm)
+			elif transform_to_spec is not None:
+				transforms.append(transform_to_spec)
+
+			if len(transforms) == 0:
+				raise RuntimeError("Found an empty list of transforms.")
+			elif len(transforms) == 1:
+				pool_new.append(transforms[0])
+			else:
+				pool_new.append(Compose(*transforms))
+
+		if len(pool_new) == 0:
+			raise RuntimeError("Found an empty transform pool.")
+		elif len(pool_new) == 1:
+			transform_composed = pool_new[0]
+		else:
+			transform_composed = RandomChoice(*pool_new)
+
+		self._transform_composed = transform_composed

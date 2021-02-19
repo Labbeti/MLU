@@ -17,6 +17,9 @@ class Squeeze(Module):
 	def forward(self, x: Tensor) -> Tensor:
 		return x.squeeze(self.dim)
 
+	def extra_repr(self) -> str:
+		return f"dim={self.dim}"
+
 
 class UnSqueeze(Module):
 	def __init__(self, dim: int):
@@ -25,6 +28,9 @@ class UnSqueeze(Module):
 
 	def forward(self, x: Tensor) -> Tensor:
 		return x.unsqueeze(self.dim)
+
+	def extra_repr(self) -> str:
+		return f"dim={self.dim}"
 
 
 class Mish(Module):

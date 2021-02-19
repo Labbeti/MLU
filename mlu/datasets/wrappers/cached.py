@@ -14,6 +14,8 @@ class CachedDataset(DatasetWrapper):
 
 	def __getitem__(self, *args, **kwargs) -> T:
 		args_dict = locals()
+		args_dict = {k: str(v) for k, v in args_dict.items()}
+
 		if args_dict in self._cached_items.keys():
 			item = self._cached_items[args_dict]
 		else:
