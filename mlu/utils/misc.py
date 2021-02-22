@@ -9,7 +9,10 @@ from torch import Tensor
 from torch.nn import Module
 from torch.optim import Optimizer
 from torch.utils.tensorboard import SummaryWriter
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, TypeVar, Union
+
+
+T = TypeVar("T")
 
 
 def get_datetime() -> str:
@@ -32,12 +35,21 @@ def reset_seed(seed: int):
 	np.random.seed(seed)
 	torch.manual_seed(seed)
 	torch.cuda.manual_seed_all(seed)
-	torch.backends.cudnn.deterministic = True
-	torch.backends.cudnn.benchmark = False
+
+	if hasattr(torch.backends, "cudnn"):
+		torch.backends.cudnn.deterministic = True
+		torch.backends.cudnn.benchmark = False
+	else:
+		raise RuntimeError(
+			"Cannot make deterministic behaviour for current torch backend (torch.backends does have the attribute 'cudnn')."
+		)
 
 
 def random_rect(
-	width_img: int, height_img: int, width_range: Tuple[float, float], height_range: Tuple[float, float]
+	width_img: int,
+	height_img: int,
+	width_range: Tuple[float, float],
+	height_range: Tuple[float, float]
 ) -> (int, int, int, int):
 	"""
 		Create a random rectangle inside an area defined by the limits (left, right, top, down).
@@ -166,18 +178,44 @@ def to_dict_rec(obj: Any, class_name_key: Optional[str] = "__class__") -> Union[
 	elif isinstance(obj, Tensor):
 		return to_dict_rec(obj.tolist(), class_name_key)
 	elif hasattr(obj, "_ast"):
-		return to_dict_rec(obj._ast())
+		return to_dict_rec(obj._ast(), class_name_key)
 	elif hasattr(obj, "__iter__") and not isinstance(obj, str):
 		return [to_dict_rec(v, class_name_key) for v in obj]
 	elif hasattr(obj, "__dict__"):
 		data = {}
 		if class_name_key is not None and hasattr(obj, "__class__"):
 			data[class_name_key] = obj.__class__.__name__
-		data.update(dict([
-			(attr, to_dict_rec(value, class_name_key))
+		data.update({
+			attr: to_dict_rec(value, class_name_key)
 			for attr, value in obj.__dict__.items()
-			if not callable(value) and not attr.startswith('_')
-		]))
+			if not callable(value) and not attr.startswith("__")
+		})
 		return data
 	else:
 		return obj
+
+
+def scalar_interpolation(min_: T, max_: T, coefficient: T) -> T:
+	"""
+		Compute the linear interpolation between min_ and max_ with a coefficient.
+
+		:param min_: The minimal value used for interpolation.
+		:param max_: The maximal value used for interpolation.
+		:param coefficient: The coefficient in [0.0, 1.0] for compute the results.
+		:returns: The value interpolated between min_ and max_.
+	"""
+	return (max_ - min_) * coefficient + min_
+
+
+def scalar_normalization(value: T, old_min: T, old_max: T, new_min: T = 0.0, new_max: T = 1.0) -> T:
+	"""
+		Normalize a value from range [old_min, old_max] to [new_min, new_max].
+
+		:param value: The value to normalize.
+		:param old_min: The minimal value of the previous range.
+		:param old_max: The maximal value of the previous range.
+		:param new_min: The minimal value of the new range. (default: 0.0)
+		:param new_max: The maximal value of the new range. (default: 1.0)
+		:returns: The value normalized in the new range.
+	"""
+	return (value - old_min) / (old_max - old_min) * (new_max - new_min) + new_min

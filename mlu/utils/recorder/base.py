@@ -20,17 +20,18 @@ class RecorderABC(ABC):
 	def step(self):
 		"""
 			Update global trackers and save epoch results to tensorboard.
+			This method must be called at the end of an epoch.
+		"""
+		raise RuntimeError("Abstract method")
+
+	def get_bests_epochs(self) -> Dict[str, Dict[str, Union[int, float]]]:
+		"""
+			:return: Best scores over all epochs on a dictionary like 'Dict[scalar_name][best_type] -> float'.
 		"""
 		raise RuntimeError("Abstract method")
 
 	def get_writer(self) -> Optional[SummaryWriter]:
 		"""
 			:return: Internal SummaryWriter object.
-		"""
-		raise RuntimeError("Abstract method")
-
-	def get_all_bests(self) -> Dict[str, Dict[str, float]]:
-		"""
-			:return: Best score over epochs on a dictionary Dict[scalar_name][best_type].
 		"""
 		raise RuntimeError("Abstract method")

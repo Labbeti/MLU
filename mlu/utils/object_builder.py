@@ -10,6 +10,8 @@ class ObjectBuilder:
 		"""
 			ObjectBuilder for build objects by name.
 
+			TODO : add submodules of a module.
+
 			:param case_sensitive: If True, the names registered will be in convert to lower case. (default: True)
 			:param verbose: Verbose level of the class. Use 1 for print information and warnings. (default: 0)
 		"""
