@@ -1,9 +1,10 @@
 
-from typing import Iterable, Sized, Union
+from mlu.utils.typing.classes import SizedIterable
+from typing import Iterable, Sized
 
 
 class ZipCycle(Iterable, Sized):
-	def __init__(self, iterables: Union[list, tuple], policy: str = "max"):
+	def __init__(self, *iterables: SizedIterable, policy: str = "max"):
 		"""
 			Zip through a list of iterables and sized objects of different lengths.
 			Reset the iterators when there and finish iteration when the longest one is over.

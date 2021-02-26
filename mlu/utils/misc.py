@@ -1,6 +1,7 @@
 
 import numpy as np
 import random
+import re
 import subprocess
 import torch
 
@@ -27,7 +28,8 @@ def get_datetime() -> str:
 
 def reset_seed(seed: int):
 	"""
-		Reset the seed of following packages : random, numpy, torch, torch.cuda, torch.backends.cudnn.
+		Reset the seed of following packages : random, numpy, torch, torch.cuda and set deterministic behaviour for cudnn
+		backend.
 
 		:param seed: The seed to set.
 	"""
@@ -219,3 +221,47 @@ def scalar_normalization(value: T, old_min: T, old_max: T, new_min: T = 0.0, new
 		:returns: The value normalized in the new range.
 	"""
 	return (value - old_min) / (old_max - old_min) * (new_max - new_min) + new_min
+
+
+def duration_formatter(seconds: int, format_: str = "%jd:%Hh:%Mm:%Ss") -> str:
+	rest = seconds
+
+	rest, seconds = divmod(rest, 60)
+	rest, minutes = divmod(rest, 60)
+	rest, hours = divmod(rest, 24)
+	days = rest
+
+	replaces = {
+		"%S": seconds,
+		"%M": minutes,
+		"%H": hours,
+		"%j": days,
+	}
+	result = format_
+	for directive, value in replaces.items():
+		result = result.replace(directive, str(value))
+	return result
+
+
+def duration_unformatter(string: str, format_: str = "%jd:%Hh:%Mm:%Ss") -> int:
+	replaces = {
+		"%S": "(?P<S>[0-9]+)",
+		"%M": "(?P<M>[0-9]+)",
+		"%H": "(?P<H>[0-9]+)",
+		"%j": "(?P<j>[0-9]+)",
+	}
+	format_re = format_
+	for directive, value in replaces.items():
+		format_re = format_re.replace(directive, str(value))
+
+	match = re.search(format_re, string)
+	if match is None:
+		raise RuntimeError(f"Invalid string '{string}' with format '{format_}'.")
+
+	seconds = int(match["S"])
+	minutes = int(match["M"])
+	hours = int(match["H"])
+	days = int(match["j"])
+	total_seconds = seconds + minutes * 60 + hours * 3600 + days * 3600 * 24
+
+	return total_seconds

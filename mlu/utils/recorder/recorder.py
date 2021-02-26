@@ -4,7 +4,7 @@ import copy
 from mlu.metrics.base import IncrementalMetric
 from mlu.metrics.incremental import IncrementalMean, MaxTracker
 from mlu.utils.recorder.base import RecorderABC
-from mlu.utils.recorder.utils import _add_subname_suffix, _add_pre_and_suffix
+from mlu.utils.recorder.utils import _add_subname_suffix, _add_suffixes
 from torch import Tensor
 from torch.utils.tensorboard.writer import SummaryWriter
 from typing import Dict, Optional, Union
@@ -14,7 +14,7 @@ class Recorder(RecorderABC):
 	def __init__(
 		self,
 		writer: Optional[SummaryWriter] = None,
-		write_iteration: bool = False,
+		write_iteration: bool = True,
 		write_epoch: bool = True,
 		write_global: bool = False,
 		it_suffix: str = "it",
@@ -35,7 +35,7 @@ class Recorder(RecorderABC):
 			:param write_global: If True, save global value to tensorboard writer.
 				(default: False)
 			:param it_suffix: Iteration suffix name.
-				(default: 'it_')
+				(default: 'it')
 			:param it_start: The iteration start index. Useful when the recorder is used for continue a training process.
 				(default: 0)
 			:param default_epoch_trackers: Default epoch tracker for compute an epoch value with scalar stored.
@@ -75,7 +75,7 @@ class Recorder(RecorderABC):
 			try:
 				scalar = scalar.item()
 			except ValueError:
-				raise ValueError(f"Cannot add to MLU Recorder a non-scalar tensor '{scalar}'.")
+				raise ValueError(f"Cannot add to MLU Recorder a non-scalar tensor '{scalar}' (scalar_name='{scalar_name}').")
 
 		if epoch not in self._step_trackers.keys():
 			self._step_trackers[epoch] = {}
@@ -114,7 +114,7 @@ class Recorder(RecorderABC):
 						global_tracker.add(tracker.get_current())
 						if self._write_epoch:
 							# Save best data to writer
-							tag = _add_pre_and_suffix(scalar_name, global_incr_name, step_incr_name)
+							tag = _add_suffixes(scalar_name, global_incr_name, step_incr_name)
 							self._add_scalar_to_writer(tag, global_tracker.get_current(), epoch)
 		self._step_trackers.clear()
 

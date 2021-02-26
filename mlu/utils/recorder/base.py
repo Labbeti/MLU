@@ -24,6 +24,16 @@ class RecorderABC(ABC):
 		"""
 		raise RuntimeError("Abstract method")
 
+	def set_write_modes(self, write_iteration: bool, write_epoch: bool, write_global: bool):
+		"""
+			Activate or deactivate the writing modes in SummaryWriter.
+
+			:param write_iteration: If True, write every iteration in writer.
+			:param write_epoch: If True, write epochs values (defined by epochs trackers).
+			:param write_global: If True, write global values (defined by global trackers).
+		"""
+		raise RuntimeError("Abstract method")
+
 	def get_bests_epochs(self) -> Dict[str, Dict[str, Union[int, float]]]:
 		"""
 			:return: Best scores over all epochs on a dictionary like 'Dict[scalar_name][best_type] -> float'.
