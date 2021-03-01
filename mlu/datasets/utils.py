@@ -1,10 +1,14 @@
 
 import numpy as np
 import random
+import torch
 
+from mlu.utils.typing import SizedDataset
+from numpy.random import RandomState
+from torch import Tensor
 from torch.utils.data.dataset import Dataset, Subset
 from torch.utils.data.sampler import Sampler, SubsetRandomSampler
-from typing import List
+from typing import Callable, List, Optional
 
 
 def split_dataset(
@@ -57,51 +61,144 @@ def generate_indexes(
 		:param shuffle_idx: Shuffle classes indexes before split them. (default: True)
 		:returns: A list of indexes for each ratios.
 	"""
-	cls_idx_all = _get_classes_idx(dataset, nb_classes, target_one_hot)
+	indexes_per_class = get_indexes_per_class(dataset, nb_classes, target_one_hot)
 	if shuffle_idx:
-		cls_idx_all = _shuffle_classes_idx(cls_idx_all)
-	indexes = _split_classes_idx(cls_idx_all, ratios)
+		indexes_per_class = shuffle_indexes_per_class(indexes_per_class)
+	indexes = split_indexes_per_class_flat(indexes_per_class, ratios)
 	return indexes
 
 
-def _get_classes_idx(dataset: Dataset, nb_classes: int, target_one_hot: bool = True) -> List[List[int]]:
+def get_indexes_per_class(
+	dataset: SizedDataset,
+	nb_classes: int,
+	target_one_hot: bool = True,
+) -> List[List[int]]:
 	"""
-		Get class indexes from a standard dataset with index of class as label.
+		Get class indexes from a Sized dataset with index of class as label.
+
+		:param dataset: TODO
+		:param nb_classes: TODO
+		:param target_one_hot: TODO
 	"""
 	result = [[] for _ in range(nb_classes)]
 
 	for i in range(len(dataset)):
 		_data, label = dataset[i]
 		if target_one_hot:
-			label = np.argmax(label)
-		result[label].append(i)
+			if isinstance(label, np.ndarray) or isinstance(label, Tensor):
+				label_idx = label.argmax().item()
+			else:
+				raise RuntimeError(
+					f"Invalid one-hot label type '{type(label)}' at index {i}. Must be one of '{(np.ndarray, torch.Tensor)}'")
+		else:
+			label_idx = label
+		result[label_idx].append(i)
 	return result
 
 
-def _shuffle_classes_idx(classes_idx: List[List[int]]) -> List[List[int]]:
+def shuffle_indexes_per_class(
+	indexes_per_class: List[List[int]],
+	random_state: Optional[RandomState] = None,
+) -> List[List[int]]:
 	"""
-		Shuffle each class indexes. (operation "in-place").
+		Shuffle each indexes per class. (this operation is "in-place").
+
+		:param indexes_per_class: TODO
+		:param random_state: TODO
+		:return: TODO
 	"""
-	for indexes in classes_idx:
-		random.shuffle(indexes)
-	return classes_idx
+	if random_state is None:
+		random_state = random
+
+	for indexes in indexes_per_class:
+		random_state.shuffle(indexes)
+	return indexes_per_class
 
 
-def _split_classes_idx(classes_idx: List[List[int]], ratios: List[float]) -> List[List[int]]:
+def split_indexes_per_class_flat(
+	indexes_per_class: List[List[int]],
+	ratios: List[float],
+) -> List[List[int]]:
 	"""
 		Split class indexes and merge them for each ratio.
 
 		Ex:
-			input:  classes_idx = [[1, 2], [3, 4], [5, 6]], ratios = [0.5, 0.5]
-			output: [[1, 3, 5], [2, 4, 6]]
+		>>> split_indexes_per_class_flat(indexes_per_class=[[1, 2], [3, 4], [5, 6]], ratios=[0.5, 0.5])
+		... [[1, 3, 5], [2, 4, 6]]
+
+		:param indexes_per_class: TODO
+		:param ratios: TODO
+		:return: TODO
 	"""
+	assert sum(ratios) <= 1.0, "Ratio sum can be greater than 1.0."
 
 	result = [[] for _ in range(len(ratios))]
 
-	for indexes in classes_idx:
+	for indexes in indexes_per_class:
 		current_begin = 0
-		for i, ratio in enumerate(ratios):
+		for j, ratio in enumerate(ratios):
 			current_end = current_begin + int(round(ratio * len(indexes)))
-			result[i] += indexes[current_begin:current_end]
+			result[j] += indexes[current_begin:current_end]
 			current_begin = current_end
 	return result
+
+
+def split_indexes_per_class(
+	indexes_per_class: List[List[int]],
+	ratios: List[float],
+	round_fn: Callable[[float], int] = round,
+) -> List[List[List[int]]]:
+	"""
+		Split class indexes.
+
+		Ex:
+		>>> split_indexes_per_class_flat(indexes_per_class=[[1, 2], [3, 4], [5, 6]], ratios=[0.5, 0.5])
+		... [[[1], [3], [5]], [[2], [4], [6]]]
+
+		:param indexes_per_class: List of indexes of each class.
+		:param ratios: The ratios of each indexes split.
+		:param round_fn: The round mode for compute the last index of a sub-indexes. (default: round)
+		:return: The indexes per ratio and per class of size (nb_ratios, nb_classes, nb_indexes_in_ratio_and_class).
+			Note: The return is not a tensor or ndarray because 'nb_indexes_in_ratio_and_class' can be different for each
+			ratio or class.
+	"""
+	assert sum(ratios) <= 1.0, "Ratio sum can be greater than 1.0."
+
+	nb_classes = len(indexes_per_class)
+	nb_ratios = len(ratios)
+
+	indexes_per_ratio_per_class = [[
+			[] for _ in range(nb_classes)
+		]
+		for _ in range(nb_ratios)
+	]
+
+	current_starts = [0 for _ in range(nb_classes)]
+	for i, ratio in enumerate(ratios):
+		for j, indexes in enumerate(indexes_per_class):
+			current_start = current_starts[j]
+			current_end = current_start + int(round_fn(ratio * len(indexes)))
+			sub_indexes = indexes[current_start:current_end]
+			indexes_per_ratio_per_class[i][j] = sub_indexes
+			current_starts[j] = current_end
+	return indexes_per_ratio_per_class
+
+
+def reduce_indexes_per_class(
+	indexes_per_class: List[List[int]],
+	ratio: float,
+) -> List[List[int]]:
+	return split_indexes_per_class(indexes_per_class, [ratio])[0]
+
+
+def flat_indexes_per_class(
+	indexes_per_class: List[List[int]],
+) -> List[int]:
+	"""
+		:param indexes_per_class: TODO
+		:return: TODO
+	"""
+	indexes = []
+	for class_indexes in indexes_per_class:
+		indexes.extend(class_indexes)
+	return indexes

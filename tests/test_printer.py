@@ -11,6 +11,7 @@ class TestPrinter(TestCase):
 
 		printer.print_current_values({"train/accuracy": 0.89, "train/loss": 1.525}, 0, 100, 2, "train")
 		print()
+		print()
 
 		nb_epoch = 1
 		nb_it = 50000
