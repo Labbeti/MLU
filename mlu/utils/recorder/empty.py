@@ -12,6 +12,9 @@ class EmptyRecorder(RecorderABC):
 	def step(self):
 		pass
 
+	def get_current(self, epoch: int, step_incr_name: str = "mean", add_step_incr_name: bool = False) -> Dict[str, float]:
+		return {}
+
 	def get_bests_epochs(self) -> Dict[str, Dict[str, Union[int, float]]]:
 		return {}
 

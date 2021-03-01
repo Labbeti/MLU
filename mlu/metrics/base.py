@@ -7,6 +7,7 @@ Input = TypeVar("Input")
 Target = TypeVar("Target")
 Output = TypeVar("Output")
 T = TypeVar("T")
+U = TypeVar("U")
 
 
 class Metric(Module, Callable, ABC, Generic[Input, Target, Output]):
@@ -23,14 +24,14 @@ class Metric(Module, Callable, ABC, Generic[Input, Target, Output]):
 		raise NotImplementedError("Abstract method")
 
 
-class IncrementalMetric(Module, Callable, ABC):
+class IncrementalMetric(Module, Callable, ABC, Generic[T, U]):
 	"""
 		Base class for incremental metrics modules, which wrap a metric and compute a continue value on the scores.
 
 		Abstract methods:
 			- reset(self):
-			- add(self, value: Tensor):
-			- get_current(self) -> Optional[Tensor]:
+			- add(self, value: T):
+			- get_current(self) -> Optional[U]:
 			- is_empty(self) -> bool:
 	"""
 	def reset(self):
@@ -53,7 +54,7 @@ class IncrementalMetric(Module, Callable, ABC):
 		"""
 		raise NotImplementedError("Abstract method")
 
-	def get_current(self) -> Optional[T]:
+	def get_current(self) -> Optional[U]:
 		"""
 			Get the current incremental score.
 
@@ -70,7 +71,7 @@ class IncrementalMetric(Module, Callable, ABC):
 		for value in values:
 			self.add(value)
 
-	def forward(self, value: T) -> Optional[T]:
+	def forward(self, value: T) -> Optional[U]:
 		"""
 			:param value: Add a value to the metric and returns the current incremental value.
 			:return: The current incremental metric value.

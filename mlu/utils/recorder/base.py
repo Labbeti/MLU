@@ -34,6 +34,19 @@ class RecorderABC(ABC):
 		"""
 		raise RuntimeError("Abstract method")
 
+	def get_current(self, epoch: int, step_incr_name: str = "mean", add_step_incr_name: bool = False) -> Dict[str, float]:
+		"""
+			Get the current continues epoch values.
+
+			:param epoch: The index of the epoch.
+			:param step_incr_name: The name of the incremental (continue) values to get.
+				(default: 'mean')
+			:param add_step_incr_name: If True, add the step_incr_name after the name of the incremental value stored.
+				(default: False)
+			:return: The dictionary of current incremental values of the epoch.
+		"""
+		raise RuntimeError("Abstract method")
+
 	def get_bests_epochs(self) -> Dict[str, Dict[str, Union[int, float]]]:
 		"""
 			:return: Best scores over all epochs on a dictionary like 'Dict[scalar_name][best_type] -> float'.

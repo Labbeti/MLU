@@ -56,7 +56,8 @@ class IncrementalStd(IncrementalMetric):
 			Compute the continue unbiased Standard Deviation (std).
 
 			:param unbiased: If True, apply the bessel correction to std (like in the default std of pytorch).
-				Otherwise return the classic std (like the default std of numpy). (default: False)
+				Otherwise return the classic std (like the default std of numpy).
+				(default: False)
 		"""
 		super().__init__()
 		self._unbiased = unbiased
@@ -104,13 +105,17 @@ class IncrementalStd(IncrementalMetric):
 
 
 class MinTracker(IncrementalMetric):
-	def __init__(self, *args: Tensor):
+	def __init__(self, *args: Tensor, start_min: Optional[Tensor] = None, start_index_min: int = -1):
 		"""
 			Keep the minimum of the values stored.
+
+			:param args: The optional arguments to add to MaxTracker.
+			:param start_min: The minimum value stored. (default: None)
+			:param start_index_min: The index of the min value stored. (default: -1)
 		"""
 		super().__init__()
-		self._min = None
-		self._index_min = -1
+		self._min = start_min
+		self._index_min = start_index_min
 		self._counter = 0
 
 		self.add_values(list(args))
@@ -144,20 +149,25 @@ class MinTracker(IncrementalMetric):
 	def get_nb_values_added(self) -> int:
 		return self._counter
 
-	def set_min(self, min_: Tensor, counter: int, index_min: int = -1):
+	def set_min(self, min_: Tensor):
 		self._min = min_
-		self._counter = counter
+
+	def set_index(self, index_min: int):
 		self._index_min = index_min
 
 
 class MaxTracker(IncrementalMetric):
-	def __init__(self, *args: Tensor):
+	def __init__(self, *args: Tensor, start_max: Optional[Tensor] = None, start_index_max: int = -1):
 		"""
 			Keep the maximum of the values stored.
+
+			:param args: The optional arguments to add to MaxTracker.
+			:param start_max: The maximum value stored. (default: None)
+			:param start_index_max: The index of the max value stored. (default: -1)
 		"""
 		super().__init__()
-		self._max = None
-		self._index_max = -1
+		self._max = start_max
+		self._index_max = start_index_max
 		self._counter = 0
 
 		self.add_values(list(args))
@@ -191,9 +201,10 @@ class MaxTracker(IncrementalMetric):
 	def get_nb_values_added(self) -> int:
 		return self._counter
 
-	def set_max(self, max_: Tensor, counter: int, index_max: int = -1):
+	def set_max(self, max_: Tensor):
 		self._max = max_
-		self._counter = counter
+
+	def set_index(self, index_max: int):
 		self._index_max = index_max
 
 

@@ -112,26 +112,16 @@ def random_cuboid(shapes: Sequence[int], ratios: Sequence[Tuple[float, float]]) 
 	return limits
 
 
-def get_lrs(optim: Optimizer) -> List[float]:
-	""" Get the learning rates of an optimizer. """
-	return [group["lr"] for group in optim.param_groups]
-
-
-def get_lr(optim: Optimizer, idx: int = 0) -> float:
-	""" Get the learning rate of an optimizer. """
-	return get_lrs(optim)[idx]
-
-
-def get_nb_parameters(model: Module, trainable_param: bool = True) -> int:
+def get_nb_parameters(model: Module, only_trainable: bool = True) -> int:
 	"""
 		Return the number of parameters in a model.
 
 		:param model: Pytorch Module to check.
-		:param trainable_param: If True, count only parameter that requires gradient. (default: True)
+		:param only_trainable: If True, count only parameter that requires gradient. (default: True)
 		:returns: The number of parameters.
 	"""
-	params = (p for p in model.parameters() if not trainable_param or p.requires_grad)
-	return sum([p.numel() for p in params])
+	params = (p for p in model.parameters() if not only_trainable or p.requires_grad)
+	return sum(p.numel() for p in params)
 
 
 def add_dict_to_writer(dic: Dict[str, Any], writer: SummaryWriter):
