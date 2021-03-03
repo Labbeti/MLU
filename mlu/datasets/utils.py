@@ -8,7 +8,8 @@ from numpy.random import RandomState
 from torch import Tensor
 from torch.utils.data.dataset import Dataset, Subset
 from torch.utils.data.sampler import Sampler, SubsetRandomSampler
-from typing import Callable, List, Optional
+from types import ModuleType
+from typing import Callable, List, Optional, Union
 
 
 def split_dataset(
@@ -79,6 +80,7 @@ def get_indexes_per_class(
 		:param dataset: TODO
 		:param nb_classes: TODO
 		:param target_one_hot: TODO
+		:return: TODO
 	"""
 	result = [[] for _ in range(nb_classes)]
 
@@ -98,7 +100,7 @@ def get_indexes_per_class(
 
 def shuffle_indexes_per_class(
 	indexes_per_class: List[List[int]],
-	random_state: Optional[RandomState] = None,
+	random_state: Optional[Union[RandomState, ModuleType]] = None,
 ) -> List[List[int]]:
 	"""
 		Shuffle each indexes per class. (this operation is "in-place").
@@ -123,6 +125,7 @@ def split_indexes_per_class_flat(
 		Split class indexes and merge them for each ratio.
 
 		Ex:
+		
 		>>> split_indexes_per_class_flat(indexes_per_class=[[1, 2], [3, 4], [5, 6]], ratios=[0.5, 0.5])
 		... [[1, 3, 5], [2, 4, 6]]
 
@@ -130,7 +133,7 @@ def split_indexes_per_class_flat(
 		:param ratios: TODO
 		:return: TODO
 	"""
-	assert sum(ratios) <= 1.0, "Ratio sum can be greater than 1.0."
+	assert 0.0 <= sum(ratios) <= 1.0, "Ratio sum can be greater than 1.0."
 
 	result = [[] for _ in range(len(ratios))]
 
@@ -152,6 +155,7 @@ def split_indexes_per_class(
 		Split class indexes.
 
 		Ex:
+
 		>>> split_indexes_per_class_flat(indexes_per_class=[[1, 2], [3, 4], [5, 6]], ratios=[0.5, 0.5])
 		... [[[1], [3], [5]], [[2], [4], [6]]]
 
@@ -162,7 +166,7 @@ def split_indexes_per_class(
 			Note: The return is not a tensor or ndarray because 'nb_indexes_in_ratio_and_class' can be different for each
 			ratio or class.
 	"""
-	assert sum(ratios) <= 1.0, "Ratio sum can be greater than 1.0."
+	assert 0.0 <= sum(ratios) <= 1.0, "Ratio sum can be greater than 1.0."
 
 	nb_classes = len(indexes_per_class)
 	nb_ratios = len(ratios)
