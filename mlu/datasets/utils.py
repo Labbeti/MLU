@@ -28,7 +28,7 @@ def split_dataset(
 		:param ratios: Ratios used to split the dataset. The sum must be 1.
 		:param shuffle_idx: Shuffle classes indexes before split them.
 		:param target_one_hot: Consider labels as one-hot vectors. If False, consider labels as class indexes.
-		:returns: A list of sub-wrappers.
+		:return: A list of sub-wrappers.
 	"""
 	indexes = generate_indexes(dataset, nb_classes, ratios, shuffle_idx, target_one_hot)
 	return [Subset(dataset, idx) for idx in indexes]
@@ -60,12 +60,13 @@ def generate_indexes(
 		:param ratios: Ratios used to split the dataset. The sum must <= 1.
 		:param target_one_hot: Consider labels as one-hot vectors. If False, consider labels as class indexes. (default: True)
 		:param shuffle_idx: Shuffle classes indexes before split them. (default: True)
-		:returns: A list of indexes for each ratios.
+		:return: A list of indexes for each ratios.
 	"""
 	indexes_per_class = get_indexes_per_class(dataset, nb_classes, target_one_hot)
 	if shuffle_idx:
 		indexes_per_class = shuffle_indexes_per_class(indexes_per_class)
-	indexes = split_indexes_per_class_flat(indexes_per_class, ratios)
+	splits = split_indexes_per_class(indexes_per_class, ratios)
+	indexes = [flat_indexes_per_class(split) for split in splits]
 	return indexes
 
 
@@ -117,46 +118,17 @@ def shuffle_indexes_per_class(
 	return indexes_per_class
 
 
-def split_indexes_per_class_flat(
-	indexes_per_class: List[List[int]],
-	ratios: List[float],
-) -> List[List[int]]:
-	"""
-		Split class indexes and merge them for each ratio.
-
-		Ex:
-		
-		>>> split_indexes_per_class_flat(indexes_per_class=[[1, 2], [3, 4], [5, 6]], ratios=[0.5, 0.5])
-		... [[1, 3, 5], [2, 4, 6]]
-
-		:param indexes_per_class: TODO
-		:param ratios: TODO
-		:return: TODO
-	"""
-	assert 0.0 <= sum(ratios) <= 1.0, "Ratio sum can be greater than 1.0."
-
-	result = [[] for _ in range(len(ratios))]
-
-	for indexes in indexes_per_class:
-		current_begin = 0
-		for j, ratio in enumerate(ratios):
-			current_end = current_begin + int(round(ratio * len(indexes)))
-			result[j] += indexes[current_begin:current_end]
-			current_begin = current_end
-	return result
-
-
 def split_indexes_per_class(
 	indexes_per_class: List[List[int]],
 	ratios: List[float],
 	round_fn: Callable[[float], int] = round,
 ) -> List[List[List[int]]]:
 	"""
-		Split class indexes.
+		Split distinct indexes per class.
 
 		Ex:
 
-		>>> split_indexes_per_class_flat(indexes_per_class=[[1, 2], [3, 4], [5, 6]], ratios=[0.5, 0.5])
+		>>> split_indexes_per_class(indexes_per_class=[[1, 2], [3, 4], [5, 6]], ratios=[0.5, 0.5])
 		... [[[1], [3], [5]], [[2], [4], [6]]]
 
 		:param indexes_per_class: List of indexes of each class.

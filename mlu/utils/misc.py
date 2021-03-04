@@ -1,4 +1,5 @@
 
+import inspect
 import numpy as np
 import random
 import re
@@ -8,9 +9,9 @@ import torch
 from datetime import datetime
 from torch import Tensor
 from torch.nn import Module
-from torch.optim import Optimizer
 from torch.utils.tensorboard import SummaryWriter
-from typing import Any, Dict, List, Optional, Sequence, Tuple, TypeVar, Union
+from types import MethodType, FunctionType
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Type, TypeVar, Union
 
 
 T = TypeVar("T")
@@ -255,3 +256,28 @@ def duration_unformatter(string: str, format_: str = "%jd:%Hh:%Mm:%Ss") -> int:
 	total_seconds = seconds + minutes * 60 + hours * 3600 + days * 3600 * 24
 
 	return total_seconds
+
+
+def get_func_params_names(func: Union[MethodType, FunctionType]) -> List[str]:
+	parameters_names = func.__code__.co_varnames
+	return list(parameters_names)
+
+
+def get_param_names(class_or_func: Callable) -> List[str]:
+	if inspect.isfunction(class_or_func):
+		func = class_or_func
+	elif inspect.isclass(class_or_func) and hasattr(class_or_func, "__init__"):
+		func = class_or_func.__init__
+	elif callable(class_or_func) and hasattr(class_or_func, "__call__"):
+		func = class_or_func.__call__
+	else:
+		raise RuntimeError(
+			f"Invalid class, function or object '{class_or_func.__name__}'. Must be a function, class or callable object.")
+
+	return get_func_params_names(func)
+
+
+def filter_dict_with_func(dic: Dict[str, Any], func: Callable) -> Dict[str, Any]:
+	param_names = get_param_names(func)
+	names_intersection = set(param_names).intersection(dic.keys())
+	return {name: dic[name] for name in names_intersection}
