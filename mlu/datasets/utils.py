@@ -17,10 +17,10 @@ def generate_subsets(
 	nb_classes: int,
 	ratios: List[float],
 	shuffle_idx: bool = True,
-	target_one_hot: bool = True,
+	target_one_hot: bool = False,
 ) -> List[Dataset]:
 	"""
-		Split dataset in several sub-wrappers by using a list of ratios.
+		Split mono-labeled dataset in several sub-wrappers by using a list of ratios.
 		Also keep the original class distribution in every sub-dataset.
 
 		:param dataset: The original dataset.
@@ -28,7 +28,7 @@ def generate_subsets(
 		:param ratios: Ratios used to split the dataset. The sum must be 1.
 		:param shuffle_idx: Shuffle classes indexes before split them.
 		:param target_one_hot: Consider labels as one-hot vectors. If False, consider labels as class indexes.
-		:return: A list of sub-wrappers.
+		:return: A list of subsets.
 	"""
 	indexes = generate_indexes(dataset, nb_classes, ratios, shuffle_idx, target_one_hot)
 	return [Subset(dataset, idx) for idx in indexes]
@@ -36,10 +36,20 @@ def generate_subsets(
 
 def generate_split_samplers(
 	dataset: Dataset,
-	ratios: List[float],
 	nb_classes: int,
-	target_one_hot: bool = True,
+	ratios: List[float],
+	target_one_hot: bool = False,
 ) -> List[Sampler]:
+	"""
+		Split monolabeled dataset with several samplers that must be used by pytorch Dataloaders.
+		Also keep the original class distribution in every sub-dataset.
+
+		:param dataset: The original dataset.
+		:param nb_classes: The number of classes in the original dataset.
+		:param ratios: Ratios used to split the dataset. The sum must be 1.
+		:param target_one_hot: Consider labels as one-hot vectors. If False, consider labels as class indexes.
+		:return: A list of samplers of length of ratios list.
+	"""
 	indexes = generate_indexes(dataset, nb_classes, ratios, target_one_hot=target_one_hot)
 	return [SubsetRandomSampler(idx) for idx in indexes]
 
@@ -73,15 +83,16 @@ def generate_indexes(
 def get_indexes_per_class(
 	dataset: SizedDataset,
 	nb_classes: int,
-	target_one_hot: bool = True,
+	target_one_hot: bool = False,
 ) -> List[List[int]]:
 	"""
 		Get class indexes from a Sized dataset with index of class as label.
 
-		:param dataset: TODO
-		:param nb_classes: TODO
-		:param target_one_hot: TODO
-		:return: TODO
+		:param dataset: The mono-labeled sized dataset to iterate.
+		:param nb_classes: The number of classes in the dataset.
+		:param target_one_hot: If True, convert each label as one-hot label encoding instead of class index. (default: False)
+		:return: The indexes per class in the dataset of size (num_classes, num_elem_in_class_i).
+			Note: If the class distribution is not perfectly uniform, this return is not a complete matrix.
 	"""
 	result = [[] for _ in range(nb_classes)]
 
@@ -106,9 +117,9 @@ def shuffle_indexes_per_class(
 	"""
 		Shuffle each indexes per class. (this operation is "in-place").
 
-		:param indexes_per_class: TODO
-		:param random_state: TODO
-		:return: TODO
+		:param indexes_per_class: The list of indexes per class.
+		:param random_state: The module or numpy RandomState to use for shuffle. If None, use python random module.
+		:return: The list of indexes per class shuffled.
 	"""
 	if random_state is None:
 		random_state = random
@@ -178,8 +189,8 @@ def flat_indexes_per_class(
 	indexes_per_class: List[List[int]],
 ) -> List[int]:
 	"""
-		:param indexes_per_class: TODO
-		:return: TODO
+		:param indexes_per_class: The indexes per class.
+		:return: The complete indexes list of the indexes per class.
 	"""
 	indexes = []
 	for class_indexes in indexes_per_class:
