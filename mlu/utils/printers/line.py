@@ -60,7 +60,7 @@ class LinePrinter(PrinterABC):
 		if self.print_it:
 			it_format = f"{{:{len(str(nb_iterations))}d}}"
 			it_frac_format = f"it {it_format}/{it_format}"
-			content.append(it_frac_format.format(iteration, nb_iterations))
+			content.append(it_frac_format.format(iteration + 1, nb_iterations))
 
 		if self.print_progression_percent:
 			progression = int(100 * (iteration + 1) / nb_iterations)
@@ -75,5 +75,5 @@ class LinePrinter(PrinterABC):
 		content = ", ".join(content)
 		print(content, end="\r")
 
-		if iteration >= nb_iterations:
+		if iteration + 1 >= nb_iterations:
 			print()

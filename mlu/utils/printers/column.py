@@ -64,7 +64,7 @@ class ColumnPrinter(PrinterABC):
 		if self.print_it:
 			it_format = f"{{:{len(str(nb_iterations))}d}}"
 			it_frac_format = f"It {it_format}/{it_format}"
-			content.append(it_frac_format.format(iteration, nb_iterations))
+			content.append(it_frac_format.format(iteration + 1, nb_iterations))
 
 		if self.print_progression_percent:
 			progression = int(100 * (iteration + 1) / nb_iterations)
@@ -82,7 +82,7 @@ class ColumnPrinter(PrinterABC):
 
 		print("- {:s} -".format(" - ".join(content)), end="\r")
 
-		if iteration >= nb_iterations:
+		if iteration + 1 >= nb_iterations:
 			print()
 
 	def _print_header(self, name: str, keys: List[str], nb_iterations: int):
