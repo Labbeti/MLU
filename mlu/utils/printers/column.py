@@ -82,7 +82,7 @@ class ColumnPrinter(PrinterABC):
 
 		print("- {:s} -".format(" - ".join(content)), end="\r")
 
-		if iteration == nb_iterations - 1:
+		if iteration >= nb_iterations:
 			print()
 
 	def _print_header(self, name: str, keys: List[str], nb_iterations: int):

@@ -75,5 +75,5 @@ class LinePrinter(PrinterABC):
 		content = ", ".join(content)
 		print(content, end="\r")
 
-		if iteration == nb_iterations - 1:
-			print("")
+		if iteration >= nb_iterations:
+			print()
