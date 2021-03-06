@@ -5,7 +5,7 @@ from mlu.transforms.base import ImageTransform
 from mlu.utils.misc import random_rect
 
 from torch import Tensor
-from typing import List, Tuple, Union
+from typing import Iterable, Tuple, Union
 
 
 class Normalize(ImageTransform):
@@ -31,21 +31,21 @@ class Standardize(ImageTransform):
 	"""
 		Standardize image with a list of means and standard-deviations.
 	"""
-	def __init__(self, means: List[float], stds: List[float], dim_channel: int = 2, p: float = 1.0):
+	def __init__(self, means: Iterable[float], stds: Iterable[float], channel_dim: int = 0, p: float = 1.0):
 		super().__init__(p=p)
-		self.means = means
-		self.stds = stds
-		self.dim_channel = dim_channel
+		self.means = list(means)
+		self.stds = list(stds)
+		self.channel_dim = channel_dim
 
-		if len(means) != len(stds):
+		if len(self.means) != len(self.stds):
 			raise RuntimeError("Means and stds lists must have the same size.")
 
 	def apply(self, x: Tensor) -> Tensor:
 		output = torch.empty_like(x)
 
-		for channel, (mean, std) in enumerate(zip(self.means, self.stds)):
+		for channel_idx, (mean, std) in enumerate(zip(self.means, self.stds)):
 			slices: list = [slice(None)] * len(x.shape)
-			slices[self.dim_channel] = channel
+			slices[self.channel_dim] = channel_idx
 			output[slices] = (x[slices] - mean) / std
 		return output
 

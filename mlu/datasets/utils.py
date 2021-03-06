@@ -12,7 +12,7 @@ from types import ModuleType
 from typing import Callable, List, Optional, Union
 
 
-def split_dataset(
+def generate_subsets(
 	dataset: Dataset,
 	nb_classes: int,
 	ratios: List[float],
@@ -138,7 +138,7 @@ def split_indexes_per_class(
 			Note: The return is not a tensor or ndarray because 'nb_indexes_in_ratio_and_class' can be different for each
 			ratio or class.
 	"""
-	assert 0.0 <= sum(ratios) <= 1.0, "Ratio sum can be greater than 1.0."
+	assert 0.0 <= sum(ratios) <= 1.0, "Ratio sum cannot be greater than 1.0."
 
 	nb_classes = len(indexes_per_class)
 	nb_ratios = len(ratios)
@@ -158,6 +158,13 @@ def split_indexes_per_class(
 			indexes_per_ratio_per_class[i][j] = sub_indexes
 			current_starts[j] = current_end
 	return indexes_per_ratio_per_class
+
+
+def split_multilabel_indexes_per_class(
+	indexes_per_class: List[List[int]],
+	ratios: List[float],
+) -> List[List[List[int]]]:
+	raise NotImplementedError("TODO")
 
 
 def reduce_indexes_per_class(
