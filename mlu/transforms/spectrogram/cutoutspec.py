@@ -31,7 +31,7 @@ class CutOutSpec(SpectrogramTransform):
 			if isinstance(height_scales, tuple) else (height_scales, height_scales)
 		self.fill_value = fill_value
 
-	def apply(self, spectrogram: Tensor) -> Tensor:
+	def process(self, spectrogram: Tensor) -> Tensor:
 		assert len(spectrogram.shape) >= 2
 
 		height, width = spectrogram.shape[-2], spectrogram.shape[-1]

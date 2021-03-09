@@ -12,7 +12,7 @@ from types import ModuleType
 from typing import Callable, List, Optional, Union
 
 
-def generate_subsets(
+def generate_subsets_split(
 	dataset: Dataset,
 	nb_classes: int,
 	ratios: List[float],
@@ -30,18 +30,18 @@ def generate_subsets(
 		:param target_one_hot: Consider labels as one-hot vectors. If False, consider labels as class indexes.
 		:return: A list of subsets.
 	"""
-	indexes = generate_indexes(dataset, nb_classes, ratios, shuffle_idx, target_one_hot)
+	indexes = generate_indexes_split(dataset, nb_classes, ratios, shuffle_idx, target_one_hot)
 	return [Subset(dataset, idx) for idx in indexes]
 
 
-def generate_split_samplers(
+def generate_samplers_split(
 	dataset: Dataset,
 	nb_classes: int,
 	ratios: List[float],
 	target_one_hot: bool = False,
 ) -> List[Sampler]:
 	"""
-		Split monolabeled dataset with several samplers that must be used by pytorch Dataloaders.
+		Split mono-labeled dataset with several samplers that must be used by pytorch Dataloaders.
 		Also keep the original class distribution in every sub-dataset.
 
 		:param dataset: The original dataset.
@@ -50,11 +50,11 @@ def generate_split_samplers(
 		:param target_one_hot: Consider labels as one-hot vectors. If False, consider labels as class indexes.
 		:return: A list of samplers of length of ratios list.
 	"""
-	indexes = generate_indexes(dataset, nb_classes, ratios, target_one_hot=target_one_hot)
+	indexes = generate_indexes_split(dataset, nb_classes, ratios, target_one_hot=target_one_hot)
 	return [SubsetRandomSampler(idx) for idx in indexes]
 
 
-def generate_indexes(
+def generate_indexes_split(
 	dataset: Dataset,
 	nb_classes: int,
 	ratios: List[float],
@@ -183,6 +183,10 @@ def reduce_indexes_per_class(
 	ratio: float,
 ) -> List[List[int]]:
 	return split_indexes_per_class(indexes_per_class, [ratio])[0]
+
+
+def flat_split_indexes_per_class(splits: List[List[List[int]]]) -> List[List[int]]:
+	return [flat_indexes_per_class(split) for split in splits]
 
 
 def flat_indexes_per_class(

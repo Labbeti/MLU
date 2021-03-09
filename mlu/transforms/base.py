@@ -22,7 +22,7 @@ class Transform(Module, Callable, ABC, Generic[Input, Output]):
 
 	def forward(self, *x: Input) -> Output:
 		if self.p >= 1.0 or random() <= self.p:
-			return self.apply(*x)
+			return self.process(*x)
 		else:
 			return x if len(x) > 1 else x[0]
 
@@ -60,7 +60,7 @@ class Transform(Module, Callable, ABC, Generic[Input, Output]):
 		"""
 		return False
 
-	def apply(self, x: Input) -> Output:
+	def process(self, x: Input) -> Output:
 		raise NotImplementedError("Abstract method")
 
 

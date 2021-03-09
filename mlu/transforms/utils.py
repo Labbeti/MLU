@@ -12,7 +12,7 @@ class Identity(Transform):
 		"""
 		super().__init__(p=p)
 
-	def apply(self, x: Tensor) -> Tensor:
+	def process(self, x: Tensor) -> Tensor:
 		return x
 
 	def is_image_transform(self) -> bool:

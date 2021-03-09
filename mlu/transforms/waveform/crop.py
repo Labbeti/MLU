@@ -12,7 +12,7 @@ class CropAlignLeft(WaveformTransform):
 		self.target_length = target_length
 		self.dim = dim
 
-	def apply(self, waveform: Tensor) -> Tensor:
+	def process(self, waveform: Tensor) -> Tensor:
 		waveform = crop_align_left(waveform, self.target_length, self.dim)
 		return waveform
 
@@ -23,7 +23,7 @@ class CropAlignRight(WaveformTransform):
 		self.target_length = target_length
 		self.dim = dim
 
-	def apply(self, waveform: Tensor) -> Tensor:
+	def process(self, waveform: Tensor) -> Tensor:
 		waveform = crop_align_right(waveform, self.target_length, self.dim)
 		return waveform
 
@@ -34,7 +34,7 @@ class CropAlignCenter(WaveformTransform):
 		self.target_length = target_length
 		self.dim = dim
 
-	def apply(self, waveform: Tensor) -> Tensor:
+	def process(self, waveform: Tensor) -> Tensor:
 		waveform = crop_align_center(waveform, self.target_length, self.dim)
 		return waveform
 
@@ -45,7 +45,7 @@ class CropAlignRandom(WaveformTransform):
 		self.target_length = target_length
 		self.dim = dim
 
-	def apply(self, waveform: Tensor) -> Tensor:
+	def process(self, waveform: Tensor) -> Tensor:
 		waveform = crop_align_random(waveform, self.target_length, self.dim)
 		return waveform
 
@@ -57,7 +57,7 @@ class Crop(WaveformTransform):
 		self.dim = dim
 		self.align = align
 
-	def apply(self, waveform: Tensor) -> Tensor:
+	def process(self, waveform: Tensor) -> Tensor:
 		waveform = crop(waveform, self.target_length, self.dim, self.align)
 		return waveform
 

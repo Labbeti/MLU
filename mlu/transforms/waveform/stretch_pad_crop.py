@@ -33,7 +33,7 @@ class StretchPadCrop(WaveformTransform):
 		self._stretch = StretchNearestFreq(dim=dim)
 		self._pad_crop = PadCrop(target_length=0, align=align, dim=dim)
 
-	def apply(self, x: Tensor) -> Tensor:
+	def process(self, x: Tensor) -> Tensor:
 		length = x.shape[self._dim]
 		self._stretch.orig_freq = length
 		self._stretch.new_freq = round(length * self._uniform.sample().item())
@@ -70,7 +70,7 @@ class StretchPadCrop2(WaveformTransform):
 		self._stretch = StretchNearestRate(rates=rates, dim=dim)
 		self._pad_crop = PadCrop(target_length=0, align=align, dim=dim)
 
-	def apply(self, x: Tensor) -> Tensor:
+	def process(self, x: Tensor) -> Tensor:
 		length = x.shape[self._dim]
 		self._pad_crop.set_target_length(length)
 

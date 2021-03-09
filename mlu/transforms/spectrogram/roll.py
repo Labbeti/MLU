@@ -18,7 +18,7 @@ class RollSpec(SpectrogramTransform):
 		self.rolls = rolls if isinstance(rolls, tuple) else (rolls, rolls)
 		self.uniform = Uniform(low=self.rolls[0], high=self.rolls[1])
 
-	def apply(self, spectrogram: Tensor) -> Tensor:
+	def process(self, spectrogram: Tensor) -> Tensor:
 		roll_scale = self.uniform.sample().item()
 		roll_size = round(spectrogram.shape[self.dim] * roll_scale)
 		spectrogram = spectrogram.roll(roll_size, dims=self.dim)

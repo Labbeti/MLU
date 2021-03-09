@@ -31,7 +31,7 @@ class PadCrop(WaveformTransform):
 		self.dim = dim
 		self.align = align
 
-	def apply(self, waveform: Tensor) -> Tensor:
+	def process(self, waveform: Tensor) -> Tensor:
 		waveform = pad_crop(waveform, self.target_length, self.fill_value, self.dim, self.align)
 		return waveform
 

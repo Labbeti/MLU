@@ -14,6 +14,8 @@ class Container(Transform, ABC):
 		self._transforms = list(transforms)
 
 		for i, transform in enumerate(self._transforms):
+			if not callable(transform):
+				raise RuntimeError(f"Cannot add non-callable object '{type(transform)}'.")
 			if not isinstance(transform, Module):
 				transform = TransformWrap(transform)
 			self.add_module(str(i), transform)
@@ -44,7 +46,7 @@ class Compose(Container):
 		"""
 		super().__init__(*transforms, p=p)
 
-	def apply(self, x: Any) -> Any:
+	def process(self, x: Any) -> Any:
 		for transform in self.get_transforms():
 			x = transform(x)
 		return x
@@ -72,7 +74,7 @@ class RandomChoice(Container):
 		self.nb_choices = nb_choices
 		self.weights = weights
 
-	def apply(self, x: Any) -> Any:
+	def process(self, x: Any) -> Any:
 		transforms = random.choices(self.get_transforms(), weights=self.weights, k=self.nb_choices)
 		for transform in transforms:
 			x = transform(x)
@@ -97,7 +99,7 @@ class PoolRandomChoice(Container):
 
 		self._build()
 
-	def apply(self, x: Any) -> Any:
+	def process(self, x: Any) -> Any:
 		return self._transform_composed(x)
 
 	def _build(self):
