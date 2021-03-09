@@ -1,5 +1,5 @@
 
-from mlu.metrics.base import Metric, IncrementalMetric, Input, Target, Output, T
+from mlu.metrics.base import Metric, IncrementalMetric, Input, Target, Output, T, U
 from mlu.metrics.incremental import IncrementalMean
 
 from torch.nn import Module
@@ -148,7 +148,7 @@ class IncrementalList(IncrementalMetric):
 			for incremental in self.incremental_list
 		]
 
-	def get_current(self) -> List[Optional[T]]:
+	def get_current(self) -> List[Optional[U]]:
 		return [
 			incremental.get_current()
 			for incremental in self.incremental_list

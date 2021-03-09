@@ -145,8 +145,8 @@ class Recorder(RecorderABC):
 				for global_incr_name, tracker in trackers.items():
 					bests[tag][global_incr_name] = tracker.get_current().item()
 
-					if hasattr(tracker, "get_index") and callable(tracker.get_index):
-						index = tracker.get_index()
+					if hasattr(tracker, "get_index") and callable(tracker.get_index_best):
+						index = tracker.get_index_best()
 						if isinstance(index, int):
 							bests[tag][f"{global_incr_name}_{self._idx_suffix}"] = index
 		return bests
