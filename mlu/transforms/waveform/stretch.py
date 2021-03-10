@@ -28,9 +28,10 @@ class StretchNearestFreq(WaveformTransform):
 		self.new_freq = new_freq
 		self.dim = dim
 
-	def apply(self, data: Tensor) -> Tensor:
+	def process(self, data: Tensor) -> Tensor:
 		length = data.shape[self.dim]
-		indexes = torch.arange(start=0, end=length, step=self.orig_freq / self.new_freq)
+		step = self.orig_freq / self.new_freq
+		indexes = torch.arange(start=0, end=length, step=step)
 		indexes = indexes.floor().long().clamp(max=length - 1)
 		slices = [slice(None)] * len(data.shape)
 		slices[self.dim] = indexes
@@ -57,10 +58,11 @@ class StretchNearestRate(WaveformTransform):
 		rates = rates if isinstance(rates, tuple) else (rates, rates)
 		self._uniform = Uniform(low=rates[0], high=rates[1])
 
-	def apply(self, data: Tensor) -> Tensor:
+	def process(self, data: Tensor) -> Tensor:
 		length = data.shape[self.dim]
 		rate = self._uniform.sample().item()
-		indexes = torch.arange(start=0, end=length, step=1.0 / rate)
+		step = 1.0 / rate
+		indexes = torch.arange(start=0, end=length, step=step)
 		indexes = indexes.floor().long().clamp(max=length - 1)
 		slices = [slice(None)] * len(data.shape)
 		slices[self.dim] = indexes

@@ -43,7 +43,7 @@ class RandAugment(ImageTransform):
 
 		self._augms = _build_augms(self._augm_pool, self._magnitude)
 
-	def apply(self, x: Input) -> Output:
+	def process(self, x: Input) -> Output:
 		if self._magnitude_policy == "random":
 			new_magnitude = random.random()
 			self.set_magnitude(new_magnitude)

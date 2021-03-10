@@ -77,7 +77,7 @@ class TestIncremental(TestCase):
 		tracker.add_values(values)
 
 		self.assertTrue(tracker.get_current().eq(torch.as_tensor([7, 7, 6])).all())
-		self.assertTrue(tracker.get_index() == [2, 4, 3])
+		self.assertTrue(tracker.get_indexes_current() == [2, 4, 3])
 
 		tracker.reset()
 		self.assertIsNone(tracker.get_current())

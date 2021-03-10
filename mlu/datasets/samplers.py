@@ -1,10 +1,13 @@
 
 from torch.utils.data.sampler import Sampler
-from typing import Iterable, List, Sized
+from typing import Iterable, List, Optional, Sized
 
 
 class SubsetSampler(Sampler):
-	def __init__(self, data_source: Sized, indexes: List[int]):
+	"""
+		A subset sampler without shuffle.
+	"""
+	def __init__(self, indexes: List[int], data_source: Optional[Sized] = None):
 		super().__init__(data_source)
 		self._indexes = indexes
 

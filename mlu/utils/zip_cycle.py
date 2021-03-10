@@ -1,9 +1,10 @@
 
+from mlu.utils.typing.classes import SizedIterable
 from typing import Iterable, Sized
 
 
 class ZipCycle(Iterable, Sized):
-	def __init__(self, iterables: list, policy: str = "max"):
+	def __init__(self, *iterables: SizedIterable, policy: str = "max"):
 		"""
 			Zip through a list of iterables and sized objects of different lengths.
 			Reset the iterators when there and finish iteration when the longest one is over.
@@ -15,22 +16,20 @@ class ZipCycle(Iterable, Sized):
 			>>> cycle = ZipCycle([r1, r2])
 			>>> for v1, v2 in cycle:
 			>>> 	print("(", v1, ",", v2, ")")
-
-			will print :
-
-			>>>	( 1 , 1 )
-			>>>	( 2 , 2 )
-			>>>	( 3 , 3 )
-			>>>	( 1 , 4 )
-			>>>	( 2 , 5 )
+			...	( 1 , 1 )
+			...	( 2 , 2 )
+			...	( 3 , 3 )
+			...	( 1 , 4 )
+			...	( 2 , 5 )
 
 			:param iterables: A list of Sized Iterables to browse. Must not be an empty list.
 			:param policy: The policy to use during iteration. (default: "max")
 				If policy = "max", the output will stop when the last iterable is finished. (like in the example above)
 				If policy = "min", the class will stop when the first iterable is finished. (like in the built-in "zip" python)
 		"""
-		assert policy in ["min", "max"]
+		assert policy in ["min", "max"], f"Available policies are '{('min', 'max')}'."
 		assert len(iterables) > 0
+
 		lens = [len(iterable) for iterable in iterables]
 		for len_ in lens:
 			if len_ == 0:

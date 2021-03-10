@@ -27,7 +27,7 @@ class Occlusion(WaveformTransform):
 		self.fill_value = fill_value
 		self.dim = dim
 
-	def apply(self, waveform: Tensor) -> Tensor:
+	def process(self, waveform: Tensor) -> Tensor:
 		length = waveform.shape[self.dim]
 		min_scale, max_scale = self.scales
 

@@ -27,7 +27,7 @@ class PadAlignLeft(WaveformTransform):
 		self.fill_value = fill_value
 		self.dim = dim
 
-	def apply(self, waveform: Tensor) -> Tensor:
+	def process(self, waveform: Tensor) -> Tensor:
 		waveform = pad_align_left(waveform, self.target_length, self.fill_value, self.dim)
 		return waveform
 
@@ -53,7 +53,7 @@ class PadAlignRight(WaveformTransform):
 		self.fill_value = fill_value
 		self.dim = dim
 
-	def apply(self, waveform: Tensor) -> Tensor:
+	def process(self, waveform: Tensor) -> Tensor:
 		waveform = pad_align_right(waveform, self.target_length, self.fill_value, self.dim)
 		return waveform
 
@@ -79,7 +79,7 @@ class PadAlignCenter(WaveformTransform):
 		self.fill_value = fill_value
 		self.dim = dim
 
-	def apply(self, waveform: Tensor) -> Tensor:
+	def process(self, waveform: Tensor) -> Tensor:
 		waveform = pad_align_center(waveform, self.target_length, self.fill_value, self.dim)
 		return waveform
 
@@ -105,7 +105,7 @@ class PadAlignRandom(WaveformTransform):
 		self.fill_value = fill_value
 		self.dim = dim
 
-	def apply(self, waveform: Tensor) -> Tensor:
+	def process(self, waveform: Tensor) -> Tensor:
 		waveform = pad_align_random(waveform, self.target_length, self.fill_value, self.dim)
 		return waveform
 
@@ -136,7 +136,7 @@ class Pad(WaveformTransform):
 		self.dim = dim
 		self.align = align
 
-	def apply(self, waveform: Tensor) -> Tensor:
+	def process(self, waveform: Tensor) -> Tensor:
 		waveform = pad(waveform, self.target_length, self.fill_value, self.dim, self.align)
 		return waveform
 

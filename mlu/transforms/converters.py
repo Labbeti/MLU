@@ -34,43 +34,62 @@ class ToNumpy(Module):
 
 
 class ToTensor(Module):
-	def __init__(self, dtype: Optional[torch.dtype] = None, device: Optional[torch.device] = None):
+	def __init__(
+		self,
+		dtype: Optional[torch.dtype] = None,
+		device: Optional[torch.device] = None,
+		permute_tensor: bool = True,
+		normalize_tensor: bool = True,
+	):
 		"""
 			Convert a python list, numpy array or PIL image to pytorch tensor.
 
 			:param dtype: The optional dtype of the pytorch tensor. (default: None)
 			:param device: The optional device of the pytorch tensor. (default: None)
+			:param permute_tensor: Permute dimensions (height, width, channel) to (channel, height, width) when converting
+				from PIL image. (default: True)
+			:param normalize_tensor: Normalize the tensor values from [0, 255] to [0.0, 1.0]. (default: True)
 		"""
 		super().__init__()
 		self.dtype = dtype
 		self.device = device
+		self.permute_tensor = permute_tensor
+		self.normalize_tensor = normalize_tensor
 
 	def forward(self, x: Union[list, np.ndarray, Tensor, Image.Image]) -> Tensor:
-		return to_tensor(x, self.dtype, self.device)
+		return to_tensor(x, self.dtype, self.device, self.permute_tensor, self.normalize_tensor)
 
 
 class ToPIL(Module):
-	def __init__(self, mode: Optional[str] = "RGB", permute_tensor: bool = True):
+	def __init__(
+		self,
+		mode: Optional[str] = "RGB",
+		permute_tensor: bool = False,
+		denormalize_tensor: bool = True,
+	):
 		"""
 			Convert a pytorch tensor, numpy array or python list to PIL image.
 
 			:param mode: Define the type and depth of a pixel in the image. (default: "RGB")
 				See https://pillow.readthedocs.io/en/5.1.x/handbook/concepts.html#modes for details on PIL modes.
 			:param permute_tensor: Permute dimensions (height, width, channel) to (channel, height, width) for PIL image.
+				(default: False)
+			:param denormalize_tensor: Normalize tensor values from [0.0, 1.0] to [0, 255].
 				(default: True)
 		"""
 		super().__init__()
 		self.mode = mode
 		self.permute_tensor = permute_tensor
+		self.denormalize_tensor = denormalize_tensor
 
 	def forward(self, x: Union[list, np.ndarray, Tensor, Image.Image]) -> Image.Image:
-		return to_pil(x, self.mode, self.permute_tensor)
+		return to_pil(x, self.mode, self.permute_tensor, self.denormalize_tensor)
 
 
 # --- FUNCTIONS ---
 
 def to_list(
-	x: Union[list, np.ndarray, Tensor, Image.Image]
+	x: Union[list, np.ndarray, Tensor, Image.Image],
 ) -> list:
 
 	if isinstance(x, list):
@@ -85,7 +104,7 @@ def to_list(
 
 def to_numpy(
 	x: Union[list, np.ndarray, Tensor, Image.Image],
-	dtype: Optional[object] = None
+	dtype: Optional[object] = None,
 ) -> np.ndarray:
 	"""
 		:param x: The list, numpy array, pytorch tensor or pillow image to convert.
@@ -105,17 +124,25 @@ def to_numpy(
 def to_tensor(
 	x: Union[list, np.ndarray, Tensor, Image.Image],
 	dtype: Optional[torch.dtype] = None,
-	device: Optional[torch.device] = torch.device("cpu")
+	device: Optional[torch.device] = torch.device("cpu"),
+	permute_tensor: bool = True,
+	normalize_tensor: bool = True,
 ) -> Tensor:
 
 	if isinstance(x, list):
 		return torch.as_tensor(x, dtype=dtype, device=device)
 	elif isinstance(x, np.ndarray):
-		return torch.from_numpy(x.copy()).to(dtype).to(device)
+		return torch.from_numpy(x.copy()).to(dtype=dtype, device=device)
 	elif isinstance(x, Tensor):
 		return x.to(dtype).to(device)
 	elif isinstance(x, Image.Image):
-		return to_tensor(to_numpy(x), dtype=dtype, device=device)
+		x = to_tensor(to_numpy(x))
+		if permute_tensor:
+			# Permute dimensions (height, width, channel) to (channel, height, width).
+			x = x.permute(2, 0, 1)
+		if normalize_tensor:
+			x = x / 255.0
+		return torch.as_tensor(x, dtype=dtype, device=device)
 	else:
 		return torch.as_tensor(x, dtype=dtype, device=device)
 
@@ -123,7 +150,8 @@ def to_tensor(
 def to_pil(
 	x: Union[list, np.ndarray, Tensor, Image.Image],
 	mode: Optional[str] = "RGB",
-	permute_tensor: bool = True,
+	permute_tensor: bool = False,
+	denormalize_tensor: bool = True,
 ) -> Image.Image:
 
 	if isinstance(x, list):
@@ -135,6 +163,8 @@ def to_pil(
 		if permute_tensor:
 			# Permute dimensions (height, width, channel) to (channel, height, width).
 			x = x.permute(2, 0, 1)
+		if denormalize_tensor:
+			x = x * 255
 		to_pil_image = tv.transforms.ToPILImage(mode)
 		return to_pil_image(x)
 	elif isinstance(x, Image.Image):

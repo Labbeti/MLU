@@ -109,4 +109,7 @@ pip install git+https://github.com/Labbeti/MLU
 - WER
 
 ## TODO
-- Other ROUGEs, SPICE and SPIDEr metrics
+- Other ROUGEs metrics
+- Clotho dataset,
+- FSD50K dataset,
+- AudioSet dataset,

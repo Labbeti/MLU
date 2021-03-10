@@ -28,7 +28,7 @@ class ProcessTransformWrap(Transform):
 		self.post_convert = post_convert
 		self._update_callables()
 
-	def apply(self, x: Any) -> Any:
+	def process(self, x: Any) -> Any:
 		for callable_ in self._callables:
 			x = callable_(x)
 		return x
@@ -73,8 +73,8 @@ class PILInternalWrap(ProcessTransformWrap):
 			p=p,
 		)
 
-	def apply(self, x: Tensor) -> Tensor:
-		return super().apply(x)
+	def process(self, x: Tensor) -> Tensor:
+		return super().process(x)
 
 
 class TensorInternalWrap(ProcessTransformWrap):
@@ -93,7 +93,7 @@ class TensorInternalWrap(ProcessTransformWrap):
 			p=p,
 		)
 
-	def apply(self, x: Image.Image) -> Image.Image:
+	def process(self, x: Image.Image) -> Image.Image:
 		self.post_convert.mode = x.mode
 		return self.post_convert(self.transform(self.pre_convert(x)))
 
@@ -123,7 +123,7 @@ class TransformWrap(Transform):
 		self.waveform_transform = waveform_transform
 		self.spectrogram_transform = spectrogram_transform
 
-	def apply(self, x: Tensor) -> Tensor:
+	def process(self, x: Tensor) -> Tensor:
 		return self.callable_(x)
 
 	def is_image_transform(self) -> bool:
@@ -151,7 +151,7 @@ class Duplicate(Transform):
 		self.transform = transform
 		self.n = n
 
-	def apply(self, x: Any) -> Any:
+	def process(self, x: Any) -> Any:
 		for _ in range(self.n):
 			x = self.transform(x)
 		return x

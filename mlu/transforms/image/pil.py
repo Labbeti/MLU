@@ -23,7 +23,7 @@ class _Enhance(ImageTransform):
 		self.method = method
 		self.levels = levels if isinstance(levels, tuple) else (levels, levels)
 
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		level = np.random.uniform(*self.levels)
 		# Old enhance : enhance(0.1 + 1.9 * level).
 		# Note : enhance(1) => return the same data.
@@ -37,18 +37,18 @@ class _Blend(ImageTransform):
 		self.augment = augment
 		self.levels = levels if isinstance(levels, tuple) else (levels, levels)
 
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		level = np.random.uniform(*self.levels)
-		return Image.blend(data, self.augment.apply(data), level)
+		return Image.blend(data, self.augment.process(data), level)
 
 
 class AutoContrast(ImageTransform):
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		return ImageOps.autocontrast(data)
 
 
 class Blur(ImageTransform):
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		return data.filter(ImageFilter.BLUR)
 
 
@@ -61,8 +61,8 @@ class Brightness(ImageTransform):
 		super().__init__(p=p)
 		self.enhance = _Enhance(method=ImageEnhance.Brightness, levels=levels, p=1.0)
 
-	def apply(self, data: Image.Image) -> Image.Image:
-		return self.enhance.apply(data)
+	def process(self, data: Image.Image) -> Image.Image:
+		return self.enhance.process(data)
 
 
 class Color(ImageTransform):
@@ -74,8 +74,8 @@ class Color(ImageTransform):
 		super().__init__(p=p)
 		self.enhance = _Enhance(method=ImageEnhance.Color, levels=levels, p=1.0)
 
-	def apply(self, data: Image.Image) -> Image.Image:
-		return self.enhance.apply(data)
+	def process(self, data: Image.Image) -> Image.Image:
+		return self.enhance.process(data)
 
 
 class Contrast(ImageTransform):
@@ -87,8 +87,8 @@ class Contrast(ImageTransform):
 		super().__init__(p=p)
 		self.enhance = _Enhance(method=ImageEnhance.Contrast, levels=levels, p=1.0)
 
-	def apply(self, data: Image.Image) -> Image.Image:
-		return self.enhance.apply(data)
+	def process(self, data: Image.Image) -> Image.Image:
+		return self.enhance.process(data)
 
 
 class CutOutImgPIL(ImageTransform):
@@ -107,7 +107,7 @@ class CutOutImgPIL(ImageTransform):
 		self.height_scale_range = scales
 		self.fill_value = fill_value
 
-	def apply(self, x: Image.Image) -> Image.Image:
+	def process(self, x: Image.Image) -> Image.Image:
 		width, height = x.width, x.height
 		left, right, top, down = random_rect(width, height, self.width_scale_range, self.height_scale_range)
 
@@ -120,7 +120,7 @@ class CutOutImgPIL(ImageTransform):
 
 
 class Equalize(ImageTransform):
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		return ImageOps.equalize(data)
 
 
@@ -129,17 +129,17 @@ class HorizontalFlip(ImageTransform):
 		super().__init__(p=p)
 		self.flip_h = RandomHorizontalFlip(1.0)
 
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		return self.flip_h(data)
 
 
 class Invert(ImageTransform):
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		return ImageOps.invert(data)
 
 
 class IdentityImage(ImageTransform):
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		return data
 
 
@@ -153,7 +153,7 @@ class Posterize(ImageTransform):
 		self.nbs_bits = nbs_bits if isinstance(nbs_bits, tuple) else (nbs_bits, nbs_bits)
 		self.nbs_bits = tuple(map(int, self.nbs_bits))
 
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		nb_bits = np.random.randint(*self.nbs_bits) if self.nbs_bits[0] != self.nbs_bits[1] else self.nbs_bits[0]
 		nb_bits = 8 - nb_bits
 		return ImageOps.posterize(data, nb_bits)
@@ -169,7 +169,7 @@ class Rescale(ImageTransform):
 		self.scales = scales
 		self.method = method
 
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		scale = np.random.uniform(*self.scales)
 		scale -= 1
 		scale *= (1.0 if scale <= 0.0 else 0.25)
@@ -190,7 +190,7 @@ class Rotate(ImageTransform):
 		super().__init__(p=p)
 		self.angles = angles if isinstance(angles, tuple) else (angles, angles)
 
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		angle = np.random.uniform(*self.angles)
 		return data.rotate(angle)
 
@@ -204,8 +204,8 @@ class Sharpness(ImageTransform):
 		super().__init__(p=p)
 		self.enhance = _Enhance(method=ImageEnhance.Sharpness, levels=levels, p=1.0)
 
-	def apply(self, data: Image.Image) -> Image.Image:
-		return self.enhance.apply(data)
+	def process(self, data: Image.Image) -> Image.Image:
+		return self.enhance.process(data)
 
 
 class ShearX(ImageTransform):
@@ -217,7 +217,7 @@ class ShearX(ImageTransform):
 		super().__init__(p=p)
 		self.shears = shears if isinstance(shears, tuple) else (shears, shears)
 
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		shear = np.random.uniform(*self.shears)
 		return data.transform(data.size, Image.AFFINE, (1, shear, 0, 0, 1, 0))
 
@@ -231,13 +231,13 @@ class ShearY(ImageTransform):
 		super().__init__(p=p)
 		self.shears = shears if isinstance(shears, tuple) else (shears, shears)
 
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		shear = np.random.uniform(*self.shears)
 		return data.transform(data.size, Image.AFFINE, (1, 0, 0, shear, 1, 0))
 
 
 class Smooth(ImageTransform):
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		return data.filter(ImageFilter.SMOOTH)
 
 
@@ -255,7 +255,7 @@ class Solarize(ImageTransform):
 		self.thresholds = thresholds if isinstance(thresholds, tuple) else (thresholds, thresholds)
 		self.thresholds = tuple(map(int, self.thresholds))
 
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		threshold = np.random.randint(*self.thresholds) if self.thresholds[0] != self.thresholds[1] else self.thresholds[0]
 		threshold = 256 - threshold
 		return ImageOps.solarize(data, threshold)
@@ -271,7 +271,7 @@ class TranslateX(ImageTransform):
 		super().__init__(p=p)
 		self.deltas = deltas if isinstance(deltas, tuple) else (deltas, deltas)
 
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		delta = np.random.uniform(*self.deltas)
 		delta = np.floor(delta * data.size[0])
 		return data.transform(data.size, Image.AFFINE, (1, 0, delta, 0, 1, 0))
@@ -287,7 +287,7 @@ class TranslateY(ImageTransform):
 		super().__init__(p=p)
 		self.deltas = deltas if isinstance(deltas, tuple) else (deltas, deltas)
 
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		delta = np.random.uniform(*self.deltas)
 		delta = np.floor(delta * data.size[1])
 		return data.transform(data.size, Image.AFFINE, (1, 0, 0, 0, 1, delta))
@@ -298,5 +298,5 @@ class VerticalFlip(ImageTransform):
 		super().__init__(p=p)
 		self.flip_v = RandomVerticalFlip(1.0)
 
-	def apply(self, data: Image.Image) -> Image.Image:
+	def process(self, data: Image.Image) -> Image.Image:
 		return self.flip_v(data)

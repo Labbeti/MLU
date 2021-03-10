@@ -15,9 +15,9 @@ class CutOutSpec(SpectrogramTransform):
 		p: float = 1.0,
 	):
 		"""
-			CutOut transforms for spectrogram.
+			CutOut transform for spectrogram.
 
-			Input must be of shape (..., freq, time).
+			Input must be of shape (..., freq, time), which means the width is the time and height the freq of the spectrogram.
 
 			:param width_scales: The range of ratios of the rectangle cut width. (default: (0.1, 0.5))
 			:param height_scales: The range of ratios of the rectangle cut height. (default: (0.1, 0.5))
@@ -25,17 +25,17 @@ class CutOutSpec(SpectrogramTransform):
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
-		self.width_scale_range = width_scales \
+		self.width_scales = width_scales \
 			if isinstance(width_scales, tuple) else (width_scales, width_scales)
-		self.height_scale_range = height_scales \
+		self.height_scales = height_scales \
 			if isinstance(height_scales, tuple) else (height_scales, height_scales)
 		self.fill_value = fill_value
 
-	def apply(self, spectrogram: Tensor) -> Tensor:
+	def process(self, spectrogram: Tensor) -> Tensor:
 		assert len(spectrogram.shape) >= 2
 
 		height, width = spectrogram.shape[-2], spectrogram.shape[-1]
-		left, right, top, down = random_rect(height, width, self.width_scale_range, self.height_scale_range)
+		left, right, top, down = random_rect(height, width, self.width_scales, self.height_scales)
 		slices = [slice(None)] * (len(spectrogram.shape) - 2) + [slice(left, right), slice(top, down)]
 		spectrogram = spectrogram.clone()
 		spectrogram[slices] = self.fill_value

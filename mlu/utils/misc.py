@@ -1,15 +1,20 @@
 
+import inspect
 import numpy as np
 import random
+import re
 import subprocess
 import torch
 
 from datetime import datetime
 from torch import Tensor
 from torch.nn import Module
-from torch.optim import Optimizer
 from torch.utils.tensorboard import SummaryWriter
-from typing import Any, Dict, List, Sequence, Tuple, Union
+from types import MethodType, FunctionType
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Type, TypeVar, Union
+
+
+T = TypeVar("T")
 
 
 def get_datetime() -> str:
@@ -24,7 +29,8 @@ def get_datetime() -> str:
 
 def reset_seed(seed: int):
 	"""
-		Reset the seed of following packages : random, numpy, torch, torch.cuda, torch.backends.cudnn.
+		Reset the seed of following packages : random, numpy, torch, torch.cuda and set deterministic behaviour for cudnn
+		backend.
 
 		:param seed: The seed to set.
 	"""
@@ -32,12 +38,21 @@ def reset_seed(seed: int):
 	np.random.seed(seed)
 	torch.manual_seed(seed)
 	torch.cuda.manual_seed_all(seed)
-	torch.backends.cudnn.deterministic = True
-	torch.backends.cudnn.benchmark = False
+
+	if hasattr(torch.backends, "cudnn"):
+		torch.backends.cudnn.deterministic = True
+		torch.backends.cudnn.benchmark = False
+	else:
+		raise RuntimeError(
+			"Cannot make deterministic behaviour for current torch backend (torch.backends does have the attribute 'cudnn')."
+		)
 
 
 def random_rect(
-	width_img: int, height_img: int, width_range: Tuple[float, float], height_range: Tuple[float, float]
+	width_img: int,
+	height_img: int,
+	width_range: Tuple[float, float],
+	height_range: Tuple[float, float]
 ) -> (int, int, int, int):
 	"""
 		Create a random rectangle inside an area defined by the limits (left, right, top, down).
@@ -98,26 +113,16 @@ def random_cuboid(shapes: Sequence[int], ratios: Sequence[Tuple[float, float]]) 
 	return limits
 
 
-def get_lrs(optim: Optimizer) -> List[float]:
-	""" Get the learning rates of an optimizer. """
-	return [group["lr"] for group in optim.param_groups]
-
-
-def get_lr(optim: Optimizer, idx: int = 0) -> float:
-	""" Get the learning rate of an optimizer. """
-	return get_lrs(optim)[idx]
-
-
-def get_nb_parameters(model: Module, trainable_param: bool = True) -> int:
+def get_nb_parameters(model: Module, only_trainable: bool = True) -> int:
 	"""
 		Return the number of parameters in a model.
 
 		:param model: Pytorch Module to check.
-		:param trainable_param: If True, count only parameter that requires gradient. (default: True)
+		:param only_trainable: If True, count only parameter that requires gradient. (default: True)
 		:returns: The number of parameters.
 	"""
-	params = (p for p in model.parameters() if not trainable_param or p.requires_grad)
-	return sum([p.numel() for p in params])
+	params = (p for p in model.parameters() if not only_trainable or p.requires_grad)
+	return sum(p.numel() for p in params)
 
 
 def add_dict_to_writer(dic: Dict[str, Any], writer: SummaryWriter):
@@ -145,3 +150,134 @@ def get_current_git_hash() -> str:
 		return git_hash
 	except subprocess.CalledProcessError:
 		return "UNKNOWN"
+
+
+def to_dict_rec(obj: Any, class_name_key: Optional[str] = "__class__") -> Union[dict, list]:
+	"""
+		Convert an object to a dictionary.
+
+		Source code was imported from : (with few changes)
+			https://stackoverflow.com/questions/1036409/recursively-convert-python-object-graph-to-dictionary
+
+		:param obj: The object to convert.
+		:param class_name_key: Key used to save the class name if we convert an object.
+		:returns: The dictionary corresponding to the object.
+	"""
+	if isinstance(obj, dict):
+		return {
+			key: to_dict_rec(value, class_name_key)
+			for key, value in obj.items()
+		}
+	elif isinstance(obj, Tensor):
+		return to_dict_rec(obj.tolist(), class_name_key)
+	elif hasattr(obj, "_ast"):
+		return to_dict_rec(obj._ast(), class_name_key)
+	elif hasattr(obj, "__iter__") and not isinstance(obj, str):
+		return [to_dict_rec(v, class_name_key) for v in obj]
+	elif hasattr(obj, "__dict__"):
+		data = {}
+		if class_name_key is not None and hasattr(obj, "__class__"):
+			data[class_name_key] = obj.__class__.__name__
+		data.update({
+			attr: to_dict_rec(value, class_name_key)
+			for attr, value in obj.__dict__.items()
+			if not callable(value) and not attr.startswith("__")
+		})
+		return data
+	else:
+		return obj
+
+
+def scalar_interpolation(min_: T, max_: T, coefficient: T) -> T:
+	"""
+		Compute the linear interpolation between min_ and max_ with a coefficient.
+
+		:param min_: The minimal value used for interpolation.
+		:param max_: The maximal value used for interpolation.
+		:param coefficient: The coefficient in [0.0, 1.0] for compute the results.
+		:returns: The value interpolated between min_ and max_.
+	"""
+	return (max_ - min_) * coefficient + min_
+
+
+def scalar_normalization(value: T, old_min: T, old_max: T, new_min: T = 0.0, new_max: T = 1.0) -> T:
+	"""
+		Normalize a value from range [old_min, old_max] to [new_min, new_max].
+
+		:param value: The value to normalize.
+		:param old_min: The minimal value of the previous range.
+		:param old_max: The maximal value of the previous range.
+		:param new_min: The minimal value of the new range. (default: 0.0)
+		:param new_max: The maximal value of the new range. (default: 1.0)
+		:returns: The value normalized in the new range.
+	"""
+	return (value - old_min) / (old_max - old_min) * (new_max - new_min) + new_min
+
+
+def duration_formatter(seconds: int, format_: str = "%jd:%Hh:%Mm:%Ss") -> str:
+	rest = seconds
+
+	rest, seconds = divmod(rest, 60)
+	rest, minutes = divmod(rest, 60)
+	rest, hours = divmod(rest, 24)
+	days = rest
+
+	replaces = {
+		"%S": seconds,
+		"%M": minutes,
+		"%H": hours,
+		"%j": days,
+	}
+	result = format_
+	for directive, value in replaces.items():
+		result = result.replace(directive, str(value))
+	return result
+
+
+def duration_unformatter(string: str, format_: str = "%jd:%Hh:%Mm:%Ss") -> int:
+	replaces = {
+		"%S": "(?P<S>[0-9]+)",
+		"%M": "(?P<M>[0-9]+)",
+		"%H": "(?P<H>[0-9]+)",
+		"%j": "(?P<j>[0-9]+)",
+	}
+	format_re = format_
+	for directive, value in replaces.items():
+		format_re = format_re.replace(directive, str(value))
+
+	match = re.search(format_re, string)
+	if match is None:
+		raise RuntimeError(f"Invalid string '{string}' with format '{format_}'.")
+
+	seconds = int(match["S"])
+	minutes = int(match["M"])
+	hours = int(match["H"])
+	days = int(match["j"])
+	total_seconds = seconds + minutes * 60 + hours * 3600 + days * 3600 * 24
+
+	return total_seconds
+
+
+def get_func_params_names(func: Union[MethodType, FunctionType]) -> List[str]:
+	parameters_names = func.__code__.co_varnames
+	return list(parameters_names)
+
+
+def get_param_names(class_or_func: Callable) -> List[str]:
+	if inspect.isfunction(class_or_func):
+		func = class_or_func
+	elif inspect.isclass(class_or_func) and hasattr(class_or_func, "__init__"):
+		func = class_or_func.__init__
+	elif callable(class_or_func) and hasattr(class_or_func, "__call__"):
+		func = class_or_func.__call__
+	else:
+		raise RuntimeError(
+			f"Invalid class, function or object '{class_or_func.__name__}'. Must be a function, class or callable object.")
+
+	return get_func_params_names(func)
+
+
+def filter_dict_with_func(dic: Dict[str, Any], func: Callable) -> Dict[str, Any]:
+	param_names = get_param_names(func)
+	names_intersection = set(param_names).intersection(dic.keys())
+	return {name: dic[name] for name in names_intersection}
