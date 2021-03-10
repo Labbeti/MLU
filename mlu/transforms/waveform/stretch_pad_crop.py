@@ -17,10 +17,10 @@ class StretchPadCrop(WaveformTransform):
 		p: float = 1.0,
 	):
 		"""
-			Stretch, pad and crop the signal.
+			Stretch, pad and crop the signal. The output will have the same shape than input.
 
 			:param rates: The ratio of the signal used for resize. (default: (0.9, 1.1))
-			:param align: Alignment to use for cropping or padding. Can be 'left', 'right', 'center' or 'random'.
+			:param align: Alignment to use for cropping and padding. Can be 'left', 'right', 'center' or 'random'.
 				(default: 'random')
 			:param dim: The dimension to stretch and pad or crop. (default: -1)
 			:param p: The probability to apply the transform. (default: 1.0)
@@ -45,7 +45,7 @@ class StretchPadCrop(WaveformTransform):
 		return x
 
 
-class StretchPadCrop2(WaveformTransform):
+class StretchPadCropNew(WaveformTransform):
 	def __init__(
 		self,
 		rates: Union[Tuple[float, float], float] = (0.9, 1.1),
@@ -54,19 +54,16 @@ class StretchPadCrop2(WaveformTransform):
 		p: float = 1.0,
 	):
 		"""
-			Stretch, pad and crop the signal.
+			Stretch, pad and crop the signal. The output will have the same shape than input.
 
 			:param rates: The ratio of the signal used for resize. (default: (0.9, 1.1))
-			:param align: Alignment to use for cropping or padding. Can be 'left', 'right', 'center' or 'random'.
+			:param align: Alignment to use for cropping and padding. Can be 'left', 'right', 'center' or 'random'.
 				(default: 'random')
 			:param dim: The dimension to stretch and pad or crop. (default: -1)
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
-		self._rates = rates if isinstance(rates, tuple) else (rates, rates)
 		self._dim = dim
-
-		self._uniform = Uniform(low=self._rates[0], high=self._rates[1])
 		self._stretch = StretchNearestRate(rates=rates, dim=dim)
 		self._pad_crop = PadCrop(target_length=0, align=align, dim=dim)
 

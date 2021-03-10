@@ -5,7 +5,7 @@ from abc import ABC
 from mlu.transforms.base import Transform
 from mlu.transforms.wrappers import TransformWrap
 from torch.nn import Module
-from typing import Any, Callable, Iterable, List, Optional, Sequence
+from typing import Any, Callable, List, Optional, Sequence
 
 
 class Container(Transform, ABC):
@@ -48,10 +48,6 @@ class Compose(Container):
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(*transforms, p=p)
-
-	@staticmethod
-	def from_iterable(transforms: Iterable[Callable], p: float = 1.0) -> 'Compose':
-		return Compose(*transforms, p=p)
 
 	def process(self, x: Any) -> Any:
 		for transform in self.get_transforms():
@@ -112,11 +108,11 @@ class PoolRandomChoice(Container):
 		# Add optional pre and post transforms
 		self._transform_composed = self._add_pre_post_processes(main_augm)
 
-	def _build_main_augm(self) -> Callable:
+	def _build_main_augm(self) -> Optional[Callable]:
 		augm_pool = self.get_transforms()
 
 		if len(augm_pool) == 0:
-			raise RuntimeError("Found an empty transform pool.")
+			main_augm = None
 		elif len(augm_pool) == 1:
 			main_augm = augm_pool[0]
 		else:
@@ -124,7 +120,7 @@ class PoolRandomChoice(Container):
 
 		return main_augm
 
-	def _add_pre_post_processes(self, main_augm: Callable) -> Callable:
+	def _add_pre_post_processes(self, main_augm: Optional[Callable]) -> Callable:
 		pre_process = self._pre_transform
 		post_process = self._post_transform
 
@@ -135,7 +131,7 @@ class PoolRandomChoice(Container):
 		]
 
 		if len(final_pool) == 0:
-			raise RuntimeError("Invalid state when building pool.")
+			raise RuntimeError("Found an empty list of transforms.")
 		elif len(final_pool) == 1:
 			transform_composed = final_pool[0]
 		else:
@@ -157,10 +153,10 @@ class AudioPoolRandomChoice(PoolRandomChoice):
 		"""
 			PoolRandomChoice for compose augment pools with pre, post and to spectrogram transforms.
 
-			:param post_transform: TODO
-			:param pre_transform: TODO
 			:param augm_pool: TODO
-			:param transform_to_spec: TODO
+			:param post_transform: TODO (default: None)
+			:param pre_transform: TODO (default: None)
+			:param transform_to_spec: TODO (default: None)
 			:param is_spec_transform: TODO (default: lambda t: isinstance(t, Transform) and t.is_spec_transform())
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
