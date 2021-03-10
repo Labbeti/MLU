@@ -19,7 +19,7 @@ install_requires = [
 
 setup(
 	name="mlu",
-	version="0.3.3",
+	version="0.4.0",
 	packages=find_packages(),
 	url="https://github.com/Labbeti/MLU",
 	license="MIT",
