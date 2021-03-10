@@ -5,7 +5,7 @@ from abc import ABC
 from mlu.transforms.base import Transform
 from mlu.transforms.wrappers import TransformWrap
 from torch.nn import Module
-from typing import Any, Callable, List, Optional, Sequence
+from typing import Any, Callable, Iterable, List, Optional, Sequence
 
 
 class Container(Transform, ABC):
@@ -22,6 +22,9 @@ class Container(Transform, ABC):
 
 	def __getitem__(self, index: int) -> Callable:
 		return self._transforms[index]
+
+	def __len__(self) -> int:
+		return len(self._transforms)
 
 	def get_transforms(self) -> List[Callable]:
 		return self._transforms
@@ -45,6 +48,10 @@ class Compose(Container):
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(*transforms, p=p)
+
+	@staticmethod
+	def from_iterable(transforms: Iterable[Callable], p: float = 1.0) -> 'Compose':
+		return Compose(*transforms, p=p)
 
 	def process(self, x: Any) -> Any:
 		for transform in self.get_transforms():
@@ -84,31 +91,90 @@ class RandomChoice(Container):
 class PoolRandomChoice(Container):
 	def __init__(
 		self,
-		pool_transforms: List[Callable],
-		transform_to_spec: Optional[Callable],
-		is_spec_transform: Callable,
-		p: float = 1.0
+		augm_pool: List[Callable],
+		pre_transform: Optional[Callable] = None,
+		post_transform: Optional[Callable] = None,
+		p: float = 1.0,
 	):
-		"""
-			TODO
-		"""
-		super().__init__(*pool_transforms, p=p)
-		self._transform_to_spec = transform_to_spec
-		self._is_spec_transform = is_spec_transform
+		super().__init__(*augm_pool, p=p)
+		self._pre_transform = pre_transform
+		self._post_transform = post_transform
 		self._transform_composed = None
-
 		self._build()
 
 	def process(self, x: Any) -> Any:
 		return self._transform_composed(x)
 
 	def _build(self):
-		pool = self.get_transforms()
+		# Random selection of the augment
+		main_augm = self._build_main_augm()
+
+		# Add optional pre and post transforms
+		self._transform_composed = self._add_pre_post_processes(main_augm)
+
+	def _build_main_augm(self) -> Callable:
+		augm_pool = self.get_transforms()
+
+		if len(augm_pool) == 0:
+			raise RuntimeError("Found an empty transform pool.")
+		elif len(augm_pool) == 1:
+			main_augm = augm_pool[0]
+		else:
+			main_augm = RandomChoice(*augm_pool)
+
+		return main_augm
+
+	def _add_pre_post_processes(self, main_augm: Callable) -> Callable:
+		pre_process = self._pre_transform
+		post_process = self._post_transform
+
+		final_pool = [
+			transform
+			for transform in (pre_process, main_augm, post_process)
+			if transform is not None
+		]
+
+		if len(final_pool) == 0:
+			raise RuntimeError("Invalid state when building pool.")
+		elif len(final_pool) == 1:
+			transform_composed = final_pool[0]
+		else:
+			transform_composed = Compose(*final_pool)
+
+		return transform_composed
+
+
+class AudioPoolRandomChoice(PoolRandomChoice):
+	def __init__(
+		self,
+		augm_pool: List[Callable],
+		pre_transform: Optional[Callable] = None,
+		post_transform: Optional[Callable] = None,
+		transform_to_spec: Optional[Callable] = None,
+		is_spec_transform: Callable[[Callable], bool] = lambda t: isinstance(t, Transform) and t.is_spec_transform(),
+		p: float = 1.0,
+	):
+		"""
+			PoolRandomChoice for compose augment pools with pre, post and to spectrogram transforms.
+
+			:param post_transform: TODO
+			:param pre_transform: TODO
+			:param augm_pool: TODO
+			:param transform_to_spec: TODO
+			:param is_spec_transform: TODO (default: lambda t: isinstance(t, Transform) and t.is_spec_transform())
+			:param p: The probability to apply the transform. (default: 1.0)
+		"""
+		self._transform_to_spec = transform_to_spec
+		self._is_spec_transform = is_spec_transform
+		super().__init__(augm_pool, pre_transform, post_transform, p=p)
+
+	def _build_main_augm(self) -> Callable:
+		augm_pool = self.get_transforms()
 		transform_to_spec = self._transform_to_spec
 		is_spec_transform = self._is_spec_transform
 
-		pool_new = []
-		for augm in pool:
+		augm_pool_with_to_spec = []
+		for augm in augm_pool:
 			transforms = []
 
 			if augm is not None:
@@ -128,15 +194,16 @@ class PoolRandomChoice(Container):
 			if len(transforms) == 0:
 				raise RuntimeError("Found an empty list of transforms.")
 			elif len(transforms) == 1:
-				pool_new.append(transforms[0])
+				augm_pool_with_to_spec.append(transforms[0])
 			else:
-				pool_new.append(Compose(*transforms))
+				augm_pool_with_to_spec.append(Compose(*transforms))
 
-		if len(pool_new) == 0:
+		# Random selection of the augment
+		if len(augm_pool_with_to_spec) == 0:
 			raise RuntimeError("Found an empty transform pool.")
-		elif len(pool_new) == 1:
-			transform_composed = pool_new[0]
+		elif len(augm_pool_with_to_spec) == 1:
+			main_transform = augm_pool_with_to_spec[0]
 		else:
-			transform_composed = RandomChoice(*pool_new)
+			main_transform = RandomChoice(*augm_pool_with_to_spec)
 
-		self._transform_composed = transform_composed
+		return main_transform
