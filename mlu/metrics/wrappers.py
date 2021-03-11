@@ -6,6 +6,19 @@ from torch.nn import Module
 from typing import Callable, Dict, List, Optional
 
 
+class MetricDict(Dict[str, Metric], Metric):
+	def __init__(self, *args, prefix: Optional[str] = None, **kwargs):
+		dict.__init__(self, *args, **kwargs)
+		Metric.__init__(self)
+		self.prefix = prefix
+
+	def compute_score(self, input_: Input, target: Target) -> Dict[str, Output]:
+		return {f"{self.prefix}{metric_name}": metric(input_, target) for metric_name, metric in self.items()}
+
+	def __hash__(self) -> int:
+		return hash(tuple(sorted(self.items())))
+
+
 class MetricWrapper(Metric):
 	def __init__(
 		self,
@@ -85,7 +98,7 @@ class IncrementalListWrapper(Metric):
 		return [continue_metric.get_current() for continue_metric in self.continue_metric_list]
 
 
-class MetricDict(Dict[str, Metric], Metric):
+class MetricDictPrePostFix(Dict[str, Metric], Metric):
 	def __init__(
 		self,
 		default_prefix: Optional[str] = None,

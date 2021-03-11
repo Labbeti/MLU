@@ -43,6 +43,7 @@ class Compose(Container):
 	def __init__(self, *transforms: Callable, p: float = 1.0):
 		"""
 			Compose a list of transforms for apply them sequentially.
+			The use is very similar to pytorch Sequential(), but it wrap non-modules object into TransformWrap() class.
 
 			:param transforms: The list of transforms to apply.
 			:param p: The probability to apply the transform. (default: 1.0)
