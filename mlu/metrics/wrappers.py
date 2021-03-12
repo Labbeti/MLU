@@ -7,16 +7,24 @@ from typing import Callable, Dict, List, Optional
 
 
 class MetricDict(Dict[str, Metric], Metric):
-	def __init__(self, *args, prefix: Optional[str] = None, **kwargs):
+	def __init__(self, *args, prefix: str = "", suffix: str = "", **kwargs):
 		dict.__init__(self, *args, **kwargs)
 		Metric.__init__(self)
 		self.prefix = prefix
+		self.suffix = suffix
 
 	def compute_score(self, input_: Input, target: Target) -> Dict[str, Output]:
-		return {f"{self.prefix}{metric_name}": metric(input_, target) for metric_name, metric in self.items()}
+		return {f"{self.prefix}{metric_name}{self.suffix}": metric(input_, target) for metric_name, metric in self.items()}
 
 	def __hash__(self) -> int:
-		return hash(tuple(sorted(self.items())))
+		return hash(tuple(sorted(self.items()))) + hash(self.prefix) + hash(self.suffix)
+
+	def to_dict(self, with_pre_and_suf: bool = True) -> Dict[str, Metric]:
+		if with_pre_and_suf:
+			dic = {f"{self.prefix}{metric_name}{self.suffix}": metric for metric_name, metric in self.items()}
+		else:
+			dic = dict(self)
+		return dic
 
 
 class MetricWrapper(Metric):
@@ -96,50 +104,6 @@ class IncrementalListWrapper(Metric):
 		for continue_metric in self.continue_metric_list:
 			continue_metric.add(score)
 		return [continue_metric.get_current() for continue_metric in self.continue_metric_list]
-
-
-class MetricDictPrePostFix(Dict[str, Metric], Metric):
-	def __init__(
-		self,
-		default_prefix: Optional[str] = None,
-		default_suffix: Optional[str] = None,
-		**kwargs,
-	):
-		super().__init__(**kwargs)
-		self.default_prefix = default_prefix
-		self.default_suffix = default_suffix
-
-		if self.default_prefix is not None or self.default_suffix is not None:
-			for metric_name, metric in self.items():
-				self.add_metric(metric, metric_name)
-
-	def compute_score(self, input_: Input, target: Target) -> Dict[str, Output]:
-		return {metric_name: metric(input_, target) for metric_name, metric in self.items()}
-
-	def add_metric(
-		self,
-		metric: Metric,
-		name: Optional[str] = None,
-	):
-		"""
-			Add a metric to the MetricDict.
-
-			:param metric: The metric to add.
-			:param name: The name of the metric.
-				If None, the name of metric class will be used. (default: None)
-		"""
-		if name is None:
-			name = metric.__name__
-
-		if "/" in name or self.default_prefix is None:
-			complete_name = name
-		else:
-			complete_name = f"{self.default_prefix}/{name}"
-
-		if self.default_suffix is not None:
-			complete_name += self.default_suffix
-
-		self[complete_name] = metric
 
 
 class IncrementalList(IncrementalMetric):

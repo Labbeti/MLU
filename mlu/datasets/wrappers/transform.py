@@ -1,7 +1,7 @@
 
 from mlu.datasets.wrappers.base import DatasetWrapper
 from torch.utils.data.dataset import Dataset
-from typing import Any, Callable, Optional, Sized
+from typing import Any, Callable, Optional
 
 
 class TransformDataset(DatasetWrapper):
