@@ -1,6 +1,6 @@
 
-from mlu.metrics.base import Metric
 from torch import Tensor
+from mlu.metrics.base import Metric
 
 
 class EqMetric(Metric):

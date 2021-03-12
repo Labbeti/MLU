@@ -1,11 +1,12 @@
 
 import torch
 
+from torch import Tensor
+from typing import Callable, Optional
+
 from mlu.metrics.classification.precision import Precision
 from mlu.metrics.classification.recall import Recall
 from mlu.metrics.base import Metric
-from torch import Tensor
-from typing import Callable, Optional
 
 
 class FScore(Metric):

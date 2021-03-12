@@ -14,9 +14,9 @@ from typing import Optional, List
 class METEOR2(Metric):
 	""" TODO : test """
 
-	def __init__(self, nb_classes: Optional[int] = None, alpha: float = 0.9, gamma: float = 0.5, beta: float = 3.0):
+	def __init__(self, num_classes: Optional[int] = None, alpha: float = 0.9, gamma: float = 0.5, beta: float = 3.0):
 		super().__init__()
-		self.nb_classes = nb_classes
+		self.num_classes = num_classes
 		self.alpha = alpha
 		self.gamma = gamma
 		self.beta = beta
@@ -25,26 +25,26 @@ class METEOR2(Metric):
 		self.precision = Precision()
 
 	def compute_score(self, candidate: Tensor, references: List[Tensor]) -> Tensor:
-		if self.nb_classes is None:
+		if self.num_classes is None:
 			idx_set = set(candidate.unique().tolist())
 			for reference in references:
 				idx_set.union(reference.unique().tolist())
-			nb_classes = len(idx_set)
+			num_classes = len(idx_set)
 		else:
-			nb_classes = self.nb_classes
+			num_classes = self.num_classes
 
 		print("candidate ", candidate)
 		print("references", references)
-		print("nb_classes", nb_classes)
+		print("num_classes", num_classes)
 
-		candidate_onehot = one_hot(candidate.to(torch.int64), nb_classes)
-		references_onehot = [one_hot(reference.to(torch.int64), nb_classes) for reference in references]
+		candidate_onehot = one_hot(candidate.to(torch.int64), num_classes)
+		references_onehot = [one_hot(reference.to(torch.int64), num_classes) for reference in references]
 
 		max_sentence_size = max([len(ref) for ref in references_onehot] + [len(candidate_onehot)])
 		print("max_sentence_size", max_sentence_size)
 		print("shapes", candidate_onehot.shape, " ; ", [ref.shape for ref in references_onehot])
-		candidate_onehot = torch.cat((candidate_onehot, torch.zeros(max_sentence_size - candidate_onehot.shape[0], nb_classes)))
-		references_onehot = [torch.cat((reference, torch.zeros(max_sentence_size - reference.shape[0], nb_classes))) for reference in references_onehot]
+		candidate_onehot = torch.cat((candidate_onehot, torch.zeros(max_sentence_size - candidate_onehot.shape[0], num_classes)))
+		references_onehot = [torch.cat((reference, torch.zeros(max_sentence_size - reference.shape[0], num_classes))) for reference in references_onehot]
 
 		recall = [self.recall(candidate_onehot, reference) for reference in references_onehot]
 		precision = [self.precision(candidate_onehot, reference) for reference in references_onehot]

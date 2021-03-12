@@ -1,11 +1,12 @@
 
 import torch
 
-from mlu.metrics.base import Metric
 from scipy.stats import norm
 from sklearn.metrics import roc_auc_score
 from torch import Tensor
 from typing import Callable, Optional
+
+from mlu.metrics.base import Metric
 
 
 class DPrime(Metric):
@@ -28,8 +29,8 @@ class DPrime(Metric):
 		"""
 			Compute DPrime score on prediction and target.
 
-			:param input_: (nb_classes) or (batch_size, nb_classes) tensor
-			:param target: (nb_classes) or (batch_size, nb_classes) tensor
+			:param input_: (num_classes) or (batch_size, num_classes) tensor
+			:param target: (num_classes) or (batch_size, num_classes) tensor
 			:return: The DPrime score as scalar tensor.
 		"""
 		assert input_.shape == target.shape

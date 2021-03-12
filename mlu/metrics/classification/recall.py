@@ -1,8 +1,10 @@
 
 import torch
-from mlu.metrics.base import Metric
+
 from torch import Tensor
 from typing import Callable, Optional
+
+from mlu.metrics.base import Metric
 
 
 class Recall(Metric):
@@ -16,7 +18,7 @@ class Recall(Metric):
 		"""
 			Compute Recall score between binary vectors.
 
-			>>> Recall = TP / (TP + FN) where TP = True Positives, FN = False Negatives.
+			>>> # Recall = TP / (TP + FN) where TP = True Positives, FN = False Negatives.
 
 			Vectors must be binary tensors of shape (nb classes) or (nb samplers, nb classes).
 

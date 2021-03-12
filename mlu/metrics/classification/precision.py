@@ -1,9 +1,10 @@
 
 import torch
 
-from mlu.metrics.base import Metric
 from torch import Tensor
 from typing import Callable, Optional
+
+from mlu.metrics.base import Metric
 
 
 class Precision(Metric):
