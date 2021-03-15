@@ -8,6 +8,19 @@ from typing import Callable, Dict, List, Optional
 
 class MetricDict(Dict[str, Metric], Metric):
 	def __init__(self, *args, prefix: str = "", suffix: str = "", **kwargs):
+		"""
+			Subclass of Dict[str, Metric] and Metric.
+			Compute score of each metric when forward() is called.
+
+			Example :
+
+			>>> import torch
+			>>> from mlu.metrics import CategoricalAccuracy, FScore
+			>>> input_, target = torch.rand(5, 10), torch.rand(5, 10)
+			>>> metric_dict = MetricDict(acc=CategoricalAccuracy(), f1=FScore())
+			>>> metric_dict(input_, target)
+			... {"acc": 0.4, "f1": 0.1}
+		"""
 		dict.__init__(self, *args, **kwargs)
 		Metric.__init__(self)
 		self.prefix = prefix
