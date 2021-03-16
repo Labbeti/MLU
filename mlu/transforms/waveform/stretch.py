@@ -4,7 +4,7 @@ import torch
 from mlu.transforms.base import WaveformTransform
 from torch import Tensor
 from torch.distributions import Uniform
-from typing import Tuple, Union
+from typing import Tuple, Optional, Union
 
 
 class StretchNearestFreq(WaveformTransform):
@@ -57,10 +57,12 @@ class StretchNearestRate(WaveformTransform):
 
 		rates = rates if isinstance(rates, tuple) else (rates, rates)
 		self._uniform = Uniform(low=rates[0], high=rates[1])
+		self._last_rate = None
 
 	def process(self, data: Tensor) -> Tensor:
 		length = data.shape[self.dim]
 		rate = self._uniform.sample().item()
+		self._last_rate = rate
 		step = 1.0 / rate
 		indexes = torch.arange(start=0, end=length, step=step)
 		indexes = indexes.floor().long().clamp(max=length - 1)
@@ -71,3 +73,6 @@ class StretchNearestRate(WaveformTransform):
 	def set_rates(self, rates: Union[float, Tuple[float, float]]):
 		rates = rates if isinstance(rates, tuple) else (rates, rates)
 		self._uniform = Uniform(low=rates[0], high=rates[1])
+
+	def prev_rate(self) -> Optional[float]:
+		return self._last_rate

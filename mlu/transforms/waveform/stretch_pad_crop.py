@@ -5,7 +5,7 @@ from mlu.transforms.waveform.stretch import StretchNearestFreq, StretchNearestRa
 
 from torch import Tensor
 from torch.distributions import Uniform
-from typing import Tuple, Union
+from typing import Tuple, Optional, Union
 
 
 class StretchPadCrop(WaveformTransform):
@@ -32,17 +32,22 @@ class StretchPadCrop(WaveformTransform):
 		self._uniform = Uniform(low=self._rates[0], high=self._rates[1])
 		self._stretch = StretchNearestFreq(dim=dim)
 		self._pad_crop = PadCrop(target_length=0, fill_value=0.0, align=align, dim=dim)
+		self._last_rate = None
 
 	def process(self, x: Tensor) -> Tensor:
 		length = x.shape[self._dim]
 		self._stretch.orig_freq = length
-		self._stretch.new_freq = round(length * self._uniform.sample().item())
+		self._last_rate = self._uniform.sample().item()
+		self._stretch.new_freq = round(length * self._last_rate)
 		self._pad_crop.set_target_length(length)
 
 		x = self._stretch(x)
 		x = self._pad_crop(x)
 
 		return x
+
+	def prev_rate(self) -> Optional[float]:
+		return self._last_rate
 
 
 class StretchPadCropNew(WaveformTransform):
@@ -77,3 +82,6 @@ class StretchPadCropNew(WaveformTransform):
 		x = self._pad_crop(x)
 
 		return x
+
+	def prev_rate(self) -> Optional[float]:
+		return self._stretch.prev_rate()
