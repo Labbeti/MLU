@@ -1,9 +1,12 @@
 
-from mlu.nn.functional.math import mish
+import math
+import torch
 
 from torch import Tensor
 from torch.nn import Module
 from typing import Any, Optional
+
+from mlu.nn.functional.misc import mish
 
 
 DEFAULT_EPSILON = 2e-20
@@ -111,3 +114,13 @@ class To(Module):
 class Item(Module):
 	def forward(self, x: Tensor) -> float:
 		return x.item()
+
+
+class Clamp(Module):
+	def __init__(self, min_: float = -math.inf, max_: float = math.inf):
+		super().__init__()
+		self.min = min_
+		self.max = max_
+
+	def forward(self, x: Tensor) -> Tensor:
+		return torch.clamp(x, self.min, self.max)
