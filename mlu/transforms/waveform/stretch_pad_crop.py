@@ -31,7 +31,7 @@ class StretchPadCrop(WaveformTransform):
 
 		self._uniform = Uniform(low=self._rates[0], high=self._rates[1])
 		self._stretch = StretchNearestFreq(dim=dim)
-		self._pad_crop = PadCrop(target_length=0, align=align, dim=dim)
+		self._pad_crop = PadCrop(target_length=0, fill_value=0.0, align=align, dim=dim)
 
 	def process(self, x: Tensor) -> Tensor:
 		length = x.shape[self._dim]
@@ -49,6 +49,7 @@ class StretchPadCropNew(WaveformTransform):
 	def __init__(
 		self,
 		rates: Union[Tuple[float, float], float] = (0.9, 1.1),
+		fill_value: float = 0.0,
 		align: str = "random",
 		dim: int = -1,
 		p: float = 1.0,
@@ -57,6 +58,7 @@ class StretchPadCropNew(WaveformTransform):
 			Stretch, pad and crop the signal. The output will have the same shape than input.
 
 			:param rates: The ratio of the signal used for resize. (default: (0.9, 1.1))
+			:param fill_value: The fill value when padding the waveform. (default: 0.0)
 			:param align: Alignment to use for cropping and padding. Can be 'left', 'right', 'center' or 'random'.
 				(default: 'random')
 			:param dim: The dimension to stretch and pad or crop. (default: -1)
@@ -65,7 +67,7 @@ class StretchPadCropNew(WaveformTransform):
 		super().__init__(p=p)
 		self._dim = dim
 		self._stretch = StretchNearestRate(rates=rates, dim=dim)
-		self._pad_crop = PadCrop(target_length=0, align=align, dim=dim)
+		self._pad_crop = PadCrop(target_length=0, fill_value=fill_value, align=align, dim=dim)
 
 	def process(self, x: Tensor) -> Tensor:
 		length = x.shape[self._dim]

@@ -1,10 +1,11 @@
 
 import torch
 
-from mlu.metrics.base import Metric
 from sklearn.metrics import roc_auc_score
 from torch import Tensor
 from typing import Callable, Optional
+
+from mlu.metrics.base import Metric
 
 
 class RocAuc(Metric):
@@ -24,8 +25,8 @@ class RocAuc(Metric):
 		"""
 			Compute ROC AUC score on prediction and target.
 
-			:param input_: (batch_size, nb_classes) tensor
-			:param target: (batch_size, nb_classes) tensor
+			:param input_: (batch_size, num_classes) tensor
+			:param target: (batch_size, num_classes) tensor
 			:return: The ROC AUC score as scalar tensor.
 		"""
 		assert input_.shape == target.shape

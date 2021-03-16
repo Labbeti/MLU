@@ -1,15 +1,16 @@
 
 import torch
 
-from mlu.metrics.base import Metric
 from torch import Tensor
 from typing import Callable, Optional
+
+from mlu.metrics.base import Metric
 
 
 class CategoricalAccuracy(Metric):
 	def __init__(
 		self,
-		dim: int = 1,
+		dim: int = -1,
 		vector_input: bool = True,
 		vector_target: bool = True,
 		reduce_fn: Optional[Callable] = torch.mean
@@ -17,7 +18,7 @@ class CategoricalAccuracy(Metric):
 		"""
 			Compute the categorical accuracy between a batch of prediction and labels.
 
-			:param dim: The dimension to compute the score. (default: 1)
+			:param dim: The dimension to compute the score. (default: -1)
 			:param vector_input: If True, considers inputs as a vector of probabilities.
 				If False, it will be considered as a vectors of classes index. (default: True)
 			:param vector_target: If True, considers target as a vector of probabilities.

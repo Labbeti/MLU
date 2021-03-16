@@ -12,6 +12,7 @@ class CosineLRScheduler(LambdaLR):
 
 			lr = lr0 * cos(7 * pi * epoch / (16 * nb_steps))
 
+			Note : Used in FixMatch method.
 			Note : If the step() method is called more than nb_steps times, the lr will not be updated anymore.
 
 			:param optim: The optimizer to update.

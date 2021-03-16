@@ -1,6 +1,6 @@
 """
 
-The code is based on the following codes :
+The scratch code is based on the following sources :
 	- https://github.com/Mjkim88/Pytorch-Torchtext-Seq2Seq/blob/master/bleu.py
 	- https://github.com/neural-dialogue-metrics/BLEU/blob/master/bleu/metrics.py
 	- https://github.com/tylin/coco-caption/blob/master/pycocoevalcap/bleu/bleu_scorer.py
@@ -10,9 +10,11 @@ The code is based on the following codes :
 import torch
 
 from collections import Counter
-from mlu.metrics.base import Metric
 from torch import Tensor
-from typing import List, Optional
+from torchtext.data.metrics import bleu_score
+from typing import List, Optional, Union
+
+from mlu.metrics.base import Metric
 
 
 class BLEU(Metric):
@@ -21,12 +23,33 @@ class BLEU(Metric):
 
 		Original paper : https://www.aclweb.org/anthology/P02-1040.pdf
 	"""
-	def __init__(self, ngram_order: int, smooth: bool = False):
+	def __init__(
+		self,
+		ngram_order: int,
+		smooth: bool = False,
+		weights: Optional[List[float]] = None,
+		backend: str = "scratch",
+	):
+		assert backend in ["scratch", "torchtext"], f"Supported backends are {('scratch', 'torchtext')}."
+
+		if backend == "scratch":
+			if weights is not None:
+				print(f"WARNING: Weights argument is not supported for '{backend}' backend, it will be ignored.")
+		elif backend == "torchtext":
+			if smooth:
+				print(f"WARNING: smooth=True is not supported for '{backend}' backend, it will be ignored.")
+
 		super().__init__()
 		self.ngram_order = ngram_order
 		self.smooth = smooth
+		self.weights = weights if weights is not None else (torch.ones(self.ngram_order) / self.ngram_order).tolist()
+		self.backend = backend
 
-	def compute_score(self, candidate_corpus: List[Tensor], references_corpus: List[List[Tensor]]) -> Tensor:
+	def compute_score(
+		self,
+		candidate_corpus: Union[List[Tensor], List[List[str]]],
+		references_corpus: Union[List[List[Tensor]], List[List[List[str]]]],
+	) -> Tensor:
 		"""
 			Compute the BLEU score metric.
 
@@ -34,10 +57,15 @@ class BLEU(Metric):
 			:param references_corpus: (N, nb references, reference size)
 			:return: The BLEU score in range [0.0, 1.0].
 		"""
-		return compute_bleu_score(candidate_corpus, references_corpus, self.ngram_order, self.smooth)
+		if self.backend == "scratch":
+			return compute_bleu_score_scratch(candidate_corpus, references_corpus, self.ngram_order, self.smooth)
+		elif self.backend == "torchtext":
+			return bleu_score(candidate_corpus, references_corpus, self.ngram_order, self.weights)
+		else:
+			raise RuntimeError(f"Unknown backend '{self.backend}' for BLEU metric.")
 
 
-def compute_bleu_score(
+def compute_bleu_score_scratch(
 	candidate_corpus: List[Tensor],
 	references_corpus: List[List[Tensor]],
 	max_order: int = 4,
@@ -70,12 +98,14 @@ def compute_bleu_score(
 	else:
 		precisions = (occ_by_order + 1.0) / (occ_by_order_max + 1.0)
 
+	# Compute geometric mean
 	if min(precisions) > 0.0:
 		weights = torch.full_like(precisions, fill_value=1.0 / max_order)
 		geo_mean = (precisions.log() * weights).sum().exp()
 	else:
 		geo_mean = torch.zeros(1)
 
+	# Compute brevity penalty
 	candidates_len = sum(len(candidate) for candidate in candidate_corpus)
 	references_len = sum(min([len(reference) for reference in references]) for references in references_corpus)
 
@@ -99,11 +129,14 @@ def get_ngrams_max_counter(sentences: List[Tensor], max_order: int, ignored_valu
 	return counter_max
 
 
-def get_ngrams(sentence: Tensor, max_order: int, ignored_value: Optional[float] = None) -> Counter:
+def get_ngrams(sentence: Union[Tensor, List[str]], max_order: int, ignored_value: Optional[float] = None) -> Counter:
 	counter = Counter()
 	for order in range(1, max_order + 1):
 		for i in range(len(sentence) - order + 1):
-			ngram = sentence[i:i + order].tolist()
+			if isinstance(sentence, Tensor):
+				ngram = sentence[i:i + order].tolist()
+			else:
+				ngram = sentence[i:i + order]
 			if ignored_value is None or ignored_value not in ngram:
 				counter[tuple(ngram)] += 1
 	return counter

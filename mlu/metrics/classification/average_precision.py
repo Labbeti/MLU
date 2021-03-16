@@ -1,10 +1,11 @@
 
 import torch
 
-from mlu.metrics.base import Metric
 from sklearn.metrics import average_precision_score
 from torch import Tensor
 from typing import Callable, Optional
+
+from mlu.metrics.base import Metric
 
 
 class AveragePrecision(Metric):
@@ -23,8 +24,8 @@ class AveragePrecision(Metric):
 		"""
 			Compute mAP score on prediction and target.
 
-			:param input_: (nb_samples, nb_classes) tensor
-			:param target: (nb_samples, nb_classes) binary tensor
+			:param input_: (nb_samples, num_classes) tensor
+			:param target: (nb_samples, num_classes) binary tensor
 			:return: The mAP score as scalar tensor.
 		"""
 		assert input_.shape == target.shape

@@ -1,7 +1,7 @@
 
 import torch
 
-from mlu.nn.modules.math import DEFAULT_EPSILON, Mean
+from mlu.nn.modules.misc import DEFAULT_EPSILON, Mean
 from mlu.nn.utils import get_reduction_from_name
 
 from torch import Tensor
@@ -13,7 +13,7 @@ class CrossEntropyWithVectors(Module):
 	def __init__(self, reduction: str = "mean", dim: Optional[int] = -1, log_input: bool = False):
 		"""
 			Compute Cross-Entropy between two distributions.
-			Input and targets must be a batch of probabilities distributions of shape (batch_size, nb_classes) tensor.
+			Input and targets must be a batch of probabilities distributions of shape (batch_size, num_classes) tensor.
 		"""
 		super().__init__()
 		self.reduce_fn = get_reduction_from_name(reduction)
@@ -23,7 +23,7 @@ class CrossEntropyWithVectors(Module):
 	def forward(self, input_: Tensor, targets: Tensor, dim: Optional[int] = None) -> Tensor:
 		"""
 			Compute cross-entropy with targets.
-			Input and target must be a (batch_size, nb_classes) tensor.
+			Input and target must be a (batch_size, num_classes) tensor.
 		"""
 		if dim is None:
 			dim = self.dim
