@@ -8,11 +8,7 @@ from mlu.transforms import StretchPadCrop
 
 
 class TestAugm(TestCase):
-	def test_stretch_pad_crop(self):
-		x = torch.rand(320000)  # ADS input example
-		stretch = StretchPadCrop()
-		xa = stretch(x)
-		self.assertEqual(x.shape, xa.shape)
+	pass
 
 
 if __name__ == "__main__":
