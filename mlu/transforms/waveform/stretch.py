@@ -35,7 +35,7 @@ class StretchNearestFreq(WaveformTransform):
 		indexes = indexes.floor().long().clamp(max=length - 1)
 		slices = [slice(None)] * len(data.shape)
 		slices[self.dim] = indexes
-		return data[slices].clone().contiguous()
+		return data[slices].contiguous()
 
 
 class StretchNearestRate(WaveformTransform):
@@ -68,7 +68,7 @@ class StretchNearestRate(WaveformTransform):
 		indexes = indexes.floor().long().clamp(max=length - 1)
 		slices = [slice(None)] * len(data.shape)
 		slices[self.dim] = indexes
-		return data[slices].clone().contiguous()
+		return data[slices].contiguous()
 
 	def set_rates(self, rates: Union[float, Tuple[float, float]]):
 		rates = rates if isinstance(rates, tuple) else (rates, rates)

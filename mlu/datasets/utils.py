@@ -84,6 +84,7 @@ def get_indexes_per_class(
 	dataset: SizedDataset,
 	num_classes: int,
 	target_one_hot: bool = False,
+	label_index: int = 1,
 ) -> List[List[int]]:
 	"""
 		Get class indexes from a Sized dataset with index of class as label.
@@ -91,22 +92,26 @@ def get_indexes_per_class(
 		:param dataset: The mono-labeled sized dataset to iterate.
 		:param num_classes: The number of classes in the dataset.
 		:param target_one_hot: If True, convert each label as one-hot label encoding instead of class index. (default: False)
+		:param label_index: TODO
 		:return: The indexes per class in the dataset of size (num_classes, num_elem_in_class_i).
 			Note: If the class distribution is not perfectly uniform, this return is not a complete matrix.
 	"""
-	result = [[] for _ in range(num_classes)]
+	if hasattr(dataset, "targets") and isinstance(dataset.targets, (np.ndarray, Tensor, list)):
+		targets = dataset.targets
+		assert len(dataset) == len(targets)
+	elif hasattr(dataset, "get_target") and callable(dataset.get_target):
+		targets = [dataset.get_target(i) for i in range(len(dataset))]
+	else:
+		targets = [dataset[i][label_index] for i in range(len(dataset))]
 
-	for i in range(len(dataset)):
-		_data, label = dataset[i]
-		if target_one_hot:
-			if isinstance(label, np.ndarray) or isinstance(label, Tensor):
-				label_idx = label.argmax().item()
-			else:
-				raise RuntimeError(
-					f"Invalid one-hot label type '{type(label)}' at index {i}. Must be one of '{(np.ndarray, torch.Tensor)}'")
-		else:
-			label_idx = label
-		result[label_idx].append(i)
+	targets = torch.as_tensor(targets)
+	if target_one_hot:
+		targets = targets.argmax(dim=1)
+
+	result = [
+		torch.where(targets.eq(class_idx))[0].tolist()
+		for class_idx in range(num_classes)
+	]
 	return result
 
 

@@ -13,6 +13,7 @@ install_requires = [
 	"torchaudio~=0.7.2",
 	"torchtext~=0.8.1",
 	"torchvision~=0.8.2",
+	"pytorch-lightning",
 	"tensorboard",
 	"nltk",
 	"matplotlib",

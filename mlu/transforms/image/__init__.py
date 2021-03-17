@@ -29,4 +29,5 @@ from .tensor import (
 	CutOutImg,
 	UniColor,
 	Inversion,
+	Rotation,
 )
