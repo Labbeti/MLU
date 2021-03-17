@@ -123,7 +123,7 @@ class KLDivLossWithProbabilities(KLDivLoss):
 		The probabilities are transform to log scale internally.
 	"""
 	def __init__(self, reduction: str = "mean", epsilon: float = DEFAULT_EPSILON, log_input: bool = False, log_target: bool = False):
-		super().__init__(reduction=reduction, log_target=True)
+		super().__init__(reduction=reduction, log_target=log_target)
 		self.epsilon = epsilon
 		self.log_input = log_input
 		self.log_target = log_target
@@ -131,8 +131,6 @@ class KLDivLossWithProbabilities(KLDivLoss):
 	def forward(self, p: Tensor, q: Tensor) -> Tensor:
 		if not self.log_input:
 			p = torch.log(p + self.epsilon)
-		if not self.log_target:
-			q = torch.log(q + self.epsilon)
 		return super().forward(input=p, target=q)
 
 	def extra_repr(self) -> str:

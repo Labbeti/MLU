@@ -124,3 +124,8 @@ class Clamp(Module):
 
 	def forward(self, x: Tensor) -> Tensor:
 		return torch.clamp(x, self.min, self.max)
+
+
+class Identity(Module):
+	def forward(self, *args):
+		return args
