@@ -20,7 +20,7 @@ class FScore(Metric):
 		"""
 			FScore metric. (micro).
 
-			>>> FScore = 2 * precision * recall / (recall + precision)
+			>>> 'FScore = 2 * precision * recall / (recall + precision)'
 
 			Vectors must be binary tensors of shape (nb classes) or (nb samplers, nb classes).
 
