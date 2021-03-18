@@ -1,4 +1,6 @@
 
+import itertools
+import random
 import torch
 
 from torch.utils.data.sampler import Sampler, SubsetRandomSampler
@@ -20,27 +22,47 @@ class SubsetSampler(Sampler):
 		return len(self._indexes)
 
 
-class SubsetRandomCycleSampler(SubsetRandomSampler):
-	def __init__(
-		self,
-		indexes: List[int],
-		nb_max_iterations: Optional[int] = None,
-	):
-		super().__init__(indexes)
+class SubsetCycleSampler(Sampler):
+	def __init__(self, indexes: List[int], nb_max_iterations: Optional[int] = None, shuffle: bool = True):
+		super().__init__(None)
+		self.indexes = indexes
 		self.nb_max_iterations = nb_max_iterations if nb_max_iterations is not None else len(indexes)
-
-	def __iter__(self) -> Iterator[int]:
-		global_idx = 0
-		finished = False
-
-		while not finished:
-			for i in torch.randperm(len(self.indices), generator=self.generator):
-				if global_idx >= len(self):
-					finished = True
-					break
-
-				yield self.indices[i]
-				global_idx += 1
+		self.shuffle = shuffle
 
 	def __len__(self) -> int:
 		return self.nb_max_iterations
+
+	def __iter__(self) -> Iterator[int]:
+		for i, idx in enumerate(itertools.cycle(self.indexes)):
+			if i % len(self.indexes) == len(self.indexes) - 1:
+				self._shuffle()
+
+			if i >= self.nb_max_iterations:
+				break
+
+			yield idx
+
+	def _shuffle(self):
+		if self.shuffle:
+			random.shuffle(self.indexes)
+
+
+class InfiniteSampler(Sampler):
+	def __init__(self, indexes: List[int], shuffle: bool = True):
+		super().__init__(None)
+		self.indexes = indexes
+		self.shuffle = shuffle
+
+	def _shuffle(self):
+		if self.shuffle:
+			random.shuffle(self.indexes)
+
+	def __len__(self) -> int:
+		return len(self.indexes)
+
+	def __iter__(self):
+		for i, idx in enumerate(itertools.cycle(self.indexes)):
+			if i % len(self) == 0:
+				self._shuffle()
+
+			yield idx

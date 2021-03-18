@@ -10,7 +10,7 @@ from datetime import datetime
 from torch import Tensor
 from torch.nn import Module
 from torch.utils.tensorboard import SummaryWriter
-from types import MethodType, FunctionType
+from types import MethodType, FunctionType, ModuleType
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, TypeVar, Union
 
 
@@ -288,3 +288,22 @@ def collate_dict_item(items: List[Dict[str, Any]]) -> Dict[str, List[Any]]:
 		key: [item[key] for item in items]
 		for key in items[0].keys()
 	}
+
+
+def search_function_in_module(func_name: str, module: ModuleType) -> Optional[Callable]:
+	if not inspect.ismodule(module):
+		raise RuntimeError(f"Object '{module.__name__}' is not a Module.")
+
+	predicate = lambda member: (
+		inspect.isfunction(member) and member.__module__ == module.__name__
+	)
+	functions = inspect.getmembers(module, predicate)
+	functions = [func for name, func in functions if name == func_name]
+
+	if len(functions) == 0:
+		return None
+	elif len(functions) == 1:
+		assert inspect.isfunction(functions[0])
+		return functions[0]
+	else:
+		raise RuntimeError(f"Found multiple functions matching the following name : '{func_name}'.")
