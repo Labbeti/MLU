@@ -1,9 +1,8 @@
 
 import itertools
 import random
-import torch
 
-from torch.utils.data.sampler import Sampler, SubsetRandomSampler
+from torch.utils.data.sampler import Sampler
 from typing import Iterator, List, Optional, Sized
 
 
