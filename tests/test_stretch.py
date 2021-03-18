@@ -20,6 +20,18 @@ class TestStretch(TestCase):
 		xa = stretch(x2)
 		self.assertEqual(x2.shape, xa.shape)
 
+	def test_2(self):
+		length = torch.randint(low=1, high=100, size=()).item()
+		w = torch.ones(10, length)
+		start_shape = w.shape
+
+		stretch = StretchPadCrop()
+
+		for _ in range(10):
+			w = stretch(w)
+
+		self.assertEqual(w.shape, start_shape)
+
 
 if __name__ == "__main__":
 	main()

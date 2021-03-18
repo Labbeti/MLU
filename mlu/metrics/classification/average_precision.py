@@ -14,6 +14,7 @@ class AveragePrecision(Metric):
 			Compute mean Average Precision (mAP) score.
 			Backend: scikit-learn.
 
+			:param average: The average mode. Can be None, 'micro', 'macro', 'weighted' or 'samples'. (default: None)
 			:param reduce_fn: The reduction function to apply. (default: torch.mean)
 		"""
 		super().__init__()
@@ -37,5 +38,8 @@ class AveragePrecision(Metric):
 		score = average_precision_score(y_true=target, y_score=input_, average=self.average)
 		score = torch.as_tensor(score)
 		score = self.reduce_fn(score)
+		import math
+		if math.isnan(score):
+			breakpoint()
 
 		return score

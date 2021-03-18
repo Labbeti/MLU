@@ -5,6 +5,8 @@ import random
 from torch.utils.data.sampler import Sampler
 from typing import Iterator, List, Optional, Sized
 
+from mlu.utils.typing import SizedDataset
+
 
 class SubsetSampler(Sampler):
 	"""

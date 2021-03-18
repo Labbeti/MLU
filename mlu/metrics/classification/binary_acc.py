@@ -10,7 +10,7 @@ from mlu.metrics.base import Metric
 class BinaryAccuracy(Metric):
 	def __init__(
 		self,
-		threshold_input: Optional[float] = None,
+		threshold_input: Optional[float] = 0.5,
 		threshold_target: Optional[float] = None,
 		reduce_fn: Callable = torch.mean
 	):
