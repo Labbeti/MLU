@@ -38,8 +38,5 @@ class AveragePrecision(Metric):
 		score = average_precision_score(y_true=target, y_score=input_, average=self.average)
 		score = torch.as_tensor(score)
 		score = self.reduce_fn(score)
-		import math
-		if math.isnan(score):
-			breakpoint()
 
 		return score
