@@ -5,8 +5,6 @@ import random
 from torch.utils.data.sampler import Sampler
 from typing import Iterator, List, Optional, Sized
 
-from mlu.utils.typing import SizedDataset
-
 
 class SubsetSampler(Sampler):
 	"""
@@ -31,7 +29,8 @@ class SubsetCycleSampler(Sampler):
 			:param indexes: The list of indexes of the items.
 			:param nb_max_iterations: The maximal number of iterations. If None, it will be set to the length of indexes.
 				(default: None)
-			:param shuffle: If True, shuffle the indexes at every
+			:param shuffle: If True, shuffle the indexes at every len(indexes).
+				(default: True)
 		"""
 		super().__init__(None)
 		self.indexes = indexes
