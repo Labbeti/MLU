@@ -98,13 +98,15 @@ def get_indexes_per_class(
 	"""
 	if hasattr(dataset, "targets") and isinstance(dataset.targets, (np.ndarray, Tensor, list)):
 		targets = dataset.targets
-		assert len(dataset) == len(targets)
+		targets = torch.as_tensor(targets)
+		assert len(dataset) == len(targets), "Dataset and targets must have the same len()."
 	elif hasattr(dataset, "get_target") and callable(dataset.get_target):
-		targets = [dataset.get_target(i) for i in range(len(dataset))]
+		targets = [torch.as_tensor(dataset.get_target(i)) for i in range(len(dataset))]
+		targets = torch.stack(targets)
 	else:
-		targets = [dataset[i][label_index] for i in range(len(dataset))]
+		targets = [torch.as_tensor(dataset[i][label_index]) for i in range(len(dataset))]
+		targets = torch.stack(targets)
 
-	targets = torch.as_tensor(targets)
 	if target_one_hot:
 		targets = targets.argmax(dim=1)
 
