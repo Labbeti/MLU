@@ -25,10 +25,19 @@ class SubsetSampler(Sampler):
 
 class SubsetCycleSampler(Sampler):
 	def __init__(self, indexes: List[int], nb_max_iterations: Optional[int] = None, shuffle: bool = True):
+		"""
+			SubsetRandomSampler that cycle on indexes until a number max of iterations is reached.
+
+			:param indexes: The list of indexes of the items.
+			:param nb_max_iterations: The maximal number of iterations. If None, it will be set to the length of indexes.
+				(default: None)
+			:param shuffle: If True, shuffle the indexes at every
+		"""
 		super().__init__(None)
 		self.indexes = indexes
 		self.nb_max_iterations = nb_max_iterations if nb_max_iterations is not None else len(indexes)
 		self.shuffle = shuffle
+		self._shuffle()
 
 	def __len__(self) -> int:
 		return self.nb_max_iterations
@@ -48,11 +57,15 @@ class SubsetCycleSampler(Sampler):
 			random.shuffle(self.indexes)
 
 
-class InfiniteSampler(Sampler):
+class SubsetCycleSamplerInfinite(Sampler):
+	"""
+		SubsetRandomSampler that cycle indefinitely on indexes.
+	"""
 	def __init__(self, indexes: List[int], shuffle: bool = True):
 		super().__init__(None)
 		self.indexes = indexes
 		self.shuffle = shuffle
+		self._shuffle()
 
 	def _shuffle(self):
 		if self.shuffle:
@@ -63,7 +76,7 @@ class InfiniteSampler(Sampler):
 
 	def __iter__(self):
 		for i, idx in enumerate(itertools.cycle(self.indexes)):
-			if i % len(self) == 0:
+			if i % len(self) == len(self.indexes) - 1:
 				self._shuffle()
 
 			yield idx
