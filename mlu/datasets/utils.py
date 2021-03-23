@@ -3,13 +3,14 @@ import numpy as np
 import random
 import torch
 
-from mlu.utils.typing import SizedDataset
 from numpy.random import RandomState
 from torch import Tensor
 from torch.utils.data.dataset import Dataset, Subset
 from torch.utils.data.sampler import Sampler, SubsetRandomSampler
 from types import ModuleType
 from typing import Callable, List, Optional, Union
+
+from mlu.utils.typing import SizedDataset
 
 
 def generate_subsets_split(
@@ -58,7 +59,7 @@ def generate_indexes_split(
 	dataset: Dataset,
 	num_classes: int,
 	ratios: List[float],
-	target_one_hot: bool = True,
+	target_one_hot: bool = False,
 	shuffle_idx: bool = True,
 ) -> List[List[int]]:
 	"""
@@ -96,6 +97,9 @@ def get_indexes_per_class(
 		:return: The indexes per class in the dataset of size (num_classes, num_elem_in_class_i).
 			Note: If the class distribution is not perfectly uniform, this return is not a complete matrix.
 	"""
+	if not hasattr(dataset, "__len__"):
+		raise RuntimeError("Dataset must have __len__() method for split indexes.")
+
 	if hasattr(dataset, "targets") and isinstance(dataset.targets, (np.ndarray, Tensor, list)):
 		targets = dataset.targets
 		targets = torch.as_tensor(targets)
