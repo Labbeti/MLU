@@ -1,6 +1,8 @@
+import random
 import unittest
 
-from mlu.datasets.utils import split_indexes_per_class, flat_split_indexes_per_class
+from mlu.datasets.dummy import DummyDataset
+from mlu.datasets.utils import split_indexes_per_class, flat_split_indexes_per_class, generate_indexes_split
 from unittest import TestCase
 
 
@@ -75,6 +77,34 @@ class TestSplitIdx(TestCase):
 		for params, expected_return in zip(tests_params, tests_expected_returns):
 			split = split_indexes_per_class(**params)
 			self.assertEqual(split, expected_return)
+
+	def test_generate_indexes_split(self):
+		len_ = random.randint(10, 1000)
+		num_classes = 10
+		dataset = DummyDataset(len_=len_, num_classes=num_classes)
+
+		ratio_s = random.random()
+		ratio_u = 1.0 - ratio_s
+
+		indexes_s, indexes_u = generate_indexes_split(dataset, num_classes, [ratio_s, ratio_u], False)
+
+		# Check if contains an index multiple times
+		self.assertEqual(len(indexes_s), len(set(indexes_s)))
+		self.assertEqual(len(indexes_u), len(set(indexes_u)))
+
+		indexes_s = set(indexes_s)
+		indexes_u = set(indexes_u)
+		all_indexes = set(range(len(dataset)))
+
+		# Disjoint !
+		self.assertEqual(len(indexes_s.intersection(indexes_u)), 0)
+		self.assertTrue(indexes_s.isdisjoint(indexes_u))
+
+		# Contains valid indexes
+		self.assertTrue(indexes_s.union(indexes_u).issubset(all_indexes))
+
+		if ratio_s + ratio_u == 1.0:
+			self.assertEqual(indexes_s.union(indexes_u), all_indexes)
 
 
 if __name__ == '__main__':

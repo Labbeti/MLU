@@ -7,7 +7,33 @@ from torch.distributions import Uniform
 from typing import Tuple, Union
 
 
-class StretchNearestFreq(WaveformTransform):
+class Stretch(WaveformTransform):
+	def __init__(
+		self,
+		rates: Union[float, Tuple[float, float]] = (0.5, 1.5),
+		dim: int = -1,
+		p: float = 1.0,
+	):
+		"""
+			Stretch transform. Resample an audio waveform with nearest value.
+
+			:param rates: The rate of the stretch. Ex: use 2.0 for multiply the signal length by 2. (default: (0.5, 1.5))
+			:param dim: The dimension to modify. (default: -1)
+			:param p: The probability to apply the transform. (default: 1.0)
+		"""
+		super().__init__(p=p)
+		self.dim = dim
+
+		self.rates = rates if isinstance(rates, tuple) else (rates, rates)
+
+	def process(self, data: Tensor) -> Tensor:
+		return stretch(data, self.rates, self.dim)
+
+	def set_rates(self, rates: Union[float, Tuple[float, float]]):
+		self.rates = rates if isinstance(rates, tuple) else (rates, rates)
+
+
+class StretchFreq(WaveformTransform):
 	def __init__(
 		self,
 		orig_freq: int = 16000,
@@ -16,7 +42,7 @@ class StretchNearestFreq(WaveformTransform):
 		p: float = 1.0,
 	):
 		"""
-			StretchNearestFreq transform.
+			StretchFreq transform. Resample an audio waveform with nearest value.
 
 			:param orig_freq: The original freq of the signal. (default: 16000)
 			:param new_freq: The new freq of the signal. (default: 16000)
@@ -29,45 +55,38 @@ class StretchNearestFreq(WaveformTransform):
 		self.dim = dim
 
 	def process(self, data: Tensor) -> Tensor:
-		length = data.shape[self.dim]
-		step = self.orig_freq / self.new_freq
-		indexes = torch.arange(start=0, end=length, step=step)
-		indexes = indexes.floor().long().clamp(max=length - 1)
-		slices = [slice(None)] * len(data.shape)
-		slices[self.dim] = indexes
-		return data[slices].clone().contiguous()
+		return stretch_with_freq(data, self.orig_freq, self.new_freq, self.dim)
 
 
-class StretchNearestRate(WaveformTransform):
-	def __init__(
-		self,
-		rates: Union[float, Tuple[float, float]] = (0.5, 1.5),
-		dim: int = -1,
-		p: float = 1.0
-	):
-		"""
-			StretchNearestRate transform.
+def stretch(
+	data: Tensor,
+	rates: Union[float, Tuple[float, float]] = (0.9, 1.1),
+	dim: int = -1,
+) -> Tensor:
+	"""
+		Stretch transform.
 
-			:param rates: The rate of the stretch. Ex: use 2.0 for multiply the signal length by 2. (default: (0.5, 1.5))
-			:param dim: The dimension to modify. (default: -1)
-			:param p: The probability to apply the transform. (default: 1.0)
-		"""
-		super().__init__(p=p)
-		self.dim = dim
+		:param data: The waveform Tensor to transform.
+		:param rates: The rate of the stretch. Ex: use 2.0 for multiply the signal length by 2. (default: (0.5, 1.5))
+		:param dim: The dimension to modify. (default: -1)
+	"""
+	length = data.shape[dim]
+	sampler = Uniform(low=rates[0], high=rates[1])
+	rate = sampler.sample().item()
+	step = 1.0 / rate
+	indexes = torch.arange(start=0, end=length, step=step)
+	indexes = indexes.floor().long().clamp(max=length - 1)
+	slices = [slice(None)] * len(data.shape)
+	slices[dim] = indexes
+	data = data[slices].contiguous()
+	return data
 
-		rates = rates if isinstance(rates, tuple) else (rates, rates)
-		self._uniform = Uniform(low=rates[0], high=rates[1])
 
-	def process(self, data: Tensor) -> Tensor:
-		length = data.shape[self.dim]
-		rate = self._uniform.sample().item()
-		step = 1.0 / rate
-		indexes = torch.arange(start=0, end=length, step=step)
-		indexes = indexes.floor().long().clamp(max=length - 1)
-		slices = [slice(None)] * len(data.shape)
-		slices[self.dim] = indexes
-		return data[slices].clone().contiguous()
-
-	def set_rates(self, rates: Union[float, Tuple[float, float]]):
-		rates = rates if isinstance(rates, tuple) else (rates, rates)
-		self._uniform = Uniform(low=rates[0], high=rates[1])
+def stretch_with_freq(
+	data: Tensor,
+	origin_freq: int = 16000,
+	target_freq: int = 16000,
+	dim: int = -1,
+):
+	rate = origin_freq / target_freq
+	return stretch(data, rate, dim)

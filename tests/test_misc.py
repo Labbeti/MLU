@@ -1,5 +1,6 @@
 
-from mlu.utils.misc import random_rect, random_cuboid
+from mlu.utils import misc
+from mlu.utils.misc import random_rect, random_cuboid, search_function_in_module
 from unittest import TestCase, main
 
 
@@ -14,6 +15,10 @@ class TestMisc(TestCase):
 
 		diff_fn = lambda l: [right_ - left_ for left_, right_ in l]
 		self.assertEqual(diff_fn(limits_rect), diff_fn(limits_cuboid))
+
+	def test_search_func_in_module(self):
+		func = search_function_in_module("search_function_in_module", misc)
+		self.assertIsNotNone(func)
 
 
 if __name__ == "__main__":

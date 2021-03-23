@@ -1,6 +1,6 @@
 
 from mlu.utils.typing.classes import SizedIterable
-from typing import Iterable, Sized
+from typing import Iterable, Optional, Sized
 
 
 class ZipCycle(Iterable, Sized):
@@ -24,10 +24,11 @@ class ZipCycle(Iterable, Sized):
 
 			:param iterables: A list of Sized Iterables to browse. Must not be an empty list.
 			:param policy: The policy to use during iteration. (default: "max")
-				If policy = "max", the output will stop when the last iterable is finished. (like in the example above)
-				If policy = "min", the class will stop when the first iterable is finished. (like in the built-in "zip" python)
+				If policy = "min", the iterator will stop when the first iterable is finished. (like in the built-in "zip" python)
+				If policy = "max", the iterator will stop when the last iterable is finished. (like in the example above)
+				If policy = "inf", the iterator will never stop and cycle indefinitely on iterables stored.
 		"""
-		assert policy in ["min", "max"], f"Available policies are '{('min', 'max')}'."
+		assert policy in ["min", "max", "inf"], f"Available policies are '{('min', 'max', 'inf')}'."
 		assert len(iterables) > 0
 
 		lens = [len(iterable) for iterable in iterables]
@@ -36,14 +37,14 @@ class ZipCycle(Iterable, Sized):
 				raise RuntimeError("An iterable is empty.")
 
 		self._iterables = iterables
-		self._len = max(lens) if policy == "max" else min(lens)
 		self._policy = policy
 
 	def __iter__(self) -> list:
 		cur_iters = [iter(iterable) for iterable in self._iterables]
 		cur_count = [0 for _ in self._iterables]
 
-		for _ in range(len(self)):
+		i = 0
+		while len(self) is None or i < len(self):
 			items = []
 
 			for i, _ in enumerate(cur_iters):
@@ -57,12 +58,16 @@ class ZipCycle(Iterable, Sized):
 				items.append(item)
 
 			yield items
+			i += 1
 
-	def __len__(self) -> int:
-		return self._len
+	def __len__(self) -> Optional[int]:
+		if self._policy == "min":
+			return min(len(iterable) for iterable in self._iterables)
+		elif self._policy == "max":
+			return max(len(iterable) for iterable in self._iterables)
+		else:  # policy == "inf"
+			return None
 
 	def set_policy(self, policy: str):
-		assert policy in ["min", "max"]
-		lens = [len(iterable) for iterable in self._iterables]
-		self._len = max(lens) if policy == "max" else min(lens)
+		assert policy in ["min", "max", "inf"]
 		self._policy = policy

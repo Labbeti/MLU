@@ -1,11 +1,13 @@
 
 import torch
 
+from torch import Tensor
+from torch.distributions import Uniform
+from torchvision.transforms import RandomRotation
+from typing import Iterable, Tuple, Union
+
 from mlu.transforms.base import ImageTransform
 from mlu.utils.misc import random_rect
-
-from torch import Tensor
-from typing import Iterable, Tuple, Union
 
 
 class Normalize(ImageTransform):
@@ -120,3 +122,16 @@ class Inversion(ImageTransform):
 
 	def process(self, x: Tensor) -> Tensor:
 		return self.max_value - x
+
+
+class Rotation(ImageTransform):
+	def __init__(self, degrees: Union[float, Tuple[float, float]] = 90.0, p: float = 1.0):
+		super().__init__(p=p)
+		self.degrees = degrees if isinstance(degrees, tuple) else (degrees, degrees)
+		self._rotation = RandomRotation(0)
+		self._uniform = Uniform(low=self.degrees[0], high=self.degrees[1])
+
+	def process(self, x: Tensor) -> Tensor:
+		degree = self._uniform.sample().item()
+		self._rotation.degrees = [degree, degree]
+		return self._rotation(x)

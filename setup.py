@@ -13,6 +13,7 @@ install_requires = [
 	"torchaudio~=0.7.2",
 	"torchtext~=0.8.1",
 	"torchvision~=0.8.2",
+	"pytorch-lightning~=1.2.3",
 	"tensorboard",
 	"nltk",
 	"matplotlib",
@@ -23,7 +24,7 @@ install_requires = [
 
 setup(
 	name="mlu",
-	version="0.4.1",
+	version="0.4.5",
 	packages=find_packages(),
 	url="https://github.com/Labbeti/MLU",
 	license="MIT",
