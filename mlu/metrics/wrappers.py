@@ -6,7 +6,7 @@ from torch.nn import Module
 from typing import Callable, Dict, List, Optional
 
 
-class MetricDict(Dict[str, Metric], Metric):
+class MetricDict(Dict[str, Module], Metric):
 	def __init__(self, *args, prefix: str = "", suffix: str = "", **kwargs):
 		"""
 			Compute score of each metric stored when forward() is called.
