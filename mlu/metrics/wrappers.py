@@ -27,11 +27,18 @@ class MetricDict(Dict[str, Module], Metric):
 		self.prefix = prefix
 		self.suffix = suffix
 
-	def compute_score(self, input_: Input, target: Target) -> Dict[str, Output]:
+	def compute_score(
+		self,
+		input_: Input,
+		target: Target,
+	) -> Dict[str, Output]:
 		"""
 			Compute the score of each metric stored and return the dictionary of {metric_name: metric_score, ...}.
 		"""
-		return {f"{self.prefix}{metric_name}{self.suffix}": metric(input_, target) for metric_name, metric in self.items()}
+		return {
+			(self.prefix + metric_name + self.suffix): metric(input_, target)
+			for metric_name, metric in self.items()
+		}
 
 	def __hash__(self) -> int:
 		return hash(tuple(sorted(self.items()))) + hash(self.prefix) + hash(self.suffix)

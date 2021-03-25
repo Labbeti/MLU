@@ -81,7 +81,7 @@ class TestSplitIdx(TestCase):
 	def test_generate_indexes_split(self):
 		len_ = random.randint(10, 1000)
 		num_classes = 10
-		dataset = DummyDataset(len_=len_, num_classes=num_classes)
+		dataset = DummyDataset(length=len_, num_classes=num_classes)
 
 		ratio_s = random.random()
 		ratio_u = 1.0 - ratio_s

@@ -5,7 +5,7 @@ from torch.nn import Module
 
 
 class EMA(Module):
-	def __init__(self, model: Module, decay: float = 0.99, copy_model: bool = True):
+	def __init__(self, model: Module, decay: float = 0.99, copy_model: bool = False):
 		"""
 			Compute the exponential moving average of a model.
 
@@ -13,7 +13,7 @@ class EMA(Module):
 
 			:param model: The target model to update.
 			:param decay: The exponential decay (sometimes called "alpha") used to update the model. (default: 0.99)
-			:param copy_model: If true, the model passed as input will be copied. (default: True)
+			:param copy_model: If True, the model passed as input will be copied. (default: False)
 		"""
 		super().__init__()
 		if copy_model:

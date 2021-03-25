@@ -8,7 +8,7 @@ from torch import Tensor
 from torch.utils.data.dataset import Dataset, Subset
 from torch.utils.data.sampler import Sampler, SubsetRandomSampler
 from types import ModuleType
-from typing import Callable, List, Optional, Union
+from typing import List, Optional, Union
 
 from mlu.utils.typing import SizedDataset
 
@@ -143,19 +143,27 @@ def shuffle_indexes_per_class(
 def split_indexes_per_class(
 	indexes_per_class: List[List[int]],
 	ratios: List[float],
-	round_fn: Callable[[float], int] = round,
-) -> List[List[List[int]]]:
+	flat_indexes: bool = False,
+) -> Union[List[List[List[int]]], List[List[int]]]:
 	"""
 		Split distinct indexes per class.
 
-		Ex:
+		Example 1 :
+
+		>>> indexes_per_class = get_indexes_per_class(dataset, num_classes=10)
+		>>> indexes_s, indexes_u = split_indexes_per_class(indexes_per_class, [0.1, 0.9], flat_indexes=True)
+		>>> subset_s = Subset(dataset, indexes_s)
+		>>> subset_u = Subset(dataset, indexes_u)
+
+		Example 2 :
 
 		>>> split_indexes_per_class(indexes_per_class=[[1, 2], [3, 4], [5, 6]], ratios=[0.5, 0.5])
 		... [[[1], [3], [5]], [[2], [4], [6]]]
+		>>> dataset = Dataset()
 
 		:param indexes_per_class: List of indexes of each class.
 		:param ratios: The ratios of each indexes split.
-		:param round_fn: The round mode for compute the last index of a sub-indexes. (default: round)
+		:param flat_indexes: If True, flat each sub-indexes. (default: False)
 		:return: The indexes per ratio and per class of size (nb_ratios, num_classes, nb_indexes_in_ratio_and_class).
 			Note: The return is not a tensor or ndarray because 'nb_indexes_in_ratio_and_class' can be different for each
 			ratio or class.
@@ -175,18 +183,15 @@ def split_indexes_per_class(
 	for i, ratio in enumerate(ratios):
 		for j, indexes in enumerate(indexes_per_class):
 			current_start = current_starts[j]
-			current_end = current_start + int(round_fn(ratio * len(indexes)))
+			current_end = current_start + int(round(ratio * len(indexes)))
 			sub_indexes = indexes[current_start:current_end]
 			indexes_per_ratio_per_class[i][j] = sub_indexes
 			current_starts[j] = current_end
-	return indexes_per_ratio_per_class
 
-
-def split_multilabel_indexes_per_class(
-	indexes_per_class: List[List[int]],
-	ratios: List[float],
-) -> List[List[List[int]]]:
-	raise NotImplementedError("TODO")
+	if flat_indexes:
+		return flat_split_indexes_per_class(indexes_per_ratio_per_class)
+	else:
+		return indexes_per_ratio_per_class
 
 
 def reduce_indexes_per_class(

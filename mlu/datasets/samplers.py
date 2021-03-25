@@ -38,9 +38,6 @@ class SubsetCycleSampler(Sampler):
 		self.shuffle = shuffle
 		self._shuffle()
 
-	def __len__(self) -> int:
-		return self.nb_max_iterations
-
 	def __iter__(self) -> Iterator[int]:
 		for i, idx in enumerate(itertools.cycle(self.indexes)):
 			if i % len(self.indexes) == len(self.indexes) - 1:
@@ -50,6 +47,9 @@ class SubsetCycleSampler(Sampler):
 				break
 
 			yield idx
+
+	def __len__(self) -> int:
+		return self.nb_max_iterations
 
 	def _shuffle(self):
 		if self.shuffle:
@@ -66,16 +66,16 @@ class SubsetCycleSamplerInfinite(Sampler):
 		self.shuffle = shuffle
 		self._shuffle()
 
-	def _shuffle(self):
-		if self.shuffle:
-			random.shuffle(self.indexes)
-
-	def __len__(self) -> int:
-		return len(self.indexes)
-
-	def __iter__(self):
+	def __iter__(self) -> Iterator[int]:
 		for i, idx in enumerate(itertools.cycle(self.indexes)):
-			if i % len(self) == len(self.indexes) - 1:
+			if i % len(self.indexes) == len(self.indexes) - 1:
 				self._shuffle()
 
 			yield idx
+
+	def __len__(self) -> int:
+		raise NotImplemented("Infinite sampler does not have __len__() method.")
+
+	def _shuffle(self):
+		if self.shuffle:
+			random.shuffle(self.indexes)

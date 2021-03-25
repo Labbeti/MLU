@@ -10,26 +10,30 @@ from typing import Optional
 
 
 class CrossEntropyWithVectors(Module):
-	def __init__(self, reduction: str = "mean", dim: Optional[int] = -1, log_input: bool = False):
+	def __init__(
+		self,
+		reduction: str = "mean",
+		dim: Optional[int] = -1,
+		log_input: bool = False,
+	):
 		"""
 			Compute Cross-Entropy between two distributions.
 			Input and targets must be a batch of probabilities distributions of shape (batch_size, num_classes) tensor.
+			Useful when target is not exactly a one-hot label, like in MixMatch method.
 		"""
 		super().__init__()
 		self.reduce_fn = get_reduction_from_name(reduction)
 		self.dim = dim
 		self.log_input = log_input
 
-	def forward(self, input_: Tensor, targets: Tensor, dim: Optional[int] = None) -> Tensor:
+	def forward(self, input_: Tensor, targets: Tensor) -> Tensor:
 		"""
 			Compute cross-entropy with targets.
 			Input and target must be a (batch_size, num_classes) tensor.
 		"""
-		if dim is None:
-			dim = self.dim
 		if not self.log_input:
 			input_ = torch.log(input_)
-		loss = -torch.sum(input_ * targets, dim=dim)
+		loss = -torch.sum(input_ * targets, dim=self.dim)
 		return self.reduce_fn(loss)
 
 	def extra_repr(self) -> str:
@@ -40,7 +44,7 @@ class Entropy(Module):
 	def __init__(
 		self,
 		reduction: str = "mean",
-		dim: int = -1,
+		dim: Optional[int] = -1,
 		epsilon: float = DEFAULT_EPSILON,
 		base: Optional[float] = None,
 		log_input: bool = False,
@@ -66,13 +70,11 @@ class Entropy(Module):
 			log_base = torch.log(torch.scalar_tensor(base))
 			self.log_func = lambda x: torch.log(x) / log_base
 
-	def forward(self, input_: Tensor, dim: Optional[int] = None) -> Tensor:
-		if dim is None:
-			dim = self.dim
+	def forward(self, input_: Tensor) -> Tensor:
 		if not self.log_input:
-			entropy = - torch.sum(input_ * self.log_func(input_ + self.epsilon), dim=dim)
+			entropy = - torch.sum(input_ * self.log_func(input_ + self.epsilon), dim=self.dim)
 		else:
-			entropy = - torch.sum(torch.exp(input_) * input_, dim=dim)
+			entropy = - torch.sum(torch.exp(input_) * input_, dim=self.dim)
 		return self.reduce_fn(entropy)
 
 	def extra_repr(self) -> str:
