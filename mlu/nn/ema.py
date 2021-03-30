@@ -22,8 +22,8 @@ class EMA(Module):
 		self.decay = decay
 
 	def update(self, other_model: Module):
-		model_params = [param for param in self.model.parameters() if param.requires_grad]
-		other_params = [param for param in other_model.parameters() if param.requires_grad]
+		model_params = [param for param in self.model.parameters()]
+		other_params = [param for param in other_model.parameters()]
 
 		assert len(model_params) == len(other_params), \
 			"For EMA, models used for update is supposed to have the same architecture."
