@@ -26,4 +26,4 @@ class PrinterABC(ABC):
 			:param epoch: Current epoch of the program.
 			:param name: The name of the training or validation process.
 		"""
-		raise NotImplementedError("Abstract method")
+		raise NotImplemented("Abstract method")

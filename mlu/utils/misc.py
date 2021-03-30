@@ -29,8 +29,13 @@ def get_datetime() -> str:
 
 def reset_seed(seed: int):
 	"""
-		Reset the seed of following packages : random, numpy, torch, torch.cuda and set deterministic behaviour for cudnn
-		backend.
+		Reset the seed of following packages :
+			- random
+			- numpy
+			- torch
+			- torch.cuda
+
+		Also set deterministic behaviour for cudnn backend.
 
 		:param seed: The seed to set.
 	"""

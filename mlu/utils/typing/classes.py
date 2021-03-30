@@ -1,6 +1,5 @@
 
-from torch.utils.data.dataset import Dataset
-from typing import Iterable, Protocol, Sized, Union
+from typing import Iterable, Protocol, Sized, runtime_checkable
 
 
 class SizedIterable(Sized, Iterable, Protocol):
@@ -12,17 +11,15 @@ class SizedIterable(Sized, Iterable, Protocol):
 	pass
 
 
-class SizedDatasetProtocol(Sized, Protocol):
+@runtime_checkable
+class SizedDataset(Sized, Protocol):
 	"""
 		Class that inherit from Sized and add the '__getitem__' method of a dataset.
 
 		Subclasses must implements '__getitem__' and '__len__' methods.
 	"""
 	def __getitem__(self, idx):
-		raise NotImplementedError("Abstract method")
+		raise NotImplemented("Abstract method")
 
 	def __len__(self) -> int:
-		raise NotImplementedError("Abstract method")
-
-
-SizedDataset = Union[Dataset, SizedDatasetProtocol]
+		raise NotImplemented("Abstract method")

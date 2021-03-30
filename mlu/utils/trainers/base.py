@@ -26,7 +26,7 @@ class TrainerABC(ABC):
 			self._it_end += 1
 
 	def train_it(self, item: tuple, it: int, nb_it: int, epoch: int, nb_epochs: int):
-		raise NotImplementedError("Abstract method")
+		raise NotImplemented("Abstract method")
 
 	def get_loader(self) -> DataLoader:
-		raise NotImplementedError("Abstract method")
+		raise NotImplemented("Abstract method")

@@ -62,7 +62,7 @@ class Transform(Module, Callable, ABC, Generic[Input, Output]):
 		return False
 
 	def process(self, x: Input) -> Output:
-		raise NotImplementedError("Abstract method")
+		raise NotImplemented("Abstract method")
 
 
 class ImageTransform(Transform, ABC, Generic[Input, Output]):

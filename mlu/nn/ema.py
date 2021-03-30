@@ -1,7 +1,8 @@
 
 import copy
 
-from torch.nn import Module
+from torch.nn import Module, Parameter
+from typing import Iterator
 
 
 class EMA(Module):
@@ -33,15 +34,3 @@ class EMA(Module):
 
 	def forward(self, *args, **kwargs):
 		return self.model(*args, **kwargs)
-
-	def set_model(self, model: Module):
-		self.model = model
-
-	def set_decay(self, decay: float):
-		self.decay = decay
-
-	def get_model(self) -> Module:
-		return self.model
-
-	def get_decay(self) -> float:
-		return self.decay
