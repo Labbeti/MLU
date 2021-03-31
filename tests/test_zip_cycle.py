@@ -9,7 +9,7 @@ class TestZipCycle(TestCase):
 	def test(self):
 		r1 = range(1, 4)
 		r2 = range(1, 6)
-		zip_cycle = ZipCycle([r1, r2], policy="max")
+		zip_cycle = ZipCycle(r1, r2, policy="max")
 
 		expected = [
 			(1, 1),
