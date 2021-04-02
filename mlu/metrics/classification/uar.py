@@ -9,22 +9,30 @@ from mlu.metrics.base import Metric
 
 
 class UAR(Metric):
-	def __init__(self, vector_input: bool = True, vector_target: bool = True, reduce_fn: Callable = torch.mean):
+	"""
+		Compute the Unweighted Average Recall (UAR) score.
+	"""
+	def __init__(
+		self,
+		dim: int = -1,
+		vector_input: bool = True,
+		vector_target: bool = True,
+		average: str = "macro",
+		reduce_fn: Callable = torch.mean,
+	):
 		super().__init__()
+		self.dim = dim
 		self.vector_input = vector_input
 		self.vector_target = vector_target
 		self.reduce_fn = reduce_fn
-		self.average = "macro"
+		self.average = average
 
 	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
-		assert input_.shape == target.shape
-		assert len(input_.shape) == 2
-
 		if self.vector_input:
-			input_ = input_.argmax(dim=-1)
+			input_ = input_.argmax(dim=self.dim)
 
 		if self.vector_target:
-			target = target.argmax(dim=-1)
+			target = target.argmax(dim=self.dim)
 
 		input_ = input_.cpu().numpy()
 		target = target.cpu().numpy()
