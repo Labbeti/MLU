@@ -1,7 +1,7 @@
 
 import unittest
 
-from mlu.utils.printers import ColumnPrinter, LinePrinter
+from utils.old_ign.printers import ColumnPrinter
 from unittest import TestCase
 
 

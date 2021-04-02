@@ -29,8 +29,13 @@ def get_datetime() -> str:
 
 def reset_seed(seed: int):
 	"""
-		Reset the seed of following packages : random, numpy, torch, torch.cuda and set deterministic behaviour for cudnn
-		backend.
+		Reset the seed of following packages :
+			- random
+			- numpy
+			- torch
+			- torch.cuda
+
+		Also set deterministic behaviour for cudnn backend.
 
 		:param seed: The seed to set.
 	"""
@@ -258,7 +263,10 @@ def duration_unformatter(string: str, format_: str = "%jd:%Hh:%Mm:%Ss") -> int:
 	return total_seconds
 
 
-def get_func_params_names(func: Union[MethodType, FunctionType]) -> List[str]:
+def get_func_params_names(func: Union[MethodType, FunctionType, Callable]) -> List[str]:
+	"""
+		:returns: The name of the parameters of a function.
+	"""
 	parameters_names = func.__code__.co_varnames
 	return list(parameters_names)
 

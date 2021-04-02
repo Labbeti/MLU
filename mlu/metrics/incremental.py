@@ -217,7 +217,7 @@ class BestTracker(IncrementalMetric, ABC):
 		return self._index - self._start_index
 
 	def _check_is_better(self, value: Tensor, best: Tensor) -> bool:
-		raise NotImplementedError("Abstract method")
+		raise NotImplemented("Abstract method")
 
 
 class MinTracker(BestTracker):

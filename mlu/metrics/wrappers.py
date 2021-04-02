@@ -6,33 +6,48 @@ from torch.nn import Module
 from typing import Callable, Dict, List, Optional
 
 
-class MetricDict(Dict[str, Metric], Metric):
+class MetricDict(Dict[str, Module], Metric):
 	def __init__(self, *args, prefix: str = "", suffix: str = "", **kwargs):
 		"""
+			Compute score of each metric stored when forward() is called.
 			Subclass of Dict[str, Metric] and Metric.
-			Compute score of each metric when forward() is called.
 
 			Example :
 
 			>>> import torch
-			>>> from mlu.metrics import CategoricalAccuracy, FScore
+			>>> from mlu.metrics import CategoricalAccuracy, FScore, MetricDict
 			>>> input_, target = torch.rand(5, 10), torch.rand(5, 10)
 			>>> metric_dict = MetricDict(acc=CategoricalAccuracy(), f1=FScore())
 			>>> metric_dict(input_, target)
 			... {"acc": 0.4, "f1": 0.1}
+
 		"""
 		dict.__init__(self, *args, **kwargs)
 		Metric.__init__(self)
 		self.prefix = prefix
 		self.suffix = suffix
 
-	def compute_score(self, input_: Input, target: Target) -> Dict[str, Output]:
-		return {f"{self.prefix}{metric_name}{self.suffix}": metric(input_, target) for metric_name, metric in self.items()}
+	def compute_score(
+		self,
+		input_: Input,
+		target: Target,
+	) -> Dict[str, Output]:
+		"""
+			Compute the score of each metric stored and return the dictionary of {metric_name: metric_score, ...}.
+		"""
+		return {
+			(self.prefix + metric_name + self.suffix): metric(input_, target)
+			for metric_name, metric in self.items()
+		}
 
 	def __hash__(self) -> int:
 		return hash(tuple(sorted(self.items()))) + hash(self.prefix) + hash(self.suffix)
 
 	def to_dict(self, with_pre_and_suf: bool = True) -> Dict[str, Metric]:
+		"""
+			:param with_pre_and_suf: If True, append the prefix and suffix to the keys metrics names. (default: True)
+			:return: Return the metrics names and metrics as python dict object.
+		"""
 		if with_pre_and_suf:
 			dic = {f"{self.prefix}{metric_name}{self.suffix}": metric for metric_name, metric in self.items()}
 		else:

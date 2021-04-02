@@ -17,8 +17,9 @@ class Recall(Metric):
 	):
 		"""
 			Compute Recall score between binary vectors.
+			The recall is intuitively the ability of the classifier to find all the positive samples.
 
-			>>> 'Recall = TP / (TP + FN) where TP = True Positives, FN = False Negatives.'
+			>>> 'Recall = TP / (TP + FN), where TP = True Positives, FN = False Negatives.'
 
 			Vectors must be binary tensors of shape (nb classes) or (nb samplers, nb classes).
 

@@ -4,7 +4,7 @@ import unittest
 
 from unittest import TestCase
 
-from mlu.utils.recorder.recorder import Recorder
+from utils.old_ign.recorder.recorder import Recorder
 
 
 class TestRecorder(TestCase):

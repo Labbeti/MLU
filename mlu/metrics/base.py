@@ -21,7 +21,7 @@ class Metric(Module, Callable, ABC, Generic[Input, Target, Output]):
 		return self.compute_score(input_, target)
 
 	def compute_score(self, input_: Input, target: Target) -> Output:
-		raise NotImplementedError("Abstract method")
+		raise NotImplemented("Abstract method")
 
 
 class IncrementalMetric(Module, Callable, ABC, Generic[T, U]):
@@ -38,7 +38,7 @@ class IncrementalMetric(Module, Callable, ABC, Generic[T, U]):
 		"""
 			Reset the current incremental value.
 		"""
-		raise NotImplementedError("Abstract method")
+		raise NotImplemented("Abstract method")
 
 	def add(self, value: T):
 		"""
@@ -46,13 +46,13 @@ class IncrementalMetric(Module, Callable, ABC, Generic[T, U]):
 
 			:param value: The value to add to the current incremental metric value.
 		"""
-		raise NotImplementedError("Abstract method")
+		raise NotImplemented("Abstract method")
 
 	def is_empty(self) -> bool:
 		"""
 			:return: Return True if no value has been added to the incremental score.
 		"""
-		raise NotImplementedError("Abstract method")
+		raise NotImplemented("Abstract method")
 
 	def get_current(self) -> Optional[U]:
 		"""
@@ -60,7 +60,7 @@ class IncrementalMetric(Module, Callable, ABC, Generic[T, U]):
 
 			:return: The current incremental metric value.
 		"""
-		raise NotImplementedError("Abstract method")
+		raise NotImplemented("Abstract method")
 
 	def add_values(self, values: Iterable[T]):
 		"""

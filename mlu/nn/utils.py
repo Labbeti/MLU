@@ -2,6 +2,7 @@
 import torch
 
 from torch import Tensor
+from torch.nn import Module
 from typing import Callable
 
 
@@ -21,3 +22,9 @@ def get_reduction_from_name(name: str) -> Callable[[Tensor], Tensor]:
 		return lambda x: torch.mean(x, dim=-1)
 	else:
 		raise RuntimeError(f"Unknown reduction '{name}'. Must be one of {str(['mean', 'sum', 'none', 'batchmean'])}.")
+
+
+def model_checksum(model: Module) -> Tensor:
+	with torch.no_grad():
+		parameters = [param.sum() for param in model.parameters() if param.requires_grad]
+		return torch.stack(parameters).sum()

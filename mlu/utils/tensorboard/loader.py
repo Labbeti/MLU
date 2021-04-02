@@ -3,12 +3,26 @@ import os
 import os.path as osp
 
 from tensorboard.backend.event_processing.event_file_loader import EventFileLoader
-from typing import Any, Dict, List, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Union
 
 
 EVENT_FILE_PREFIX = "events.out.tfevents."
 DT_FLOAT = 1
 DT_STRING = 7
+
+
+def search_fpath_rec(path: str, recursive: bool, fpath_pred: Optional[Callable]) -> List[str]:
+	if osp.isfile(path) and (fpath_pred is None or fpath_pred(path)):
+		return [path]
+	elif osp.isdir(path):
+		fpaths = []
+		for subname in os.listdir(path):
+			subpath = osp.join(path, subname)
+			if osp.isfile(subpath) or (osp.isdir(subpath) and recursive):
+				fpaths += search_fpath_rec(subpath, recursive, fpath_pred)
+		return fpaths
+	else:
+		return []
 
 
 class TensorboardLoader:
@@ -38,21 +52,16 @@ class TensorboardLoader:
 		self._skip_str = skip_str
 		self._verbose = verbose
 
-		def search_fpath_rec(path_: str, recursive_: bool) -> List[str]:
-			if osp.isfile(path_):
-				return [path_]
-			elif osp.isdir(path_):
-				fpaths = []
-				for subname in os.listdir(path_):
-					subpath = osp.join(path_, subname)
-					if osp.isfile(subpath) or (osp.isdir(subpath) and recursive_):
-						fpaths.extend(search_fpath_rec(subpath, recursive_))
-				return fpaths
-			else:
-				return []
+		if isinstance(path, str):
+			paths = [path]
+		elif isinstance(path, Iterable):
+			paths = path
+		else:
+			raise RuntimeError(f"Invalid type '{type(path)}' for TensorboardLoader.")
 
-		event_paths = search_fpath_rec(path, recursive)
-		event_paths = [path for path in event_paths if osp.basename(path).startswith(EVENT_FILE_PREFIX)]
+		event_paths = []
+		for path in paths:
+			event_paths += search_fpath_rec(path, recursive, lambda fpath: osp.basename(fpath).startswith(EVENT_FILE_PREFIX))
 		self._event_fpaths = event_paths
 
 	def load(self) -> Dict[str, Dict[str, Union[str, List[float]]]]:
@@ -116,7 +125,7 @@ class TensorboardLoader:
 
 				else:
 					if self._verbose >= 1:
-						print(f"WARNING: Unknown dtype '{dtype}'. Skip this event value with tag '{tag}' and step '{step}'.")
+						print(f"WARNING: Unknown dtype '{dtype}'. Skip this event value with tag '{tag}' at step '{step}'.")
 					continue
 
 				if tag not in data.keys():
