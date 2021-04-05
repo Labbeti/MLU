@@ -47,6 +47,9 @@ class TestPickable(TestCase):
 			JSDivLoss(),
 			JSDivLossFromLogits(),
 			Entropy(),
+			Mean(),
+			Max(),
+			Min(),
 		]
 
 		try:
