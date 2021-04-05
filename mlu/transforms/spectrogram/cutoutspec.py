@@ -15,7 +15,7 @@ class CutOutSpec(SpectrogramTransform):
 		p: float = 1.0,
 	):
 		"""
-			CutOut transform for spectrogram.
+			CutOut transform for spectrogram tensors.
 
 			Input must be of shape (..., freq, time), which means the width is the time and height the freq of the spectrogram.
 

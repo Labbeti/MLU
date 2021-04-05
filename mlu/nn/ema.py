@@ -1,7 +1,9 @@
 
 import copy
+import torch
 
 from torch.nn import Module
+from typing import Any
 
 
 class EMA(Module):
@@ -15,9 +17,10 @@ class EMA(Module):
 			:param decay: The exponential decay (sometimes called "alpha") used to update the model. (default: 0.99)
 			:param copy_model: If True, the model passed as input will be copied. (default: False)
 		"""
-		super().__init__()
 		if copy_model:
 			model = copy.deepcopy(model)
+
+		super().__init__()
 		self.model = model
 		self.decay = decay
 
@@ -33,3 +36,12 @@ class EMA(Module):
 
 	def forward(self, *args, **kwargs):
 		return self.model(*args, **kwargs)
+
+	def __setattr__(self, name: str, value: Any):
+		if name not in ["model"] and False:
+			Module.__setattr__(self, name, value)
+		else:
+			object.__setattr__(self, name, value)
+
+	def extra_repr(self) -> str:
+		return f"decay={self.decay}"
