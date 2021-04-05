@@ -1,8 +1,7 @@
 
 import copy
 
-from torch.nn import Module, Parameter
-from typing import Iterator
+from torch.nn import Module
 
 
 class EMA(Module):
@@ -26,8 +25,8 @@ class EMA(Module):
 		model_params = [param for param in self.model.parameters()]
 		other_params = [param for param in other_model.parameters()]
 
-		assert len(model_params) == len(other_params), \
-			"For EMA, models used for update is supposed to have the same architecture."
+		if len(model_params) != len(other_params):
+			raise RuntimeError("For EMA, model used for update is supposed to have the same architecture.")
 
 		for param, other_param in zip(model_params, other_params):
 			param.set_(self.decay * param + (1.0 - self.decay) * other_param)

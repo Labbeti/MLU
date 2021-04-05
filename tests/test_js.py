@@ -8,7 +8,7 @@ from timeit import timeit
 from torch.nn import Softmax
 from unittest import TestCase
 
-from mlu.nn import JSDivLoss, JSDivLossWithLogits, Entropy
+from mlu.nn import JSDivLoss, JSDivLossFromLogits, Entropy
 from mlu.utils.misc import reset_seed
 
 
@@ -36,7 +36,7 @@ class TestJS(TestCase):
 
 	def crit_2(self):
 		logits_p, logits_q = self.create_logits()
-		criterion = JSDivLossWithLogits(reduction="mean")
+		criterion = JSDivLossFromLogits(reduction="mean")
 		_ = criterion(logits_p, logits_q)
 
 	def test_js(self):
@@ -52,7 +52,7 @@ class TestJS(TestCase):
 		t[0] += time() - s1
 
 		s2 = time()
-		l1 = JSDivLossWithLogits(reduction="mean")
+		l1 = JSDivLossFromLogits(reduction="mean")
 		r[1] += l1(logits_p, logits_q)
 		t[1] += time() - s2
 

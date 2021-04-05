@@ -118,18 +118,6 @@ def random_cuboid(shapes: Sequence[int], ratios: Sequence[Tuple[float, float]]) 
 	return limits
 
 
-def get_nb_parameters(model: Module, only_trainable: bool = True) -> int:
-	"""
-		Return the number of parameters in a model.
-
-		:param model: Pytorch Module to check.
-		:param only_trainable: If True, count only parameter that requires gradient. (default: True)
-		:returns: The number of parameters.
-	"""
-	params = (p for p in model.parameters() if not only_trainable or p.requires_grad)
-	return sum(p.numel() for p in params)
-
-
 def add_dict_to_writer(dic: Dict[str, Any], writer: SummaryWriter):
 	"""
 		Add dictionary content to tensorboard hyperparameters.
