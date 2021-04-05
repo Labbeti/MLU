@@ -1,10 +1,11 @@
 
 from torch import Tensor
+from typing import Optional
 from mlu.metrics.base import Metric
 
 
 class EqMetric(Metric):
-	def __init__(self, dim: int):
+	def __init__(self, dim: Optional[int] = None):
 		"""
 			Equal metric along a dimension.
 

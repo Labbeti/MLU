@@ -1,7 +1,9 @@
 
 import torch
+import unittest
+
+from unittest import TestCase
 from mlu.transforms.waveform import Occlusion
-from unittest import TestCase, main
 
 
 class TestOcclusion(TestCase):
@@ -17,4 +19,4 @@ class TestOcclusion(TestCase):
 
 
 if __name__ == "__main__":
-	main()
+	unittest.main()

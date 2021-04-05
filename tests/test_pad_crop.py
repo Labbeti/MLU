@@ -1,9 +1,10 @@
 
 import torch
+import unittest
 
+from unittest import TestCase
 from mlu.transforms.waveform.crop import CropAlignLeft, CropAlignRight, CropAlignCenter
 from mlu.transforms.waveform.pad import PadAlignLeft, PadAlignRight, PadAlignCenter, PadAlignRandom
-from unittest import TestCase, main
 
 
 class TestPad(TestCase):
@@ -74,4 +75,4 @@ class TestCut(TestCase):
 
 
 if __name__ == "__main__":
-	main()
+	unittest.main()

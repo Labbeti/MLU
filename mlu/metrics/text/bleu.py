@@ -25,7 +25,7 @@ class BLEU(Metric):
 	"""
 	def __init__(
 		self,
-		ngram_order: int,
+		ngram_order: int = 4,
 		smooth: bool = False,
 		weights: Optional[List[float]] = None,
 		backend: str = "scratch",
