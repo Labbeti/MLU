@@ -86,10 +86,8 @@ class Mean(Module):
 		super().__init__()
 		self.dim = dim
 
-	def forward(self, x: Tensor, dim: Optional[int] = None) -> Tensor:
-		if dim is None:
-			dim = self.dim
-		return x.mean(dim=dim)
+	def forward(self, x: Tensor) -> Tensor:
+		return x.mean(dim=self.dim)
 
 
 class Permute(Module):

@@ -109,7 +109,7 @@ class NBestsTracker(IncrementalMetric):
 		self,
 		*args: Tensor,
 		start_index: int = 0,
-		is_better: Callable[[Tensor, Tensor], bool] = lambda x, y: x > y,
+		is_better: Callable[[Tensor, Tensor], bool] = torch.gt,
 		n: int = 1,
 	):
 		super().__init__()
@@ -293,7 +293,7 @@ class BestTrackerBetterFunc(BestTracker):
 		start_index: int = 0,
 		start_best: Optional[Tensor] = None,
 		start_index_best: int = -1,
-		is_better: Callable[[Tensor, Tensor], bool] = lambda value, best: value > best,
+		is_better: Callable[[Tensor, Tensor], bool] = torch.gt,
 	):
 		super().__init__(
 			*args,

@@ -2,6 +2,7 @@
 from mlu.metrics.base import Metric, IncrementalMetric, Input, Target, Output, T, U
 from mlu.metrics.incremental import IncrementalMean
 
+from torch import Tensor
 from torch.nn import Module
 from typing import Callable, Dict, List, Optional
 
@@ -72,25 +73,35 @@ class MetricWrapper(Metric):
 			:param reduce_fn: The reduction function to apply.
 		"""
 		super().__init__()
+		self.callable_ = callable_
 		self.reduce_fn = reduce_fn
 
 		if use_input and use_target:
-			self.sub_call = lambda input_, target: callable_(input_, target)
+			self.sub_call = self._sub_call_both
 		elif use_input:
-			self.sub_call = lambda input_, target: callable_(input_)
+			self.sub_call = self._sub_call_input
 		elif use_target:
-			self.sub_call = lambda input_, target: callable_(target)
+			self.sub_call = self._sub_call_target
 		else:
-			self.sub_call = lambda input_, target: callable_()
-
-		if isinstance(callable_, Module):
-			self.add_module("callable", callable_)
+			self.sub_call = self._sub_call_none
 
 	def compute_score(self, input_: Input, target: Target) -> Output:
 		score = self.sub_call(input_, target)
 		if self.reduce_fn is not None:
 			score = self.reduce_fn(score)
 		return score
+
+	def _sub_call_both(self, input_: Tensor, target: Tensor) -> Tensor:
+		return self.callable_(input_, target)
+
+	def _sub_call_input(self, input_: Tensor, target: Tensor) -> Tensor:
+		return self.callable_(input_)
+
+	def _sub_call_target(self, input_: Tensor, target: Tensor) -> Tensor:
+		return self.callable_(target)
+
+	def _sub_call_none(self, input_: Tensor, target: Tensor) -> Tensor:
+		return self.callable_()
 
 
 class IncrementalWrapper(Metric):

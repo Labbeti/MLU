@@ -15,7 +15,7 @@ class FScore(Metric):
 		dim: Optional[int] = -1,
 		threshold_input: Optional[float] = 0.5,
 		threshold_target: Optional[float] = 0.5,
-		reduce_fn: Callable = torch.mean,
+		reduce_fn: Optional[Callable] = torch.mean,
 	):
 		"""
 			FScore metric. (micro).
@@ -34,8 +34,8 @@ class FScore(Metric):
 		self.threshold_target = threshold_target
 		self.reduce_fn = reduce_fn
 
-		self.recall = Recall(dim, None, None, lambda x: x)
-		self.precision = Precision(dim, None, None, lambda x: x)
+		self.recall = Recall(dim, None, None, None)
+		self.precision = Precision(dim, None, None, None)
 
 	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
 		"""
@@ -57,5 +57,7 @@ class FScore(Metric):
 		score = 2.0 * precision * recall / (recall + precision)
 		score[score.isnan()] = 0.0
 
-		score = self.reduce_fn(score)
+		if self.reduce_fn is not None:
+			score = self.reduce_fn(score)
+
 		return score

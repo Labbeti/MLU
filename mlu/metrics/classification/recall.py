@@ -13,7 +13,7 @@ class Recall(Metric):
 		dim: Optional[int] = -1,
 		threshold_input: Optional[float] = 0.5,
 		threshold_target: Optional[float] = 0.5,
-		reduce_fn: Callable = torch.mean
+		reduce_fn: Optional[Callable] = torch.mean,
 	):
 		"""
 			Compute Recall score between binary vectors.
@@ -59,6 +59,8 @@ class Recall(Metric):
 		false_negatives = (target - input_).ge(1.0).sum(dim=self.dim)
 		score = true_positives / (true_positives + false_negatives)
 		score[score.isnan()] = 0.0
-		score = self.reduce_fn(score)
+
+		if self.reduce_fn is not None:
+			score = self.reduce_fn(score)
 
 		return score

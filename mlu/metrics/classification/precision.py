@@ -13,12 +13,12 @@ class Precision(Metric):
 		dim: Optional[int] = -1,
 		threshold_input: Optional[float] = 0.5,
 		threshold_target: Optional[float] = 0.5,
-		reduce_fn: Callable = torch.mean
+		reduce_fn: Optional[Callable] = torch.mean,
 	):
 		"""
 			Compute Precision score between binary vectors.
 
-			>>> Precision = TP / (TP + FP) where TP = True Positives, FP = False Positives.
+			>>> 'Precision = TP / (TP + FP) where TP = True Positives, FP = False Positives.'
 
 			Vectors must be binary tensors of shape (nb classes) or (nb samplers, nb classes).
 
@@ -58,6 +58,8 @@ class Precision(Metric):
 		false_positives = (input_ - target).ge(1.0).sum(dim=self.dim)
 		score = true_positives / (true_positives + false_positives)
 		score[score.isnan()] = 0.0
-		score = self.reduce_fn(score)
+
+		if self.reduce_fn is not None:
+			score = self.reduce_fn(score)
 
 		return score

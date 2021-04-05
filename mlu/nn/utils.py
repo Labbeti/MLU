@@ -6,6 +6,14 @@ from torch.nn import Module
 from typing import Callable
 
 
+def identity(x: Tensor) -> Tensor:
+	return x
+
+
+def batchmean(x: Tensor) -> Tensor:
+	return torch.mean(x, dim=-1)
+
+
 def get_reduction_from_name(name: str) -> Callable[[Tensor], Tensor]:
 	"""
 		:param name: The name of the reduction function.
@@ -16,10 +24,10 @@ def get_reduction_from_name(name: str) -> Callable[[Tensor], Tensor]:
 		return torch.mean
 	elif name in ["sum"]:
 		return torch.sum
-	elif name in ["none"]:
-		return lambda x: x
+	elif name in ["none", "identity"]:
+		return identity
 	elif name in ["batchmean"]:
-		return lambda x: torch.mean(x, dim=-1)
+		return batchmean
 	else:
 		raise RuntimeError(f"Unknown reduction '{name}'. Must be one of {str(['mean', 'sum', 'none', 'batchmean'])}.")
 
