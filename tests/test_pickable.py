@@ -4,6 +4,7 @@ import unittest
 from unittest import TestCase
 
 from mlu.metrics import *
+from mlu.nn import *
 
 
 class TestPickable(TestCase):
@@ -33,6 +34,24 @@ class TestPickable(TestCase):
 		try:
 			for metric in metrics:
 				tmp = pickle.dumps(metric)
+				self.assertTrue(isinstance(tmp, bytes))
+				self.assertGreater(len(tmp), 0)
+		except AttributeError:
+			self.assertTrue(False)
+
+	def test_nn(self):
+		modules = [
+			CrossEntropyWithVectors(),
+			KLDivLossWithProbabilities(),
+			KLDivLoss(),
+			JSDivLoss(),
+			JSDivLossFromLogits(),
+			Entropy(),
+		]
+
+		try:
+			for m in modules:
+				tmp = pickle.dumps(m)
 				self.assertTrue(isinstance(tmp, bytes))
 				self.assertGreater(len(tmp), 0)
 		except AttributeError:
