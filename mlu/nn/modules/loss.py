@@ -162,12 +162,14 @@ class KLDivLossWithProbabilities(KLDivLoss):
 		return f"epsilon={self.epsilon}, log_input={self.log_input}, log_target={self.log_target}"
 
 
-class BCELossBatchMean(Sequential):
+class BCELossBatchMean(Module):
 	def __init__(self, dim: Optional[int] = -1):
-		super().__init__(
-			BCELoss(reduction="none"),
-			Mean(dim=dim),
-		)
+		super().__init__()
+		self.bce = BCELoss(reduction="none")
+		self.mean = Mean(dim=dim)
+
+	def forward(self, input_: Tensor, target: Tensor) -> Tensor:
+		return self.mean(self.bce(input_, target))
 
 	@property
 	def dim(self) -> int:

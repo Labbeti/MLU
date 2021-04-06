@@ -17,8 +17,10 @@ class Transform(Module, Callable, ABC, Generic[Input, Output]):
 
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
+		if not isinstance(p, float) or not(0.0 <= p <= 1.0):
+			raise ValueError("Probability parameter 'p' must be a float in range [0, 1].")
+
 		super().__init__()
-		assert 0.0 <= p <= 1.0, "Probability must be a float in range [0, 1]."
 		self.p = p
 
 	def forward(self, *x: Input) -> Output:
@@ -26,22 +28,6 @@ class Transform(Module, Callable, ABC, Generic[Input, Output]):
 			return self.process(*x)
 		else:
 			return x if len(x) > 1 else x[0]
-
-	def set_p(self, p: float):
-		"""
-			Set the internal probability to apply the transform.
-
-			:param p: The new probability to apply the transform in range [0, 1].
-		"""
-		self.p = p
-
-	def get_p(self) -> float:
-		"""
-			Get the probability to apply the transform.
-
-			:return: The current probability to apply the transform in range [0, 1].
-		"""
-		return self.p
 
 	def is_image_transform(self) -> bool:
 		"""
