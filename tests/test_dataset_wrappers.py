@@ -17,6 +17,13 @@ class TestDatasetWrappers(TestCase):
 		for idx in range(len(dataset)):
 			self.assertTrue(torch.allclose(dataset[idx], dataset_raw[idx][0]))
 
+	def test_no_label_2(self):
+		dataset = DummyDataset()
+		dataset_w = NoLabelDataset(dataset)
+
+		self.assertTrue(isinstance(dataset_w[0], Tensor))
+		self.assertEqual(list(dataset_w[0].shape), dataset.data_shape)
+
 
 if __name__ == "__main__":
 	unittest.main()

@@ -1,6 +1,6 @@
 
 from torch.nn import Module
-from typing import Callable
+from typing import Callable, Type
 
 
 class Print(Module):
@@ -22,4 +22,15 @@ class Assert(Module):
 
 	def forward(self, x):
 		assert self.assertion(x), str(self.msg) + str(self.msg_fn(x))
+		return x
+
+
+class CheckType(Module):
+	def __init__(self, *types: Type):
+		super().__init__()
+		self.types = tuple(types)
+
+	def forward(self, x):
+		if not isinstance(x, self.types):
+			raise ValueError(f"Invalid type '{type(x)}'. Must one of: {tuple(self.types)}.")
 		return x

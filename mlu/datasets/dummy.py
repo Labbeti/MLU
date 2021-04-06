@@ -3,14 +3,14 @@ import torch
 
 from torch import Tensor
 from torch.utils.data.dataset import Dataset
-from typing import List, Optional, Sized, Tuple
+from typing import Optional, Sequence, Sized, Tuple
 
 
 class DummyDataset(Dataset, Sized):
 	def __init__(
 		self,
 		length: int = 100,
-		data_shape: Optional[List[int]] = None,
+		data_shape: Optional[Sequence[int]] = None,
 		num_classes: int = 10,
 		balanced: bool = True,
 	):

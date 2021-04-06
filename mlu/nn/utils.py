@@ -32,10 +32,9 @@ def get_reduction_from_name(name: str) -> Callable[[Tensor], Tensor]:
 		raise RuntimeError(f"Unknown reduction '{name}'. Must be one of {str(['mean', 'sum', 'none', 'batchmean'])}.")
 
 
-def model_checksum(model: Module) -> Tensor:
-	with torch.no_grad():
-		parameters = [param.sum() for param in model.parameters() if param.requires_grad]
-		return torch.stack(parameters).sum()
+def get_module_checksum(model: Module, only_trainable: bool = True) -> Tensor:
+	params = (param for param in model.parameters() if not only_trainable or param.requires_grad)
+	return sum(param.sum() for param in params)
 
 
 def get_num_parameters(model: Module, only_trainable: bool = True) -> int:
@@ -46,15 +45,19 @@ def get_num_parameters(model: Module, only_trainable: bool = True) -> int:
 		:param only_trainable: If True, count only parameter that requires gradient. (default: True)
 		:returns: The number of parameters.
 	"""
-	params = (p for p in model.parameters() if not only_trainable or p.requires_grad)
-	return sum(p.numel() for p in params)
+	params = (param for param in model.parameters() if not only_trainable or param.requires_grad)
+	return sum(param.numel() for param in params)
 
 
-def check_params_shapes(m1: Module, m2: Module, only_trainable: bool = True) -> bool:
-	params1 = [p for p in m1.parameters() if not only_trainable or p.requires_grad]
-	params2 = [p for p in m2.parameters() if not only_trainable or p.requires_grad]
+def check_module_shapes(m1: Module, m2: Module, only_trainable: bool = True) -> bool:
+	params1 = [param for param in m1.parameters() if not only_trainable or param.requires_grad]
+	params2 = [param for param in m2.parameters() if not only_trainable or param.requires_grad]
 
-	if len(params1) != len(params2):
-		return False
-	else:
-		return all(p1.shape == p2.shape for p1, p2 in zip(params1, params2))
+	return len(params1) == len(params2) and all(p1.shape == p2.shape for p1, p2 in zip(params1, params2))
+
+
+def check_module_equal(m1: Module, m2: Module, only_trainable: bool = True) -> bool:
+	params1 = [param for param in m1.parameters() if not only_trainable or param.requires_grad]
+	params2 = [param for param in m2.parameters() if not only_trainable or param.requires_grad]
+
+	return len(params1) == len(params2) and all([p1.shape == p2.shape and p1.eq(p2).all() for p1, p2 in zip(params1, params2)])
