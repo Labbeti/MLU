@@ -12,6 +12,7 @@ from mlu.metrics.base import Metric
 class FScore(Metric):
 	def __init__(
 		self,
+		beta: float = 1.0,
 		dim: Optional[int] = -1,
 		threshold_input: Optional[float] = 0.5,
 		threshold_target: Optional[float] = 0.5,
@@ -30,6 +31,7 @@ class FScore(Metric):
 			:param reduce_fn: The reduction function to apply. (default: torch.mean)
 		"""
 		super().__init__()
+		self.beta = beta
 		self.threshold_input = threshold_input
 		self.threshold_target = threshold_target
 		self.reduce_fn = reduce_fn
@@ -54,7 +56,7 @@ class FScore(Metric):
 		recall = self.recall(input_, target)
 		precision = self.precision(input_, target)
 
-		score = 2.0 * precision * recall / (recall + precision)
+		score = (1.0 + self.beta ** 2) * precision * recall / (self.beta ** 2 * precision + recall)
 		score[score.isnan()] = 0.0
 
 		if self.reduce_fn is not None:
