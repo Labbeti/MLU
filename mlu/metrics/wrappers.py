@@ -4,11 +4,11 @@ from mlu.metrics.incremental import IncrementalMean
 
 from torch import Tensor
 from torch.nn import Module
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Union
 
 
 class MetricDict(Dict[str, Module], Metric):
-	def __init__(self, *args, prefix: str = "", suffix: str = "", **kwargs):
+	def __init__(self, *args: Union[dict, Callable, None], prefix: str = "", suffix: str = "", **kwargs):
 		"""
 			Compute score of each metric stored when forward() is called.
 			Subclass of Dict[str, Metric] and Metric.
@@ -21,8 +21,8 @@ class MetricDict(Dict[str, Module], Metric):
 			>>> metric_dict = MetricDict(acc=CategoricalAccuracy(), f1=FScore())
 			>>> metric_dict(input_, target)
 			... {"acc": 0.4, "f1": 0.1}
-
 		"""
+		args = [arg for arg in args if arg is not None]
 		dict.__init__(self, *args, **kwargs)
 		Metric.__init__(self)
 		self.prefix = prefix
