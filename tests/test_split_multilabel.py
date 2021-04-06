@@ -4,7 +4,7 @@ import unittest
 
 from torch import Tensor
 from unittest import TestCase
-from mlu.datasets.utils_multilabel import (
+from datasets.utils.split_multilabel import (
 	get_indexes_per_class,
 	split_multilabel_indexes_per_class,
 	flat_indexes_per_class,

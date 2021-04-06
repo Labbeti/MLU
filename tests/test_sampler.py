@@ -4,7 +4,7 @@ import unittest
 from torch.utils.data.sampler import SubsetRandomSampler
 from unittest import TestCase
 
-from mlu.datasets.samplers import SubsetRandomCycleSampler
+from datasets.utils.samplers import SubsetRandomCycleSampler
 
 
 class TestSRCSampler(TestCase):

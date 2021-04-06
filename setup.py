@@ -19,6 +19,7 @@ install_requires = [
 	"matplotlib",
 	"numpy",
 	"rouge-metric",
+	"py7zr",
 ]
 
 
