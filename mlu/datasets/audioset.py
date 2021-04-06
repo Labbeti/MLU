@@ -1,11 +1,13 @@
 
 import csv
+import os
 import os.path as osp
+import requests
 import torch
 import torchaudio
 
 from enum import Enum, IntEnum
-from torch import Tensor, IntTensor
+from torch import Tensor
 from torch.nn import Module
 from torch.utils.data.dataset import Dataset
 from typing import Optional, Sized, Union
@@ -17,9 +19,14 @@ class Subset(str, Enum):
 	EVAL: str = "eval"
 
 
+CLASS_LABELS_INDICES_URL = "http://storage.googleapis.com/us_audioset/youtube_corpus/v1/csv/class_labels_indices.csv"
+
+
 class AudioSet(Dataset, Sized):
 	"""
 		Unofficial AudioSet pytorch dataset.
+
+		Dataset files and folders tree :
 
 		root/
 		└── data/
@@ -37,7 +44,6 @@ class AudioSet(Dataset, Sized):
 					└── audio/
 						└── (20371 files, ~18GB)
 	"""
-
 	METADATA_FILEPATH = {
 		Subset.BALANCED: osp.join("data", "balanced_train_segments.csv"),
 		Subset.UNBALANCED: osp.join("data", "unbalanced_train_segments.csv"),
@@ -75,7 +81,13 @@ class AudioSet(Dataset, Sized):
 		verbose: int = 0
 	):
 		"""
-			Constructor of the AudioSet dataset.
+			Unofficial AudioSet pytorch dataset.
+
+			Example :
+
+			>>> from mlu.datasets import AudioSet
+			>>> from mlu.nn import MultiHot
+			>>> dataset = AudioSet("../data", "balanced", target_transform=MultiHot(527, dtype=torch.bool))
 
 			:param root: Directory path to the dataset root architecture.
 			:param subset: The name of the subset to load. Must be "balanced", "unbalanced" or "eval".
@@ -113,23 +125,17 @@ class AudioSet(Dataset, Sized):
 		self._load_labels_table()
 		self._load_subset_metadata()
 
-	def __getitem__(self, index: int) -> (Tensor, IntTensor):
+	def __getitem__(self, index: int) -> (Tensor, Tensor):
 		"""
 			Returns the audio data with labels.
 
 			:param index: The index of the audio sample.
 			:return: (Audio data as tensor, labels classes indexes as tensor of indexes of classes)
 		"""
-		audio_data = self.get_raw_data(index)
-		labels = self.get_raw_labels(index)
+		audio_data = self.get_audio(index)
+		target = self.get_target(index)
 
-		if self._transform is not None:
-			audio_data = self._transform(audio_data)
-
-		if self._target_transform is not None:
-			labels = self._target_transform(labels)
-
-		return audio_data, labels
+		return audio_data, target
 
 	def __len__(self) -> int:
 		"""
@@ -144,21 +150,30 @@ class AudioSet(Dataset, Sized):
 		"""
 		return self._metadata[self._subset][index]["filepath"]
 
-	def get_raw_data(self, index: int) -> Tensor:
+	def get_audio(self, index: int) -> Tensor:
 		"""
-			:param index: The index of the audio.
+			:param index: The index of the data.
 			:return: The raw waveform from the audio file as Tensor.
 		"""
 		filepath = self.get_filepath(index)
 		audio_data, _sample_rate = torchaudio.load(filepath)
+
+		if self._transform is not None:
+			audio_data = self._transform(audio_data)
+
 		return audio_data
 
-	def get_raw_labels(self, index: int) -> IntTensor:
+	def get_target(self, index: int) -> Tensor:
 		"""
-			:param index: The index of the classes.
+			:param index: The index of the data.
 			:return: The label classes indexes for a specific sample index.
 		"""
-		return self._metadata[self._subset][index]["labels"]
+		target = self._metadata[self._subset][index]["labels"]
+
+		if self._target_transform is not None:
+			target = self._target_transform(target)
+
+		return target
 
 	def get_num_classes(self) -> int:
 		"""
@@ -179,17 +194,23 @@ class AudioSet(Dataset, Sized):
 		if not osp.isfile(meta_filepath):
 			raise RuntimeError(f"Cannot find CSV metadata file '{meta_filepath}'.")
 
-		metadata_dirpath = osp.join(osp.dirname(osp.dirname(__file__)), "metadata")
-		table_filepath = osp.join(metadata_dirpath, "labels.csv")
-		if not osp.isfile(table_filepath):
-			raise RuntimeError(f"Cannot find CSV labels table file '{table_filepath}'.")
-
 	def _load_labels_table(self):
-		metadata_dirpath = osp.join(osp.dirname(osp.dirname(__file__)), "metadata")
-		table_filepath = osp.join(metadata_dirpath, "labels.csv")
+		def rec_basename(path: str, n: int) -> str:
+			for _ in range(n):
+				path = osp.basename(path)
+			return path
+
+		abs_current_fpath = osp.join(os.getcwd(), __file__)
+		class_labels_indices_fpath = osp.join(rec_basename(abs_current_fpath, 3), "class_labels_indices.csv")
+		if not osp.isfile(class_labels_indices_fpath):
+			with open(class_labels_indices_fpath, "wb") as file:
+				req = requests.get(CLASS_LABELS_INDICES_URL)
+				file.write(req.content)
+
+		table_filepath = class_labels_indices_fpath
 
 		if not osp.isfile(table_filepath):
-			raise RuntimeError(f"Cannot find CSV labels table file '{table_filepath}', it is not a file.")
+			raise RuntimeError(f"Invalid CSV class labels indices file '{table_filepath}'.")
 
 		with open(table_filepath, "r") as table_file:
 			reader = csv.reader(table_file, skipinitialspace=True, strict=True)
@@ -256,4 +277,7 @@ class AudioSet(Dataset, Sized):
 
 		self._metadata[self._subset] = subset_metadata
 		if self._verbose >= 2:
-			print(f"Info: Found {num_entries} metadata entries and {len(subset_metadata)} audio files matching with entries.")
+			print(
+				f"Info: Found {num_entries} metadata entries and {len(subset_metadata)} audio files matching with entries. "
+				f"(missing {num_entries - len(subset_metadata)} files)"
+			)

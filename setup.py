@@ -20,6 +20,7 @@ install_requires = [
 	"numpy",
 	"rouge-metric",
 	"py7zr",
+	"requests",
 ]
 
 

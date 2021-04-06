@@ -59,7 +59,7 @@ FILES_INFOS = {
 }
 
 
-class CLOTHOV1(Dataset, Sized):
+class ClothoV1(Dataset, Sized):
 	"""
 		Unofficial Clotho V1 pytorch dataset for DCASE2020 Task 6.
 

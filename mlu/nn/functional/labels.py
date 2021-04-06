@@ -88,7 +88,7 @@ def nums_to_multihot(
 	result = torch.zeros(len(nums_lst), num_classes, dtype=dtype)
 	for i, nums in enumerate(nums_lst):
 		for num in nums:
-			result[i, num] = 1
+			result[i, num] = torch.ones(1, dtype=dtype)
 	return result
 
 
