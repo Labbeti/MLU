@@ -39,10 +39,10 @@ def get_module_checksum(model: Module, only_trainable: bool = True) -> Tensor:
 
 def get_num_parameters(model: Module, only_trainable: bool = True) -> int:
 	"""
-		Return the number of parameters in a model.
+		Return the number of parameters in a module.
 
 		:param model: Pytorch Module to check.
-		:param only_trainable: If True, count only parameter that requires gradient. (default: True)
+		:param only_trainable: If True, count only parameters that requires gradient. (default: True)
 		:returns: The number of parameters.
 	"""
 	params = (param for param in model.parameters() if not only_trainable or param.requires_grad)

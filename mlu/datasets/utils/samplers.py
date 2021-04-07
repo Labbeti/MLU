@@ -27,7 +27,8 @@ class SubsetCycleSampler(Sampler):
 			SubsetRandomSampler that cycle on indexes until a number max of iterations is reached.
 
 			:param indexes: The list of indexes of the items.
-			:param nb_max_iterations: The maximal number of iterations. If None, it will be set to the length of indexes.
+			:param nb_max_iterations: The maximal number of iterations. If None, it will be set to the length of indexes
+				and the sampler will have the same behaviour than a SubsetRandomSampler.
 				(default: None)
 			:param shuffle: If True, shuffle the indexes at every len(indexes).
 				(default: True)
@@ -56,7 +57,7 @@ class SubsetCycleSampler(Sampler):
 			random.shuffle(self.indexes)
 
 
-class SubsetCycleSamplerInfinite(Sampler):
+class SubsetInfiniteCycleSampler(Sampler):
 	"""
 		SubsetRandomSampler that cycle indefinitely on indexes.
 	"""
