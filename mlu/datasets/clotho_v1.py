@@ -11,7 +11,7 @@ from torch import Tensor
 from torch.nn import Module
 from torch.utils.data.dataset import Dataset
 from torchaudio.datasets.utils import download_url
-from typing import Dict, List, Optional, Sized
+from typing import Dict, List, Optional
 
 
 class ClothoV1Subset(str, Enum):
@@ -20,6 +20,7 @@ class ClothoV1Subset(str, Enum):
 
 
 FOLDER_NAME = "CLOTHO_V1"
+SAMPLE_RATE: int = 44100
 
 FILES_INFOS = {
 	"development": {
@@ -59,9 +60,11 @@ FILES_INFOS = {
 }
 
 
-class ClothoV1(Dataset, Sized):
+class ClothoV1(Dataset):
 	"""
 		Unofficial Clotho V1 pytorch dataset for DCASE 2020 Task 6.
+		Audio are waveform sounds of 15 to 30 seconds, sampled at 44100 Hz.
+		Targets are a list of 5 different sentences describing each audio sample.
 
 		Paper : https://arxiv.org/pdf/1910.09387.pdf
 
@@ -133,7 +136,7 @@ class ClothoV1(Dataset, Sized):
 			:param index: The index of the item.
 			:return: A tuple of audio data of shape (size,) and the 5 matching captions.
 		"""
-		waveform = self.get_waveform(index)
+		waveform = self.get_audio(index)
 		captions = self.get_captions(index)
 		return waveform, captions
 
@@ -143,14 +146,13 @@ class ClothoV1(Dataset, Sized):
 		"""
 		return len(self._data_info)
 
-	def get_waveform(self, index: int) -> Tensor:
+	def get_audio(self, index: int) -> Tensor:
 		"""
 			:param index: The index of the item.
 			:return: The audio data as 1D tensor.
 		"""
 		if not self._waveform_cache or index not in self._waveforms.keys():
-			info = self._data_info[self.get_filename(index)]
-			filepath = info["filepath"]
+			filepath = self.get_audio_fpath(index)
 			waveform, _sample_rate = torchaudio.load(filepath)
 
 			if self._waveform_cache:
@@ -168,7 +170,7 @@ class ClothoV1(Dataset, Sized):
 			:param index: The index of the item.
 			:return: The list of 5 captions of an item.
 		"""
-		info = self._data_info[self.get_filename(index)]
+		info = self._data_info[self.get_audio_fname(index)]
 		captions = info["captions"]
 
 		if self._captions_transform is not None:
@@ -189,15 +191,23 @@ class ClothoV1(Dataset, Sized):
 			:param index: The index of the item.
 			:return: The metadata dictionary associated to the item.
 		"""
-		info = self._data_info[self.get_filename(index)]
+		info = self._data_info[self.get_audio_fname(index)]
 		return info["metadata"]
 
-	def get_filename(self, index: int) -> str:
+	def get_audio_fname(self, index: int) -> str:
 		"""
 			:param index: The index of the item.
 			:return: The filename associated to the index.
 		"""
 		return self._idx_to_filename[index]
+
+	def get_audio_fpath(self, index: int) -> str:
+		"""
+			:param index: The index of the item.
+			:return: The filepath associated to the index.
+		"""
+		info = self._data_info[self.get_audio_fname(index)]
+		return info["filepath"]
 
 	def get_dataset_root(self) -> str:
 		"""
