@@ -13,7 +13,7 @@ from torch.utils.data.dataset import Dataset
 from typing import Optional, Sized, Union
 
 
-class Subset(str, Enum):
+class AudioSetSubset(str, Enum):
 	BALANCED: str = "balanced"
 	UNBALANCED: str = "unbalanced"
 	EVAL: str = "eval"
@@ -45,15 +45,15 @@ class AudioSet(Dataset, Sized):
 						└── (20371 files, ~18GB)
 	"""
 	METADATA_FILEPATH = {
-		Subset.BALANCED: osp.join("data", "balanced_train_segments.csv"),
-		Subset.UNBALANCED: osp.join("data", "unbalanced_train_segments.csv"),
-		Subset.EVAL: osp.join("data", "eval_segments.csv"),
+		AudioSetSubset.BALANCED: osp.join("data", "balanced_train_segments.csv"),
+		AudioSetSubset.UNBALANCED: osp.join("data", "unbalanced_train_segments.csv"),
+		AudioSetSubset.EVAL: osp.join("data", "eval_segments.csv"),
 	}
 
 	SUBSET_DIRPATH = {
-		Subset.BALANCED: osp.join("data", "data", "balanced_train_segments", "audio"),
-		Subset.UNBALANCED: osp.join("data", "data", "unbalanced_train_segments", "audio"),
-		Subset.EVAL: osp.join("data", "data", "eval_segments", "audio"),
+		AudioSetSubset.BALANCED: osp.join("data", "data", "balanced_train_segments", "audio"),
+		AudioSetSubset.UNBALANCED: osp.join("data", "data", "unbalanced_train_segments", "audio"),
+		AudioSetSubset.EVAL: osp.join("data", "data", "eval_segments", "audio"),
 	}
 
 	AUDIO_FILE_EXTENSION = "flac"
@@ -75,7 +75,7 @@ class AudioSet(Dataset, Sized):
 	def __init__(
 		self,
 		root: str,
-		subset: Union[str, Subset],
+		subset: Union[str, AudioSetSubset],
 		transform: Optional[Module] = None,
 		target_transform: Optional[Module] = None,
 		verbose: int = 0
@@ -87,7 +87,7 @@ class AudioSet(Dataset, Sized):
 
 			>>> from mlu.datasets import AudioSet
 			>>> from mlu.nn import MultiHot
-			>>> dataset = AudioSet("../data", "balanced", target_transform=MultiHot(527, dtype=torch.bool))
+			>>> dataset = AudioSet("../data", "balanced", target_transform=MultiHot(527))
 
 			:param root: Directory path to the dataset root architecture.
 			:param subset: The name of the subset to load. Must be "balanced", "unbalanced" or "eval".
@@ -107,7 +107,7 @@ class AudioSet(Dataset, Sized):
 
 		if isinstance(subset, str):
 			subset = subset.lower()
-			subsets_names = [s.value for s in list(Subset)]
+			subsets_names = [s.value for s in list(AudioSetSubset)]
 			if subset not in subsets_names:
 				raise RuntimeError(f"Invalid subset name '{subset}'. Must be one of : {str(subsets_names)}")
 			subset = Subset(subset)

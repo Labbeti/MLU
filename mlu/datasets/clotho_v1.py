@@ -14,7 +14,7 @@ from torchaudio.datasets.utils import download_url
 from typing import Dict, List, Optional, Sized
 
 
-class Subset(str, Enum):
+class ClothoV1Subset(str, Enum):
 	DEVELOPMENT: str = "development"
 	EVALUATION: str = "evaluation"
 
@@ -61,7 +61,9 @@ FILES_INFOS = {
 
 class ClothoV1(Dataset, Sized):
 	"""
-		Unofficial Clotho V1 pytorch dataset for DCASE2020 Task 6.
+		Unofficial Clotho V1 pytorch dataset for DCASE 2020 Task 6.
+
+		Paper : https://arxiv.org/pdf/1910.09387.pdf
 
 		Folder tree:
 
