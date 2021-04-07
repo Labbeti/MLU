@@ -44,6 +44,18 @@ class Recall2:
 		return self.value_
 
 
+class BinaryAccuracy2:
+	def __init__(self, epsilon=1e-10):
+		super().__init__()
+		self.epsilon = epsilon
+
+	def __call__(self, y_pred, y_true):
+		y_pred = (y_pred > 0.5).float()
+		correct = y_pred.eq(y_true).float().sum()
+		value_ = correct / torch.prod(torch.as_tensor(y_true.shape))
+		return value_
+
+
 class TestPrecision(TestCase):
 	def test_precision(self):
 		p1 = Precision()
@@ -80,6 +92,18 @@ class TestPrecision(TestCase):
 		# print("s1", s1)
 		# print("s2", s2)
 		self.assertAlmostEqual(s1, s2)
+
+	def test_binacc(self):
+		binacc = BinaryAccuracy()
+		binacc2 = BinaryAccuracy2()
+
+		pred = torch.rand(8, 10)
+		target = torch.rand(8, 10).ge(0.5).float()
+
+		score = binacc(pred, target)
+		score2 = binacc2(pred, target)
+
+		self.assertAlmostEqual(score, score2)
 
 
 class TestMetricDict(TestCase):
