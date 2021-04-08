@@ -2,6 +2,7 @@
 import torch
 import unittest
 
+from torch import Tensor
 from unittest import TestCase
 
 from mlu.datasets.dummy import DummyDataset

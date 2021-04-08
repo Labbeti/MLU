@@ -110,7 +110,7 @@ class AudioSet(Dataset, Sized):
 			subsets_names = [s.value for s in list(AudioSetSubset)]
 			if subset not in subsets_names:
 				raise RuntimeError(f"Invalid subset name '{subset}'. Must be one of : {str(subsets_names)}")
-			subset = Subset(subset)
+			subset = AudioSetSubset(subset)
 
 		self._dataset_root = root
 		self._subset = subset

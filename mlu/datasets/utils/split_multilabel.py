@@ -19,6 +19,8 @@ def get_targets(indexes_per_class: List[List[int]]) -> Tensor:
 	targets = torch.full((max_idx + 1, num_classes), fill_value=False, dtype=torch.bool)
 	for idx_class, indexes in enumerate(indexes_per_class):
 		for idx in indexes:
+			if targets[idx, idx_class]:
+				raise RuntimeError(f"Found duplicate for index '{idx}' and class index '{idx_class}'.")
 			targets[idx, idx_class] = True
 	return targets
 
