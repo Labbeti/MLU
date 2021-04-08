@@ -3,7 +3,7 @@ from .average_precision import AveragePrecision
 from .binary_accuracy import BinaryAccuracy
 from .accuracy import CategoricalAccuracy
 from .dprime import DPrime
-from .eq import EqMetric
+from .equal import Equal
 from .fscore import FScore
 from .precision import Precision
 from .recall import Recall

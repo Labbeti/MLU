@@ -38,7 +38,7 @@ class EMA(Module):
 		return self.model(*args, **kwargs)
 
 	def __setattr__(self, name: str, value: Any):
-		if name not in ["model"] and False:
+		if name not in ["model"]:
 			Module.__setattr__(self, name, value)
 		else:
 			object.__setattr__(self, name, value)

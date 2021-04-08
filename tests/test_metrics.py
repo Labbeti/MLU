@@ -2,8 +2,11 @@
 import torch
 import unittest
 
+from sklearn.metrics import f1_score
 from unittest import TestCase
+
 from mlu.metrics import BinaryAccuracy, FScore, Precision, Recall
+from mlu.nn import Thresholding
 
 
 class Precision2:
@@ -104,6 +107,20 @@ class TestPrecision(TestCase):
 		score2 = binacc2(pred, target)
 
 		self.assertAlmostEqual(score, score2)
+
+	def test_f1_with_sklearn(self):
+		pred = torch.rand(10)
+		target = torch.rand(10).ge(0.5).float()
+
+		thres = Thresholding(0.5)
+		pred = thres(pred)
+
+		f1 = FScore()
+
+		sk_score = f1_score(y_pred=pred.cpu().numpy(), y_true=target.cpu().numpy())
+		mlu_score = f1(pred, target).item()
+
+		self.assertAlmostEqual(sk_score, mlu_score)
 
 
 class TestMetricDict(TestCase):

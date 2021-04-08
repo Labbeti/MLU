@@ -14,7 +14,7 @@ class TestPickable(TestCase):
 			BinaryAccuracy(),
 			CategoricalAccuracy(),
 			DPrime(),
-			EqMetric(),
+			Equal(),
 			FScore(),
 			Precision(),
 			Recall(),

@@ -33,6 +33,7 @@ class BinaryAccuracy(Metric):
 
 		if self.threshold_input is not None:
 			input_ = input_.ge(self.threshold_input).float()
+
 		if self.threshold_target is not None:
 			target = target.ge(self.threshold_target).float()
 
