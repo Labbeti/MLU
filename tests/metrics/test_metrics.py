@@ -138,5 +138,33 @@ class TestMetricDict(TestCase):
 		self.assertEqual(score, torch.ones(1))
 
 
+class TestSimplify(TestCase):
+	def test_recall(self):
+		input_ = torch.rand(10, 1000).ge(0.5).float()
+		target = torch.rand(10, 1000).ge(0.5).float()
+		dim = -1
+
+		true_positives = (input_ * target).sum(dim=dim)
+		false_negatives = (target - input_).ge(1.0).sum(dim=dim)
+		score = true_positives + false_negatives
+
+		# Maybe simplify TP + FN = Possible positives = sum(target)
+		score_v2 = target.sum(dim)
+		self.assertTrue(torch.allclose(score, score_v2))
+
+	def test_precision(self):
+		input_ = torch.rand(10, 1000).ge(0.5).float()
+		target = torch.rand(10, 1000).ge(0.5).float()
+		dim = -1
+
+		true_positives = (input_ * target).sum(dim=dim)
+		false_positives = (input_ - target).ge(1.0).sum(dim=dim)
+		score = true_positives + false_positives
+
+		# Simplify TP + FP = Predicted positives = sum(input)
+		score_v2 = input_.sum(dim)
+		self.assertTrue(torch.allclose(score, score_v2))
+
+
 if __name__ == "__main__":
 	unittest.main()

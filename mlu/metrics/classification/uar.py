@@ -27,17 +27,17 @@ class UAR(Metric):
 		self.reduce_fn = reduce_fn
 		self.average = average
 
-	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
+	def compute_score(self, pred: Tensor, target: Tensor) -> Tensor:
 		if self.vector_input:
-			input_ = input_.argmax(dim=self.dim)
+			pred = pred.argmax(dim=self.dim)
 
 		if self.vector_target:
 			target = target.argmax(dim=self.dim)
 
-		input_ = input_.cpu().numpy()
+		pred = pred.cpu().numpy()
 		target = target.cpu().numpy()
 
-		score = recall_score(y_true=target, y_pred=input_, average=self.average)
+		score = recall_score(y_true=target, y_pred=pred, average=self.average)
 		score = torch.as_tensor(score)
 		score = self.reduce_fn(score)
 

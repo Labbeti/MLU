@@ -1,5 +1,6 @@
 
 from abc import ABC
+from torch import Tensor
 from torch.nn import Module
 from typing import Iterable, Optional
 
@@ -9,12 +10,19 @@ class Metric(Module, ABC):
 		Base class for metric modules.
 
 		Abstract methods:
-			- compute_score(self, input_: Input, target: Target) -> Output:
+			- compute_score(self, input_, target):
 	"""
-	def forward(self, input_, target):
-		return self.compute_score(input_, target)
+	def __init__(self, score_to_cpu: bool = False):
+		super().__init__()
+		self.score_to_cpu = score_to_cpu
 
-	def compute_score(self, input_, target):
+	def forward(self, pred, target):
+		score = self.compute_score(pred, target)
+		if isinstance(score, Tensor) and self.score_to_cpu:
+			score = score.cpu()
+		return score
+
+	def compute_score(self, pred, target):
 		raise NotImplemented("Abstract method")
 
 
@@ -25,7 +33,7 @@ class IncrementalMetric(Module, ABC):
 		Abstract methods:
 			- reset(self):
 			- add(self, value: T):
-			- get_current(self) -> Optional[U]:
+			- get_current(self) -> Optional:
 			- is_empty(self) -> bool:
 	"""
 	def reset(self):

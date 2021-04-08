@@ -30,14 +30,14 @@ class MetricDict(Dict[str, Module], Metric):
 
 	def compute_score(
 		self,
-		input_,
+		pred,
 		target,
 	) -> dict:
 		"""
 			Compute the score of each metric stored and return the dictionary of {metric_name: metric_score, ...}.
 		"""
 		return {
-			(self.prefix + metric_name + self.suffix): metric(input_, target)
+			(self.prefix + metric_name + self.suffix): metric(pred, target)
 			for metric_name, metric in self.items()
 		}
 
@@ -85,8 +85,8 @@ class MetricWrapper(Metric):
 		else:
 			self.sub_call = self._sub_call_none
 
-	def compute_score(self, input_, target):
-		score = self.sub_call(input_, target)
+	def compute_score(self, pred, target):
+		score = self.sub_call(pred, target)
 		if self.reduce_fn is not None:
 			score = self.reduce_fn(score)
 		return score
@@ -120,8 +120,8 @@ class IncrementalWrapper(Metric):
 		self.metric = metric
 		self.continue_metric = incremental_metric
 
-	def compute_score(self, input_, target):
-		score = self.metric(input_, target)
+	def compute_score(self, pred, target):
+		score = self.metric(pred, target)
 		self.continue_metric.add(score)
 		return self.continue_metric.get_current()
 
@@ -138,8 +138,8 @@ class IncrementalListWrapper(Metric):
 		self.metric = metric
 		self.continue_metric_list = incremental_metric_list if incremental_metric_list is not None else []
 
-	def compute_score(self, input_, target) -> list:
-		score = self.metric(input_, target)
+	def compute_score(self, pred, target) -> list:
+		score = self.metric(pred, target)
 		for continue_metric in self.continue_metric_list:
 			continue_metric.add(score)
 		return [continue_metric.get_current() for continue_metric in self.continue_metric_list]
@@ -164,7 +164,7 @@ class IncrementalList(IncrementalMetric):
 			for incremental in self.incremental_list
 		]
 
-	def get_current(self) -> List[Optional]:
+	def get_current(self) -> list:
 		return [
 			incremental.get_current()
 			for incremental in self.incremental_list

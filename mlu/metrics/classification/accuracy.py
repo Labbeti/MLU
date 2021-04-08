@@ -31,16 +31,16 @@ class CategoricalAccuracy(Metric):
 		self.vector_target = vector_target
 		self.reduce_fn = reduce_fn
 
-	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
+	def compute_score(self, pred: Tensor, target: Tensor) -> Tensor:
 		if self.vector_input:
-			input_ = input_.argmax(dim=self.dim)
+			pred = pred.argmax(dim=self.dim)
 		if self.vector_target:
 			target = target.argmax(dim=self.dim)
 
-		assert input_.shape == target.shape, "Input and target must have the same shape."
-		assert 0 <= len(input_.shape) <= 2
+		assert pred.shape == target.shape, "Input and target must have the same shape."
+		assert 0 <= len(pred.shape) <= 2
 
-		score = input_.eq(target).float()
+		score = pred.eq(target).float()
 		if self.reduce_fn is not None:
 			score = self.reduce_fn(score)
 		return score

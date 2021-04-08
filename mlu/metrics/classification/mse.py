@@ -11,7 +11,7 @@ class MSE(Metric):
 		super().__init__()
 		self.reduce_fn = reduce_fn
 
-	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
-		score = (input_ - target) ** 2
+	def compute_score(self, pred: Tensor, target: Tensor) -> Tensor:
+		score = (pred - target) ** 2
 		score = self.reduce_fn(score)
 		return score

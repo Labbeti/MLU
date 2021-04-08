@@ -18,7 +18,7 @@ class Equal(Metric):
 		self.dim = dim
 		self.reduce_fn = reduce_fn
 
-	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
-		score = input_.eq(target).all(self.dim).float()
+	def compute_score(self, pred: Tensor, target: Tensor) -> Tensor:
+		score = pred.eq(target).all(self.dim).float()
 		score = self.reduce_fn(score)
 		return score
