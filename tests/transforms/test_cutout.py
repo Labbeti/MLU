@@ -35,7 +35,7 @@ class TestCutOut(TestCase):
 		self.assertNotEqual(img_pil, img_pil_res)
 
 	def test_cut_out_spec(self):
-		transform = CutOutSpec(width_scales=1.0, height_scales=0.1, fill_value=0.0)
+		transform = CutOutSpec(freq_scales=(1.0, 1.0), time_scales=(0.1, 0.1), fill_value=0.0)
 
 		t = torch.rand(3, 32, 16)
 		o = transform(t)
@@ -50,6 +50,15 @@ class TestCutOut(TestCase):
 		plt.figure()
 		plt.imshow(o.numpy().T)
 		plt.show()
+
+	def test_cos_2(self):
+		transform = CutOutSpec(freq_scales=(0.0, 1.0), time_scales=(0.0, 1.0), fill_value=-1.0)
+		t = torch.rand(3, 32, 16)
+		o = transform(t)
+
+		self.assertEqual(t.shape, o.shape)
+		self.assertGreater(t.sum(), o.sum())
+		self.assertGreater(o.eq(-1.0).sum(), 0)
 
 
 if __name__ == "__main__":

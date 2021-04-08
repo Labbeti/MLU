@@ -12,49 +12,53 @@ class Crop(WaveformTransform):
 		self.align = align
 		self.dim = dim
 
-	def process(self, waveform: Tensor) -> Tensor:
+	def process(self, data: Tensor) -> Tensor:
 		if self.align == "center":
-			return self.crop_align_center(waveform)
+			return self.crop_align_center(data)
 		elif self.align == "left":
-			return self.crop_align_left(waveform)
+			return self.crop_align_left(data)
 		elif self.align == "random":
-			return self.crop_align_random(waveform)
+			return self.crop_align_random(data)
 		elif self.align == "right":
-			return self.crop_align_right(waveform)
+			return self.crop_align_right(data)
 		else:
 			raise ValueError(f"Unknown alignment '{self.align}'. Must be one of {str(['left', 'right', 'center', 'random'])}.")
 
-	def crop_align_center(self, waveform: Tensor) -> Tensor:
-		if waveform.shape[self.dim] > self.target_length:
-			diff = waveform.shape[self.dim] - self.target_length
+	def crop_align_center(self, data: Tensor) -> Tensor:
+		if data.shape[self.dim] > self.target_length:
+			diff = data.shape[self.dim] - self.target_length
 			start = diff // 2 + diff % 2
 			end = start + self.target_length
-			slices = [slice(None)] * len(waveform.shape)
+			slices = [slice(None)] * len(data.shape)
 			slices[self.dim] = slice(start, end)
-			waveform = waveform[slices]
-		return waveform
+			data = data[slices]
+			data = data.contiguous()
+		return data
 
-	def crop_align_left(self, waveform: Tensor) -> Tensor:
-		if waveform.shape[self.dim] > self.target_length:
-			slices = [slice(None)] * len(waveform.shape)
+	def crop_align_left(self, data: Tensor) -> Tensor:
+		if data.shape[self.dim] > self.target_length:
+			slices = [slice(None)] * len(data.shape)
 			slices[self.dim] = slice(self.target_length)
-			waveform = waveform[slices]
-		return waveform
+			data = data[slices]
+			data = data.contiguous()
+		return data
 
-	def crop_align_random(self, waveform: Tensor) -> Tensor:
-		if waveform.shape[self.dim] > self.target_length:
-			diff = waveform.shape[self.dim] - self.target_length
+	def crop_align_random(self, data: Tensor) -> Tensor:
+		if data.shape[self.dim] > self.target_length:
+			diff = data.shape[self.dim] - self.target_length
 			start = torch.randint(low=0, high=diff, size=()).item()
 			end = start + self.target_length
-			slices = [slice(None)] * len(waveform.shape)
+			slices = [slice(None)] * len(data.shape)
 			slices[self.dim] = slice(start, end)
-			waveform = waveform[slices]
-		return waveform
+			data = data[slices]
+			data = data.contiguous()
+		return data
 
-	def crop_align_right(self, waveform: Tensor) -> Tensor:
-		if waveform.shape[self.dim] > self.target_length:
-			start = waveform.shape[self.dim] - self.target_length
-			slices = [slice(None)] * len(waveform.shape)
+	def crop_align_right(self, data: Tensor) -> Tensor:
+		if data.shape[self.dim] > self.target_length:
+			start = data.shape[self.dim] - self.target_length
+			slices = [slice(None)] * len(data.shape)
 			slices[self.dim] = slice(start, None)
-			waveform = waveform[slices]
-		return waveform
+			data = data[slices]
+			data = data.contiguous()
+		return data

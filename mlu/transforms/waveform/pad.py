@@ -43,88 +43,92 @@ class Pad(WaveformTransform):
 		else:
 			raise ValueError(f"Unknown alignment '{self.align}'. Must be one of {str(['left', 'right', 'center', 'random'])}.")
 
-	def pad_align_left(self, waveform: Tensor) -> Tensor:
+	def pad_align_left(self, data: Tensor) -> Tensor:
 		"""
 			Pad with left-alignment by adding zeros to right.
 
-			:param waveform: The original waveform.
+			:param data: The original waveform.
 		"""
-		if self.target_length > waveform.shape[self.dim]:
-			missing = self.target_length - waveform.shape[self.dim]
+		if self.target_length > data.shape[self.dim]:
+			missing = self.target_length - data.shape[self.dim]
 
-			shape_zeros = list(waveform.shape)
+			shape_zeros = list(data.shape)
 			shape_zeros[self.dim] = missing
 
-			waveform = torch.cat((
-				waveform,
-				torch.full(shape_zeros, self.fill_value, dtype=waveform.dtype, device=waveform.device),
+			data = torch.cat((
+				data,
+				torch.full(shape_zeros, self.fill_value, dtype=data.dtype, device=data.device),
 			), dim=self.dim)
-		return waveform
+			data = data.contiguous()
+		return data
 
-	def pad_align_right(self, waveform: Tensor) -> Tensor:
+	def pad_align_right(self, data: Tensor) -> Tensor:
 		"""
 			Pad with right-alignment by adding zeros to left.
 
-			:param waveform: The original waveform.
+			:param data: The original waveform.
 		"""
-		if self.target_length > waveform.shape[self.dim]:
-			missing = self.target_length - waveform.shape[self.dim]
+		if self.target_length > data.shape[self.dim]:
+			missing = self.target_length - data.shape[self.dim]
 
-			shape_zeros = list(waveform.shape)
+			shape_zeros = list(data.shape)
 			shape_zeros[self.dim] = missing
 
-			waveform = torch.cat((
-				torch.full(shape_zeros, self.fill_value, dtype=waveform.dtype, device=waveform.device),
-				waveform
+			data = torch.cat((
+				torch.full(shape_zeros, self.fill_value, dtype=data.dtype, device=data.device),
+				data
 			), dim=self.dim)
-		return waveform
+			data = data.contiguous()
+		return data
 
-	def pad_align_center(self, waveform: Tensor) -> Tensor:
+	def pad_align_center(self, data: Tensor) -> Tensor:
 		"""
 			Pad with center-alignment by adding half of zeros to left and the other half to right.
 
-			:param waveform: The original waveform.
+			:param data: The original waveform.
 		"""
-		if self.target_length > waveform.shape[self.dim]:
-			missing = self.target_length - waveform.shape[self.dim]
+		if self.target_length > data.shape[self.dim]:
+			missing = self.target_length - data.shape[self.dim]
 
 			missing_left = missing // 2 + missing % 2
 			missing_right = missing // 2
 
-			shape_zeros_left = list(waveform.shape)
+			shape_zeros_left = list(data.shape)
 			shape_zeros_left[self.dim] = missing_left
 
-			shape_zeros_right = list(waveform.shape)
+			shape_zeros_right = list(data.shape)
 			shape_zeros_right[self.dim] = missing_right
 
-			waveform = torch.cat((
-				torch.full(shape_zeros_left, self.fill_value, dtype=waveform.dtype, device=waveform.device),
-				waveform,
-				torch.full(shape_zeros_right, self.fill_value, dtype=waveform.dtype, device=waveform.device)
+			data = torch.cat((
+				torch.full(shape_zeros_left, self.fill_value, dtype=data.dtype, device=data.device),
+				data,
+				torch.full(shape_zeros_right, self.fill_value, dtype=data.dtype, device=data.device)
 			), dim=self.dim)
-		return waveform
+			data = data.contiguous()
+		return data
 
-	def pad_align_random(self, waveform: Tensor) -> Tensor:
+	def pad_align_random(self, data: Tensor) -> Tensor:
 		"""
 			Pad with right-alignment by adding zeros randomly to left and right.
 
-			:param waveform: The original waveform.
+			:param data: The original waveform.
 		"""
-		if self.target_length > waveform.shape[self.dim]:
-			missing = self.target_length - waveform.shape[self.dim]
+		if self.target_length > data.shape[self.dim]:
+			missing = self.target_length - data.shape[self.dim]
 
 			missing_left = torch.randint(low=0, high=missing, size=()).item()
 			missing_right = missing - missing_left
 
-			shape_zeros_left = list(waveform.shape)
+			shape_zeros_left = list(data.shape)
 			shape_zeros_left[self.dim] = missing_left
 
-			shape_zeros_right = list(waveform.shape)
+			shape_zeros_right = list(data.shape)
 			shape_zeros_right[self.dim] = missing_right
 
-			waveform = torch.cat((
-				torch.full(shape_zeros_left, self.fill_value, dtype=waveform.dtype, device=waveform.device),
-				waveform,
-				torch.full(shape_zeros_right, self.fill_value, dtype=waveform.dtype, device=waveform.device),
+			data = torch.cat((
+				torch.full(shape_zeros_left, self.fill_value, dtype=data.dtype, device=data.device),
+				data,
+				torch.full(shape_zeros_right, self.fill_value, dtype=data.dtype, device=data.device),
 			), dim=self.dim)
-		return waveform
+			data = data.contiguous()
+		return data

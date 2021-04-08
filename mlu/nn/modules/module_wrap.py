@@ -3,7 +3,7 @@ from torch.nn import Module
 from typing import Callable
 
 
-class ModuleWrap(Module, Callable):
+class ModuleWrap(Module):
 	"""
 		Wrapper for a Callable object with a forward() method.
 	"""

@@ -7,10 +7,10 @@ from torch.distributions import Uniform
 from typing import Tuple, Union
 
 
-class Stretch(WaveformTransform):
+class TimeStretch(WaveformTransform):
 	def __init__(
 		self,
-		rates: Union[float, Tuple[float, float]] = (0.5, 1.5),
+		rates: Tuple[float, float] = (0.5, 1.5),
 		dim: int = -1,
 		p: float = 1.0,
 	):
@@ -22,7 +22,7 @@ class Stretch(WaveformTransform):
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
-		self.rates = rates if isinstance(rates, tuple) else (rates, rates)
+		self.rates = rates
 		self.dim = dim
 
 	def process(self, data: Tensor) -> Tensor:
@@ -36,6 +36,3 @@ class Stretch(WaveformTransform):
 		slices[self.dim] = indexes
 		data = data[slices].contiguous()
 		return data
-
-	def set_rates(self, rates: Union[float, Tuple[float, float]]):
-		self.rates = rates if isinstance(rates, tuple) else (rates, rates)

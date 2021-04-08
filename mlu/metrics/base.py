@@ -1,30 +1,24 @@
 
 from abc import ABC
 from torch.nn import Module
-from typing import Callable, Generic, Iterable, Optional, TypeVar
-
-Input = TypeVar("Input")
-Target = TypeVar("Target")
-Output = TypeVar("Output")
-T = TypeVar("T")
-U = TypeVar("U")
+from typing import Iterable, Optional
 
 
-class Metric(Module, Callable, ABC, Generic[Input, Target, Output]):
+class Metric(Module, ABC):
 	"""
 		Base class for metric modules.
 
 		Abstract methods:
 			- compute_score(self, input_: Input, target: Target) -> Output:
 	"""
-	def forward(self, input_: Input, target: Target) -> Output:
+	def forward(self, input_, target):
 		return self.compute_score(input_, target)
 
-	def compute_score(self, input_: Input, target: Target) -> Output:
+	def compute_score(self, input_, target):
 		raise NotImplemented("Abstract method")
 
 
-class IncrementalMetric(Module, Callable, ABC, Generic[T, U]):
+class IncrementalMetric(Module, ABC):
 	"""
 		Base class for incremental metrics modules, which wrap a metric and compute a continue value on the scores.
 
@@ -40,7 +34,7 @@ class IncrementalMetric(Module, Callable, ABC, Generic[T, U]):
 		"""
 		raise NotImplemented("Abstract method")
 
-	def add(self, value: T):
+	def add(self, value):
 		"""
 			Add a value to the incremental score.
 
@@ -54,7 +48,7 @@ class IncrementalMetric(Module, Callable, ABC, Generic[T, U]):
 		"""
 		raise NotImplemented("Abstract method")
 
-	def get_current(self) -> Optional[U]:
+	def get_current(self) -> Optional:
 		"""
 			Get the current incremental score.
 
@@ -62,7 +56,7 @@ class IncrementalMetric(Module, Callable, ABC, Generic[T, U]):
 		"""
 		raise NotImplemented("Abstract method")
 
-	def add_values(self, values: Iterable[T]):
+	def add_values(self, values: Iterable):
 		"""
 			Add a list of scores to the current incremental value.
 
@@ -71,7 +65,7 @@ class IncrementalMetric(Module, Callable, ABC, Generic[T, U]):
 		for value in values:
 			self.add(value)
 
-	def forward(self, value: T) -> Optional[U]:
+	def forward(self, value) -> Optional:
 		"""
 			:param value: Add a value to the metric and returns the current incremental value.
 			:return: The current incremental metric value.

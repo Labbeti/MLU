@@ -12,7 +12,7 @@ from unittest import main, TestCase
 
 class TestRandAugment(TestCase):
 	def test_ra(self):
-		dataset = CIFAR10(root=osp.join("..", "data", "CIFAR10"), train=False, download=True, transform=None)
+		dataset = CIFAR10(root=osp.join("../..", "data", "CIFAR10"), train=False, download=True, transform=None)
 		idx = torch.randint(low=0, high=len(dataset), size=()).item()  # 908
 		img, label = dataset[idx]
 

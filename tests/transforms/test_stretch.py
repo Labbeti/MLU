@@ -3,7 +3,7 @@
 import torch
 
 from unittest import TestCase, main
-from mlu.transforms.waveform.stretch_pad_crop import StretchPadCrop
+from mlu.transforms.waveform.time_stretch_pad_crop import TimeStretchPadCrop
 
 
 class TestStretch(TestCase):
@@ -13,7 +13,7 @@ class TestStretch(TestCase):
 		# x1 = np.random.rand(320000)
 		x2 = torch.rand(320000)
 
-		stretch = StretchPadCrop()
+		stretch = TimeStretchPadCrop()
 
 		# xa = stretch(x1)
 		# self.assertEqual(x1.shape, xa.shape)
@@ -25,7 +25,7 @@ class TestStretch(TestCase):
 		w = torch.ones(10, length)
 		start_shape = w.shape
 
-		stretch = StretchPadCrop()
+		stretch = TimeStretchPadCrop()
 
 		for _ in range(10):
 			w = stretch(w)

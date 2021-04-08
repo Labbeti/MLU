@@ -148,16 +148,16 @@ class TestPadVersions(TestCase):
 			self.assertTrue(out_v2.eq(expected).all())
 
 	def test_large(self):
-		sum_dur_v1 = 0
-		sum_dur_v2 = 0
-		num_tests = 100000
+		durations_v1 = []
+		durations_v2 = []
+		num_tests = 1000
 
-		for test_idx in tqdm.trange(num_tests):
-			size = torch.randint(low=1, high=5, size=(1,)).tolist()
-			shape = torch.randint(low=1, high=10, size=size)
+		for _ in tqdm.trange(num_tests):
+			size = torch.randint(low=1, high=2, size=(1,)).tolist()
+			shape = torch.randint(low=1, high=400000, size=size)
 			x = torch.rand(*shape)
 
-			target_length = torch.randint(low=0, high=10, size=()).item()
+			target_length = torch.randint(low=shape.min(), high=1000000, size=()).item()
 			align = ["left", "right", "center", "random"][torch.randint(low=0, high=4, size=()).item()]
 			dim = torch.randint(low=-len(x.shape), high=len(x.shape), size=()).item()
 			fill_value = torch.rand(1).item()
@@ -165,21 +165,23 @@ class TestPadVersions(TestCase):
 			start = time.time()
 			pad_v1 = Pad(target_length, align, fill_value, dim)
 			out_v1 = pad_v1(x)
-			sum_dur_v1 += time.time() - start
+			durations_v1.append(time.time() - start)
 
 			start = time.time()
 			pad_v2 = PadV2(target_length, align, fill_value, dim)
 			out_v2 = pad_v2(x)
-			sum_dur_v2 += time.time() - start
+			durations_v2.append(time.time() - start)
 
 			self.assertEqual(out_v1.shape, out_v2.shape)
 			self.assertEqual((out_v1 == 0.0).sum(), (out_v2 == 0.0).sum())
 			if align != "random":
 				self.assertTrue(out_v1.eq(out_v2).all())
 
+		durations_v1 = torch.as_tensor(durations_v1)
+		durations_v2 = torch.as_tensor(durations_v2)
 		print()
-		print("Mean dur V1:", sum_dur_v1 / num_tests)
-		print("Mean dur V2:", sum_dur_v2 / num_tests)
+		print(f"Mean dur V1: {durations_v1.mean():.5e} +/- {durations_v1.std():.5e}")
+		print(f"Mean dur V2: {durations_v2.mean():.5e} +/- {durations_v2.std():.5e}")
 
 
 if __name__ == "__main__":

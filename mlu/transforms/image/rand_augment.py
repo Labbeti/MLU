@@ -1,7 +1,7 @@
 
 import random
 
-from mlu.transforms.base import ImageTransform, Input, Output
+from mlu.transforms.base import ImageTransform
 from mlu.transforms.image.ra_pools import RAND_AUGMENT_DEFAULT_POOL
 from typing import List, Optional, Tuple, Type
 
@@ -43,7 +43,7 @@ class RandAugment(ImageTransform):
 
 		self._augms = _build_augms(self._augm_pool, self._magnitude)
 
-	def process(self, x: Input) -> Output:
+	def process(self, x):
 		if self._magnitude_policy == "random":
 			new_magnitude = random.random()
 			self.set_magnitude(new_magnitude)

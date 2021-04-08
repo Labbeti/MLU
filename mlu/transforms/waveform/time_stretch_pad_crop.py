@@ -2,13 +2,13 @@
 from mlu.transforms.base import WaveformTransform
 from mlu.transforms.waveform.crop import Crop
 from mlu.transforms.waveform.pad import Pad
-from mlu.transforms.waveform.stretch import Stretch
+from mlu.transforms.waveform.time_stretch import TimeStretch
 
 from torch import Tensor
 from typing import Optional, Tuple, Union
 
 
-class StretchPadCrop(WaveformTransform):
+class TimeStretchPadCrop(WaveformTransform):
 	def __init__(
 		self,
 		rates: Union[Tuple[float, float], float] = (0.9, 1.1),
@@ -19,15 +19,15 @@ class StretchPadCrop(WaveformTransform):
 		p: float = 1.0,
 	):
 		"""
-			Stretch, pad and crop the signal. The output will have the same shape than input.
+			TimeStretch, Pad and Crop the signal.
 
 			:param rates: The ratio of the signal used for resize. (default: (0.9, 1.1))
 			:param target_length: Optional target length of the signal dimension.
-				If None, the target length used will be the same as before the stretch() augment.
+				If None, the output will have the same shape than the input.
 				(default: None)
-			:param fill_value: The fill value when padding the waveform. (default: 0.0)
 			:param align: Alignment to use for cropping and padding. Can be 'left', 'right', 'center' or 'random'.
 				(default: 'random')
+			:param fill_value: The fill value when padding the waveform. (default: 0.0)
 			:param dim: The dimension to stretch and pad or crop. (default: -1)
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
@@ -39,7 +39,7 @@ class StretchPadCrop(WaveformTransform):
 		self.dim = dim
 
 		target_length = self.target_length if self.target_length is not None else 1
-		self.stretch = Stretch(rates, dim)
+		self.stretch = TimeStretch(rates, dim)
 		self.pad = Pad(target_length, align, fill_value, dim)
 		self.crop = Crop(target_length, align, dim)
 
