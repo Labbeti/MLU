@@ -2,7 +2,6 @@
 import torch
 import unittest
 
-from torch.nn.functional import one_hot
 from torch.distributions.categorical import Categorical
 from unittest import TestCase
 
@@ -19,7 +18,7 @@ class TestDatasetWrappers(TestCase):
 
 		bsize = 1000
 
-		pred = torch.zeros(bsize)
+		# pred = torch.zeros(bsize)
 		probs = torch.as_tensor([0.2, 0.2, 0.2, 0.2, 0.2])
 		law = Categorical(probs=probs / probs.norm(1, 0, True))
 		pred = law.sample((bsize,))

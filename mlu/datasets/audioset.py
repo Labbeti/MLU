@@ -201,7 +201,7 @@ class AudioSet(Dataset, Sized):
 			return path
 
 		abs_current_fpath = osp.join(os.getcwd(), __file__)
-		class_labels_indices_fpath = osp.join(rec_basename(abs_current_fpath, 3), "class_labels_indices.csv")
+		class_labels_indices_fpath = osp.join(rec_basename(abs_current_fpath, 3), "metadata", "class_labels_indices.csv")
 		if not osp.isfile(class_labels_indices_fpath):
 			with open(class_labels_indices_fpath, "wb") as file:
 				req = requests.get(CLASS_LABELS_INDICES_URL)

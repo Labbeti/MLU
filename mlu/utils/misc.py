@@ -8,7 +8,6 @@ import torch
 
 from datetime import datetime
 from torch import Tensor
-from torch.nn import Module
 from torch.utils.tensorboard import SummaryWriter
 from types import MethodType, FunctionType, ModuleType
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, TypeVar, Union

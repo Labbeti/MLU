@@ -14,7 +14,7 @@ from mlu.utils.typing import SizedDataset
 
 
 def generate_subsets_split(
-	dataset: Dataset,
+	dataset: SizedDataset,
 	num_classes: int,
 	ratios: List[float],
 	shuffle_idx: bool = True,
@@ -36,7 +36,7 @@ def generate_subsets_split(
 
 
 def generate_samplers_split(
-	dataset: Dataset,
+	dataset: SizedDataset,
 	num_classes: int,
 	ratios: List[float],
 	target_one_hot: bool = False,
@@ -56,7 +56,7 @@ def generate_samplers_split(
 
 
 def generate_indexes_split(
-	dataset: Dataset,
+	dataset: SizedDataset,
 	num_classes: int,
 	ratios: List[float],
 	target_one_hot: bool = False,

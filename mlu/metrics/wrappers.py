@@ -1,5 +1,5 @@
 
-from mlu.metrics.base import Metric, IncrementalMetric, Input, Target, Output, T, U
+from mlu.metrics.base import Metric, IncrementalMetric
 from mlu.metrics.incremental import IncrementalMean
 
 from torch import Tensor
@@ -30,9 +30,9 @@ class MetricDict(Dict[str, Module], Metric):
 
 	def compute_score(
 		self,
-		input_: Input,
-		target: Target,
-	) -> Dict[str, Output]:
+		input_,
+		target,
+	) -> dict:
 		"""
 			Compute the score of each metric stored and return the dictionary of {metric_name: metric_score, ...}.
 		"""
@@ -85,7 +85,7 @@ class MetricWrapper(Metric):
 		else:
 			self.sub_call = self._sub_call_none
 
-	def compute_score(self, input_: Input, target: Target) -> Output:
+	def compute_score(self, input_, target):
 		score = self.sub_call(input_, target)
 		if self.reduce_fn is not None:
 			score = self.reduce_fn(score)
@@ -94,13 +94,13 @@ class MetricWrapper(Metric):
 	def _sub_call_both(self, input_: Tensor, target: Tensor) -> Tensor:
 		return self.callable_(input_, target)
 
-	def _sub_call_input(self, input_: Tensor, target: Tensor) -> Tensor:
+	def _sub_call_input(self, input_: Tensor, _target: Tensor) -> Tensor:
 		return self.callable_(input_)
 
-	def _sub_call_target(self, input_: Tensor, target: Tensor) -> Tensor:
+	def _sub_call_target(self, _input_: Tensor, target: Tensor) -> Tensor:
 		return self.callable_(target)
 
-	def _sub_call_none(self, input_: Tensor, target: Tensor) -> Tensor:
+	def _sub_call_none(self, _input_: Tensor, _target: Tensor) -> Tensor:
 		return self.callable_()
 
 
@@ -120,7 +120,7 @@ class IncrementalWrapper(Metric):
 		self.metric = metric
 		self.continue_metric = incremental_metric
 
-	def compute_score(self, input_: Input, target: Target) -> Output:
+	def compute_score(self, input_, target):
 		score = self.metric(input_, target)
 		self.continue_metric.add(score)
 		return self.continue_metric.get_current()
@@ -138,7 +138,7 @@ class IncrementalListWrapper(Metric):
 		self.metric = metric
 		self.continue_metric_list = incremental_metric_list if incremental_metric_list is not None else []
 
-	def compute_score(self, input_: Input, target: Target) -> List[Output]:
+	def compute_score(self, input_, target) -> list:
 		score = self.metric(input_, target)
 		for continue_metric in self.continue_metric_list:
 			continue_metric.add(score)
@@ -154,7 +154,7 @@ class IncrementalList(IncrementalMetric):
 		for incremental in self.incremental_list:
 			incremental.reset()
 
-	def add(self, value: T):
+	def add(self, value):
 		for incremental in self.incremental_list:
 			incremental.add(value)
 
@@ -164,7 +164,7 @@ class IncrementalList(IncrementalMetric):
 			for incremental in self.incremental_list
 		]
 
-	def get_current(self) -> List[Optional[U]]:
+	def get_current(self) -> List[Optional]:
 		return [
 			incremental.get_current()
 			for incremental in self.incremental_list

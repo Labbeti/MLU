@@ -13,7 +13,7 @@ class DatasetWrapper(Dataset, Sized):
 
 	def __len__(self) -> int:
 		if not isinstance(self._dataset, Sized):
-			raise RuntimeError(
+			raise NotImplementedError(
 				f"Wrapped dataset '{str(type(self._dataset))}' is not Sized (it does not have the method '__len__')."
 			)
 		return len(self._dataset)
