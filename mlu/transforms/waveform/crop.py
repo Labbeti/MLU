@@ -6,11 +6,11 @@ from mlu.transforms.base import WaveformTransform
 
 
 class Crop(WaveformTransform):
-	def __init__(self, target_length: int, dim: int = -1, align: str = "left", p: float = 1.0):
+	def __init__(self, target_length: int, align: str = "left", dim: int = -1, p: float = 1.0):
 		super().__init__(p=p)
 		self.target_length = target_length
-		self.dim = dim
 		self.align = align
+		self.dim = dim
 
 	def process(self, waveform: Tensor) -> Tensor:
 		if self.align == "center":

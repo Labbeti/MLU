@@ -9,9 +9,9 @@ class Pad(WaveformTransform):
 	def __init__(
 		self,
 		target_length: int,
+		align: str = "left",
 		fill_value: float = 0.0,
 		dim: int = -1,
-		align: str = "left",
 		p: float = 1.0,
 	):
 		"""
@@ -27,9 +27,9 @@ class Pad(WaveformTransform):
 		"""
 		super().__init__(p)
 		self.target_length = target_length
+		self.align = align
 		self.fill_value = fill_value
 		self.dim = dim
-		self.align = align
 
 	def process(self, waveform: Tensor) -> Tensor:
 		if self.align == "left":
