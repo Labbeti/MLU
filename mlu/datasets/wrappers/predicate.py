@@ -1,11 +1,12 @@
 
-from mlu.datasets.wrappers.base import DatasetWrapper
-from torch.utils.data.dataset import Dataset, Subset
+from torch.utils.data.dataset import Subset
 from typing import Callable
+from mlu.datasets.wrappers.base import DatasetWrapper
+from mlu.utils.typing import SizedDataset
 
 
 class PredicateSubset(DatasetWrapper):
-	def __init__(self, dataset: Dataset, predicate: Callable):
+	def __init__(self, dataset: SizedDataset, predicate: Callable):
 		"""
 			Create a subset with all item which complains with predicate.
 

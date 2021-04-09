@@ -17,10 +17,9 @@ class Precision(Metric):
 	):
 		"""
 			Compute Precision score between binary vectors.
+			The precision is intuitively the ability of the classifier not to label as positive a sample that is negative.
 
 			>>> 'Precision = TP / (TP + FP) where TP = True Positives, FP = False Positives.'
-
-			Vectors must be binary tensors of shape (nb classes) or (nb samplers, nb classes).
 
 			:param threshold_input: The threshold value for binarize input vectors. (default: 0.5)
 			:param threshold_target: The threshold value for binarize target vectors. (default: 0.5)

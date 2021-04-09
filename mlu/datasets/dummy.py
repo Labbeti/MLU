@@ -3,10 +3,10 @@ import torch
 
 from torch import Tensor
 from torch.utils.data.dataset import Dataset
-from typing import Optional, Sequence, Sized, Tuple
+from typing import Optional, Sequence, Tuple
 
 
-class DummyDataset(Dataset, Sized):
+class DummyDataset(Dataset):
 	def __init__(
 		self,
 		length: int = 100,

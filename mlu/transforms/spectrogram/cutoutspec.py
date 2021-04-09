@@ -16,8 +16,8 @@ class CutOutSpec(SpectrogramTransform):
 		p: float = 1.0,
 		freq_dim: int = -2,
 		time_dim: int = -1,
-		width_scales: Union[float, Tuple[float, float]] = None,
-		height_scales: Union[float, Tuple[float, float]] = None,
+		width_scales: Union[float, Tuple[float, float], None] = None,
+		height_scales: Union[float, Tuple[float, float], None] = None,
 	):
 		"""
 			CutOut transform for spectrogram tensors.

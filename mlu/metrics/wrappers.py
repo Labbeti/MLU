@@ -11,7 +11,7 @@ class MetricDict(Dict[str, Module], Metric):
 	def __init__(self, *args: Union[dict, Callable, None], prefix: str = "", suffix: str = "", **kwargs):
 		"""
 			Compute score of each metric stored when forward() is called.
-			Subclass of Dict[str, Metric] and Metric.
+			Subclass of Dict[str, Module] and Metric.
 
 			Example :
 
@@ -28,11 +28,7 @@ class MetricDict(Dict[str, Module], Metric):
 		self.prefix = prefix
 		self.suffix = suffix
 
-	def compute_score(
-		self,
-		pred,
-		target,
-	) -> dict:
+	def compute_score(self, pred, target) -> dict:
 		"""
 			Compute the score of each metric stored and return the dictionary of {metric_name: metric_score, ...}.
 		"""
@@ -44,7 +40,7 @@ class MetricDict(Dict[str, Module], Metric):
 	def __hash__(self) -> int:
 		return hash(tuple(sorted(self.items()))) + hash(self.prefix) + hash(self.suffix)
 
-	def to_dict(self, with_pre_and_suf: bool = True) -> Dict[str, Metric]:
+	def to_dict(self, with_pre_and_suf: bool = True) -> Dict[str, Module]:
 		"""
 			:param with_pre_and_suf: If True, append the prefix and suffix to the keys metrics names. (default: True)
 			:return: Return the metrics names and metrics as python dict object.

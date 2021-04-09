@@ -4,7 +4,7 @@ import torch
 
 from torch import Tensor
 from torch.nn import Module
-from typing import Any, Optional
+from typing import Any, Callable, Dict, Optional, Union
 
 from mlu.nn.functional.misc import mish
 
@@ -127,3 +127,32 @@ class Clamp(Module):
 class Identity(Module):
 	def forward(self, *args):
 		return args
+
+
+class ModuleDict(Dict[str, Module], Module):
+	def __init__(self, *args: Union[dict, Callable, None], prefix: str = "", suffix: str = "", **kwargs):
+		"""
+			Compute output of each module stored when forward() is called.
+			Subclass of Dict[str, Module] and Module.
+		"""
+		args = [arg for arg in args if arg is not None]
+		dict.__init__(self, *args, **kwargs)
+		Module.__init__(self)
+		self.prefix = prefix
+		self.suffix = suffix
+
+	def forward(self, *args, **kwargs) -> dict:
+		return {
+			(self.prefix + metric_name + self.suffix): metric(*args, **kwargs)
+			for metric_name, metric in self.items()
+		}
+
+	def __hash__(self) -> int:
+		return hash(tuple(sorted(self.items()))) + hash(self.prefix) + hash(self.suffix)
+
+	def to_dict(self, with_pre_and_suf: bool = True) -> Dict[str, Module]:
+		if with_pre_and_suf:
+			dic = {f"{self.prefix}{metric_name}{self.suffix}": metric for metric_name, metric in self.items()}
+		else:
+			dic = dict(self)
+		return dic

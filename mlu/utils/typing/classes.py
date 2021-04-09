@@ -1,5 +1,7 @@
 
+from abc import ABC
 from typing import Iterable, Protocol, Sized, runtime_checkable
+from torch.utils.data.dataset import Dataset
 
 
 class SizedIterable(Sized, Iterable, Protocol):
@@ -12,7 +14,7 @@ class SizedIterable(Sized, Iterable, Protocol):
 
 
 @runtime_checkable
-class SizedDataset(Sized, Protocol):
+class SizedDatasetLike(Protocol):
 	"""
 		Class that inherit from Sized and add the '__getitem__' method of a dataset.
 
@@ -23,3 +25,19 @@ class SizedDataset(Sized, Protocol):
 
 	def __len__(self) -> int:
 		raise NotImplemented("Abstract method")
+
+
+class SizedDataset(Dataset, ABC):
+	def __len__(self) -> int:
+		raise NotImplemented("Abstract method")
+
+	@staticmethod
+	def __instancecheck__(obj) -> bool:
+		return SizedDataset.__subclasscheck__(type(obj))
+
+	@staticmethod
+	def __subclasscheck__(cls) -> bool:
+		if issubclass(cls, Dataset) and hasattr(cls, "__len__"):
+			return True
+		else:
+			return False

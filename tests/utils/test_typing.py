@@ -23,6 +23,7 @@ class TestTyping(TestCase):
 
 		self.pass_type_checking_1(dataset)
 		self.pass_type_checking_2(dataset)
+		self.pass_type_checking_3(dataset)
 
 		dataset_2 = DummyDatasetNotSized()
 		self.assertTrue(isinstance(dataset_2, Dataset))
@@ -34,6 +35,9 @@ class TestTyping(TestCase):
 
 	def pass_type_checking_2(self, dataset: SizedDataset):
 		print("Hi2 ", len(dataset))
+
+	def pass_type_checking_3(self, dataset: Dataset):
+		print("Hi3 ")
 
 
 if __name__ == "__main__":

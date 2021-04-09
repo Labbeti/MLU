@@ -15,7 +15,7 @@ class Occlusion(WaveformTransform):
 		p: float = 1.0,
 	):
 		"""
-			Occlusion waveform transform.
+			Occlusion transform.
 
 			:param scales: The scale of the occlusion size. (default: 0.1)
 			:param fill_value: The fill value for occlusion. (default: 0.0)
