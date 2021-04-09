@@ -8,7 +8,7 @@ from unittest import TestCase, main
 
 class TestOneHot(TestCase):
 	def test_1(self):
-		to_onehot = OneHot(num_classes=5)
+		to_onehot = OneHot(n_classes=5)
 
 		indexes = [2, np.array([2]), torch.scalar_tensor(2, dtype=torch.long)]
 		expected_lst = [torch.as_tensor([0, 0, 1, 0, 0], dtype=torch.float)] * len(indexes)

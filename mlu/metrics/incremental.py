@@ -42,7 +42,7 @@ class IncrementalMean(IncrementalMetric):
 	def get_mean(self) -> Optional[Tensor]:
 		return (self._sum / self._counter) if self._counter > 0 else None
 
-	def get_nb_values_added(self) -> int:
+	def get_n_values_added(self) -> int:
 		return self._counter
 
 	def set_mean(self, mean: Tensor, counter: int):
@@ -100,7 +100,7 @@ class IncrementalStd(IncrementalMetric):
 		else:
 			return None
 
-	def get_nb_values_added(self) -> int:
+	def get_n_values_added(self) -> int:
 		return self._counter
 
 
@@ -163,7 +163,7 @@ class NBestsTracker(IncrementalMetric):
 	def get_indexes_current(self) -> List[int]:
 		return self._indexes_list
 
-	def get_nb_values_added(self) -> int:
+	def get_n_values_added(self) -> int:
 		return self._index - self._start_index
 
 	def _check_is_better(self, value: Tensor, best: Tensor) -> bool:
@@ -213,7 +213,7 @@ class BestTracker(IncrementalMetric, ABC):
 	def get_index_current(self) -> int:
 		return self._index_best
 
-	def get_nb_values_added(self) -> int:
+	def get_n_values_added(self) -> int:
 		return self._index - self._start_index
 
 	def _check_is_better(self, value: Tensor, best: Tensor) -> bool:

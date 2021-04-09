@@ -19,7 +19,7 @@ class CrossEntropyWithVectors(Module):
 		"""
 			Compute Cross-Entropy between two distributions probabilities.
 
-			Input and targets must be a batch of probabilities distributions of shape (batch_size, num_classes) tensor.
+			Input and targets must be a batch of probabilities distributions of shape (batch_size, n_classes) tensor.
 			Useful when target is not a one-hot label, like in Label-smoothing or MixMatch methods.
 		"""
 		super().__init__()
@@ -30,7 +30,7 @@ class CrossEntropyWithVectors(Module):
 	def forward(self, input_: Tensor, targets: Tensor) -> Tensor:
 		"""
 			Compute cross-entropy with targets.
-			Input and target must be a (batch_size, num_classes) tensor.
+			Input and target must be a (batch_size, n_classes) tensor.
 		"""
 		if not self.log_input:
 			input_ = torch.log(input_)

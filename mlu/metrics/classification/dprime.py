@@ -29,8 +29,8 @@ class DPrime(Metric):
 		"""
 			Compute DPrime score on prediction and target.
 
-			:param pred: (num_classes) or (batch_size, num_classes) tensor
-			:param target: (num_classes) or (batch_size, num_classes) tensor
+			:param pred: (n_classes) or (batch_size, n_classes) tensor
+			:param target: (n_classes) or (batch_size, n_classes) tensor
 			:return: The DPrime score as scalar tensor.
 		"""
 		assert pred.shape == target.shape

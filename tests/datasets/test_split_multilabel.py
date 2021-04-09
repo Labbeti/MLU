@@ -16,13 +16,13 @@ from datasets.utils.split_multilabel import (
 
 class TestSplitMulti(TestCase):
 	def test_convert(self):
-		num_targets = 10000
-		num_classes = 527
+		n_targets = 10000
+		n_classes = 527
 
-		targets = torch.rand(num_targets, num_classes).gt(0.5).bool()
+		targets = torch.rand(n_targets, n_classes).gt(0.5).bool()
 		for target in targets:
 			if target.sum().eq(False):
-				target[torch.randint(num_classes, (1,))] = True
+				target[torch.randint(n_classes, (1,))] = True
 
 		indexes_per_class = get_indexes_per_class(targets)
 		targets_rebuild = get_targets(indexes_per_class)
@@ -77,13 +77,13 @@ class TestSplitMulti(TestCase):
 		self.assertTrue(torch.allclose(normalize(distribution), normalize(distribution_2)))
 
 	def test_random(self):
-		num_targets = 1000
-		num_classes = 10
+		n_targets = 1000
+		n_classes = 10
 
-		targets = torch.rand(num_targets, num_classes).gt(0.5)
+		targets = torch.rand(n_targets, n_classes).gt(0.5)
 		for target in targets:
 			if target.sum().eq(0.0):
-				target[torch.randint(num_classes, (1,))] = 1.0
+				target[torch.randint(n_classes, (1,))] = 1.0
 
 		self.assertTrue(check_targets(targets, at_least_one_elem_per_class=True, at_least_one_class_per_elem=True))
 

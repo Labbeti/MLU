@@ -1,6 +1,6 @@
 
 from mlu.metrics.text.meteor.meteor import METEOR
-from mlu.metrics.text.meteor.meteor_torch import get_nb_chunks
+from mlu.metrics.text.meteor.meteor_torch import get_n_chunks
 from mlu.utils.sentence import list_sentence_to_list_tensor
 from mlu.utils.vocabulary import add_to_vocabulary, build_conversions_tables
 from unittest import TestCase, main
@@ -28,8 +28,8 @@ class TestChunks(TestCase):
 
 		expected_list = [6, 1, 2]
 		for candidate, expected in zip(candidates, expected_list):
-			nb_chunks = get_nb_chunks(candidate, references)[0].item()
-			self.assertEqual(nb_chunks, expected)
+			n_chunks = get_n_chunks(candidate, references)[0].item()
+			self.assertEqual(n_chunks, expected)
 
 
 class TestMETEOR(TestCase):

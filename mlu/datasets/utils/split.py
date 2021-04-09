@@ -15,7 +15,7 @@ from mlu.utils.typing import SizedDataset
 
 def generate_subsets_split(
 	dataset: SizedDataset,
-	num_classes: int,
+	n_classes: int,
 	ratios: List[float],
 	shuffle_idx: bool = True,
 	target_one_hot: bool = False,
@@ -25,19 +25,19 @@ def generate_subsets_split(
 		Also keep the original class distribution in every sub-dataset.
 
 		:param dataset: The original dataset.
-		:param num_classes: The number of classes in the original dataset.
+		:param n_classes: The number of classes in the original dataset.
 		:param ratios: Ratios used to split the dataset. The sum must be 1.
 		:param shuffle_idx: Shuffle classes indexes before split them.
 		:param target_one_hot: Consider labels as one-hot vectors. If False, consider labels as class indexes.
 		:return: A list of subsets.
 	"""
-	indexes = generate_indexes_split(dataset, num_classes, ratios, shuffle_idx, target_one_hot)
+	indexes = generate_indexes_split(dataset, n_classes, ratios, shuffle_idx, target_one_hot)
 	return [Subset(dataset, idx) for idx in indexes]
 
 
 def generate_samplers_split(
 	dataset: SizedDataset,
-	num_classes: int,
+	n_classes: int,
 	ratios: List[float],
 	target_one_hot: bool = False,
 ) -> List[Sampler]:
@@ -46,18 +46,18 @@ def generate_samplers_split(
 		Also keep the original class distribution in every sub-dataset.
 
 		:param dataset: The original dataset.
-		:param num_classes: The number of classes in the original dataset.
+		:param n_classes: The number of classes in the original dataset.
 		:param ratios: Ratios used to split the dataset. The sum must be 1.
 		:param target_one_hot: Consider labels as one-hot vectors. If False, consider labels as class indexes.
 		:return: A list of samplers of length of ratios list.
 	"""
-	indexes = generate_indexes_split(dataset, num_classes, ratios, target_one_hot=target_one_hot)
+	indexes = generate_indexes_split(dataset, n_classes, ratios, target_one_hot=target_one_hot)
 	return [SubsetRandomSampler(idx) for idx in indexes]
 
 
 def generate_indexes_split(
 	dataset: SizedDataset,
-	num_classes: int,
+	n_classes: int,
 	ratios: List[float],
 	target_one_hot: bool = False,
 	shuffle_idx: bool = True,
@@ -67,13 +67,13 @@ def generate_indexes_split(
 		Also keep the original class distribution in every sub-dataset.
 
 		:param dataset: The original dataset.
-		:param num_classes: The number of classes in the original dataset.
+		:param n_classes: The number of classes in the original dataset.
 		:param ratios: Ratios used to split the dataset. The sum must <= 1.
 		:param target_one_hot: Consider labels as one-hot vectors. If False, consider labels as class indexes. (default: True)
 		:param shuffle_idx: Shuffle classes indexes before split them. (default: True)
 		:return: A list of indexes for each ratios.
 	"""
-	indexes_per_class = get_indexes_per_class(dataset, num_classes, target_one_hot)
+	indexes_per_class = get_indexes_per_class(dataset, n_classes, target_one_hot)
 	if shuffle_idx:
 		indexes_per_class = shuffle_indexes_per_class(indexes_per_class)
 	splits = split_indexes_per_class(indexes_per_class, ratios)
@@ -83,7 +83,7 @@ def generate_indexes_split(
 
 def get_indexes_per_class(
 	dataset: SizedDataset,
-	num_classes: int,
+	n_classes: int,
 	target_one_hot: bool = False,
 	label_index: int = 1,
 ) -> List[List[int]]:
@@ -91,10 +91,10 @@ def get_indexes_per_class(
 		Get class indexes from a Sized dataset with index of class as label.
 
 		:param dataset: The mono-labeled sized dataset to iterate.
-		:param num_classes: The number of classes in the dataset.
+		:param n_classes: The number of classes in the dataset.
 		:param target_one_hot: If True, convert each label as one-hot label encoding instead of class index. (default: False)
 		:param label_index: TODO
-		:return: The indexes per class in the dataset of size (num_classes, num_elem_in_class_i).
+		:return: The indexes per class in the dataset of size (n_classes, n_elem_in_class_i).
 			Note: If the class distribution is not perfectly uniform, this return is not a complete matrix.
 	"""
 	if not hasattr(dataset, "__len__"):
@@ -116,7 +116,7 @@ def get_indexes_per_class(
 
 	result = [
 		torch.where(targets.eq(class_idx))[0].tolist()
-		for class_idx in range(num_classes)
+		for class_idx in range(n_classes)
 	]
 	return result
 
@@ -150,7 +150,7 @@ def split_indexes_per_class(
 
 		Example 1 :
 
-		>>> indexes_per_class = get_indexes_per_class(dataset, num_classes=10)
+		>>> indexes_per_class = get_indexes_per_class(dataset, n_classes=10)
 		>>> indexes_s, indexes_u = split_indexes_per_class(indexes_per_class, [0.1, 0.9], flat_indexes=True)
 		>>> subset_s = Subset(dataset, indexes_s)
 		>>> subset_u = Subset(dataset, indexes_u)
@@ -164,22 +164,22 @@ def split_indexes_per_class(
 		:param indexes_per_class: List of indexes of each class.
 		:param ratios: The ratios of each indexes split.
 		:param flat_indexes: If True, flat each sub-indexes. (default: False)
-		:return: The indexes per ratio and per class of size (nb_ratios, num_classes, nb_indexes_in_ratio_and_class).
-			Note: The return is not a tensor or ndarray because 'nb_indexes_in_ratio_and_class' can be different for each
+		:return: The indexes per ratio and per class of size (n_ratios, n_classes, n_indexes_in_ratio_and_class).
+			Note: The return is not a tensor or ndarray because 'n_indexes_in_ratio_and_class' can be different for each
 			ratio or class.
 	"""
 	assert 0.0 <= sum(ratios) <= 1.0, "Ratio sum cannot be greater than 1.0."
 
-	num_classes = len(indexes_per_class)
-	nb_ratios = len(ratios)
+	n_classes = len(indexes_per_class)
+	n_ratios = len(ratios)
 
 	indexes_per_ratio_per_class = [[
-			[] for _ in range(num_classes)
+			[] for _ in range(n_classes)
 		]
-		for _ in range(nb_ratios)
+		for _ in range(n_ratios)
 	]
 
-	current_starts = [0 for _ in range(num_classes)]
+	current_starts = [0 for _ in range(n_classes)]
 	for i, ratio in enumerate(ratios):
 		for j, indexes in enumerate(indexes_per_class):
 			current_start = current_starts[j]

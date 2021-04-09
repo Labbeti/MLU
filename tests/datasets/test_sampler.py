@@ -22,11 +22,11 @@ class TestSRCSampler(TestCase):
 
 	def test_distinct(self):
 		indexes = list(range(10, 20))
-		nb_max_iterations = 1000
-		sampler = SubsetCycleSampler(indexes, nb_max_iterations)
+		n_max_iterations = 1000
+		sampler = SubsetCycleSampler(indexes, n_max_iterations)
 
 		result = list(sampler)
-		splits = [result[i*len(indexes):(i+1)*len(indexes)] for i in range(nb_max_iterations // len(indexes))]
+		splits = [result[i*len(indexes):(i+1)*len(indexes)] for i in range(n_max_iterations // len(indexes))]
 
 		for i in range(len(splits) - 1):
 			for s1, s2 in zip(splits[i:], splits[i+1:]):

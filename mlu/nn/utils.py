@@ -37,7 +37,7 @@ def get_module_checksum(model: Module, only_trainable: bool = True) -> Tensor:
 	return sum(param.sum() for param in params)
 
 
-def get_num_parameters(model: Module, only_trainable: bool = True) -> int:
+def get_n_parameters(model: Module, only_trainable: bool = True) -> int:
 	"""
 		Return the number of parameters in a module.
 

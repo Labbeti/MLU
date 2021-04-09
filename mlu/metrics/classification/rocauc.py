@@ -25,8 +25,8 @@ class RocAuc(Metric):
 		"""
 			Compute ROC AUC score on prediction and target.
 
-			:param pred: (batch_size, num_classes) tensor
-			:param target: (batch_size, num_classes) tensor
+			:param pred: (batch_size, n_classes) tensor
+			:param target: (batch_size, n_classes) tensor
 			:return: The ROC AUC score as scalar tensor.
 		"""
 		assert pred.shape == target.shape

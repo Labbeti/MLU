@@ -287,9 +287,9 @@ class TestPadVersions(TestCase):
 	def test_large(self):
 		durations_v1 = []
 		durations_v2 = []
-		num_tests = 10000
+		n_tests = 10000
 
-		for _ in tqdm.trange(num_tests):
+		for _ in tqdm.trange(n_tests):
 			size = torch.randint(low=1, high=2, size=(1,)).tolist()
 			shape = torch.randint(low=1, high=100000, size=size)
 			x = torch.rand(*shape)

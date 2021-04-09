@@ -28,13 +28,13 @@ class TFIDF(Callable):
 
 
 def inverse_document_frequency(word: Tensor, documents: List[Tensor]) -> Tensor:
-	nb_docs = len(documents)
-	nb_docs_with_word = sum([1 for doc in documents if word in doc])
-	score = torch.scalar_tensor(nb_docs / nb_docs_with_word).log()
+	n_docs = len(documents)
+	n_docs_with_word = sum([1 for doc in documents if word in doc])
+	score = torch.scalar_tensor(n_docs / n_docs_with_word).log()
 	return score
 
 
 def term_frequency(word: Tensor, document: Tensor) -> Tensor:
 	count = document.eq(word).sum()
-	nb_docs = len(document)
-	return count / nb_docs
+	n_docs = len(document)
+	return count / n_docs

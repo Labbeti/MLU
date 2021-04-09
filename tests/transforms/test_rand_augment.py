@@ -20,7 +20,7 @@ class TestRandAugment(TestCase):
 		print(f"Label: {label}")
 
 		magnitude = 30
-		ra = RandAugment(nb_augm_apply=1, magnitude=magnitude, augm_pool=RAND_AUGMENT_DEFAULT_POOL[2:3], magnitude_policy="constant")
+		ra = RandAugment(n_augm_apply=1, magnitude=magnitude, augm_pool=RAND_AUGMENT_DEFAULT_POOL[2:3], magnitude_policy="constant")
 		img_ra = ra(img)
 
 		img_tens = ToTensor()(img)

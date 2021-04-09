@@ -95,7 +95,7 @@ class AudioSet(Dataset, Sized):
 				The default shape of raw audio is (1, 320000).
 				(default: None)
 			:param target_transform: The transform to apply to the tensor of indexes.
-				The default shape of labels is (nb_labels, ), where 'nb_labels' depends of the number of labels present in
+				The default shape of labels is (n_labels, ), where 'n_labels' depends of the number of labels present in
 				the corresponding audio sample.
 				(default: None)
 			:param verbose: The verbose level.
@@ -175,7 +175,7 @@ class AudioSet(Dataset, Sized):
 
 		return target
 
-	def get_num_classes(self) -> int:
+	def get_n_classes(self) -> int:
 		"""
 			:return: The number of classes present in metadata 'labels.csv' file.
 		"""
@@ -247,7 +247,7 @@ class AudioSet(Dataset, Sized):
 			for _ in range(3):
 				next(reader)
 
-			num_entries = 0
+			n_entries = 0
 			# Read metadata
 			for i, metadata in enumerate(reader):
 				ytid = metadata[self.MetaIdx.YTID]
@@ -273,11 +273,11 @@ class AudioSet(Dataset, Sized):
 						"labels": labels,
 					})
 
-				num_entries += 1
+				n_entries += 1
 
 		self._metadata[self._subset] = subset_metadata
 		if self._verbose >= 2:
 			print(
-				f"Info: Found {num_entries} metadata entries and {len(subset_metadata)} audio files matching with entries. "
-				f"(missing {num_entries - len(subset_metadata)} files)"
+				f"Info: Found {n_entries} metadata entries and {len(subset_metadata)} audio files matching with entries. "
+				f"(missing {n_entries - len(subset_metadata)} files)"
 			)

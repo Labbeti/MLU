@@ -10,30 +10,30 @@ from typing import Callable, Optional, Union
 
 
 class OneHot(Module):
-	def __init__(self, num_classes: int, smooth: Optional[float] = 0.0):
+	def __init__(self, n_classes: int, smooth: Optional[float] = 0.0):
 		"""
 			Convert label to one-hot encoding.
 
-			:param num_classes: The number of classes in the dataset.
+			:param n_classes: The number of classes in the dataset.
 			:param smooth: The optional label smoothing coefficient parameter. (default: 0.0)
 		"""
 		super().__init__()
-		self.num_classes = num_classes
+		self.n_classes = n_classes
 		self.smooth = smooth if smooth is not None else 0.0
 
 	def forward(self, x: Union[np.ndarray, Tensor]) -> Union[np.ndarray, Tensor]:
-		return nums_to_smooth_onehot(x, self.num_classes, self.smooth)
+		return nums_to_smooth_onehot(x, self.n_classes, self.smooth)
 
 
 class MultiHot(Module):
-	def __init__(self, num_classes: int, smooth: Optional[float] = 0.0, dtype: torch.dtype = torch.float):
+	def __init__(self, n_classes: int, smooth: Optional[float] = 0.0, dtype: torch.dtype = torch.float):
 		super().__init__()
-		self.num_classes = num_classes
+		self.n_classes = n_classes
 		self.smooth = smooth if smooth is not None else 0.0
 		self.dtype = dtype
 
 	def forward(self, x: Union[np.ndarray, Tensor]) -> Union[np.ndarray, Tensor]:
-		return nums_to_smooth_multihot(x, self.num_classes, self.smooth, self.dtype)
+		return nums_to_smooth_multihot(x, self.n_classes, self.smooth, self.dtype)
 
 
 class Thresholding(Module):

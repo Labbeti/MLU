@@ -11,19 +11,19 @@ class DummyDataset(Dataset):
 		self,
 		length: int = 100,
 		data_shape: Optional[Sequence[int]] = None,
-		num_classes: int = 10,
+		n_classes: int = 10,
 		balanced: bool = True,
 	):
 		super().__init__()
 		self.length = length
 		self.data_shape = data_shape if data_shape is not None else [3, 4]
-		self.num_classes = num_classes
+		self.n_classes = n_classes
 		self.balanced = balanced
 
 		if balanced:
-			self.targets = torch.as_tensor([i % self.num_classes for i in range(length)])
+			self.targets = torch.as_tensor([i % self.n_classes for i in range(length)])
 		else:
-			self.targets = torch.randint(low=0, high=self.num_classes, size=(length,))
+			self.targets = torch.randint(low=0, high=self.n_classes, size=(length,))
 
 	def __getitem__(self, idx: int) -> Tuple[Tensor, int]:
 		data = self.get_data(idx)

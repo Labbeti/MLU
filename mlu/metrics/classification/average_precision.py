@@ -31,8 +31,8 @@ class AveragePrecision(Metric):
 		"""
 			Compute mAP score on prediction and target.
 
-			:param pred: (nb_samples, num_classes) tensor
-			:param target: (nb_samples, num_classes) binary tensor
+			:param pred: (n_samples, n_classes) tensor
+			:param target: (n_samples, n_classes) binary tensor
 			:return: The mAP score as scalar tensor.
 		"""
 		assert pred.shape == target.shape

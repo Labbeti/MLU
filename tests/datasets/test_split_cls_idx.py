@@ -80,13 +80,13 @@ class TestSplitIdx(TestCase):
 
 	def test_generate_indexes_split(self):
 		len_ = random.randint(10, 1000)
-		num_classes = 10
-		dataset = DummyDataset(length=len_, num_classes=num_classes)
+		n_classes = 10
+		dataset = DummyDataset(length=len_, n_classes=n_classes)
 
 		ratio_s = random.random()
 		ratio_u = 1.0 - ratio_s
 
-		indexes_s, indexes_u = generate_indexes_split(dataset, num_classes, [ratio_s, ratio_u], False)
+		indexes_s, indexes_u = generate_indexes_split(dataset, n_classes, [ratio_s, ratio_u], False)
 
 		# Check if contains an index multiple times
 		self.assertEqual(len(indexes_s), len(set(indexes_s)))

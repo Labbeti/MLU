@@ -6,8 +6,8 @@ from typing import List
 
 
 def get_indexes_per_class(targets: Tensor) -> List[List[int]]:
-	num_classes = targets.shape[1]
-	return [torch.where(targets[:, i].eq(1.0))[0].tolist() for i in range(num_classes)]
+	n_classes = targets.shape[1]
+	return [torch.where(targets[:, i].eq(1.0))[0].tolist() for i in range(n_classes)]
 
 
 def get_targets(indexes_per_class: List[List[int]]) -> Tensor:
@@ -15,8 +15,8 @@ def get_targets(indexes_per_class: List[List[int]]) -> Tensor:
 	for indexes in indexes_per_class:
 		max_idx = max(max_idx, max(indexes))
 
-	num_classes = len(indexes_per_class)
-	targets = torch.full((max_idx + 1, num_classes), fill_value=False, dtype=torch.bool)
+	n_classes = len(indexes_per_class)
+	targets = torch.full((max_idx + 1, n_classes), fill_value=False, dtype=torch.bool)
 	for idx_class, indexes in enumerate(indexes_per_class):
 		for idx in indexes:
 			if targets[idx, idx_class]:
@@ -40,37 +40,37 @@ def split_multilabel_indexes_per_class(
 	targets = get_targets(indexes_per_class)
 	indexes_per_class = [torch.as_tensor(indexes) for indexes in indexes_per_class]
 
-	num_classes = len(indexes_per_class)
-	num_splits = len(ratios)
-	num_elements = targets.shape[0]
+	n_classes = len(indexes_per_class)
+	n_splits = len(ratios)
+	n_elements = targets.shape[0]
 
 	if verbose:
-		print(f"Info: num_classes={num_classes}, num_splits={num_splits}, num_elements={num_elements}")
+		print(f"Info: n_classes={n_classes}, n_splits={n_splits}, n_elements={n_elements}")
 
-	num_expected_per_splits = torch.as_tensor([
+	n_expected_per_splits = torch.as_tensor([
 		[round(len(indexes) * ratio) for indexes in indexes_per_class]
 		for ratio in ratios
 	])
 
 	splits = [[
-			[] for _ in range(num_classes)
+			[] for _ in range(n_classes)
 		]
-		for _ in range(num_splits)
+		for _ in range(n_splits)
 	]
 
-	taken = torch.full((num_elements,), False, dtype=torch.bool)
-	num_taken = 0
+	taken = torch.full((n_elements,), False, dtype=torch.bool)
+	n_taken = 0
 
-	while num_taken < num_elements:
-		num_by_splits = torch.as_tensor([[len(indexes) for indexes in split] for split in splits])
-		num_missing_per_splits = num_expected_per_splits - num_by_splits
+	while n_taken < n_elements:
+		n_by_splits = torch.as_tensor([[len(indexes) for indexes in split] for split in splits])
+		n_missing_per_splits = n_expected_per_splits - n_by_splits
 
 		if verbose:
-			num_missing_total = num_missing_per_splits.sum().item()
-			print(f"[{num_taken}/{num_elements}] taken. Missing: {num_missing_total}. ", end="\r")
+			n_missing_total = n_missing_per_splits.sum().item()
+			print(f"[{n_taken}/{n_elements}] taken. Missing: {n_missing_total}. ", end="\r")
 
 		# Search the max missing elem
-		idx_ratio_prior, idx_class_prior = torch.where(num_missing_per_splits.eq(num_missing_per_splits.max()))
+		idx_ratio_prior, idx_class_prior = torch.where(n_missing_per_splits.eq(n_missing_per_splits.max()))
 		random_prior = torch.randint(len(idx_ratio_prior), (1, ))
 		idx_ratio_prior = idx_ratio_prior[random_prior].item()
 		idx_class_prior = idx_class_prior[random_prior].item()
@@ -89,14 +89,14 @@ def split_multilabel_indexes_per_class(
 			for idx_class in classes_of_found_idx:
 				splits[idx_ratio_prior][idx_class].append(found_idx)
 			taken[found_idx] = True
-			num_taken += 1
+			n_taken += 1
 
 		else:
 			# If no elem of the class search is available, ignore this class now
-			num_expected_per_splits[idx_ratio_prior][idx_class_prior] = num_by_splits[idx_ratio_prior][idx_class_prior]
+			n_expected_per_splits[idx_ratio_prior][idx_class_prior] = n_by_splits[idx_ratio_prior][idx_class_prior]
 
 	if verbose:
-		print(f"[{num_taken}/{num_elements}] taken.", end="\n")
+		print(f"[{n_taken}/{n_elements}] taken.", end="\n")
 	return splits
 
 

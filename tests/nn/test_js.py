@@ -22,10 +22,10 @@ class TestJS(TestCase):
 
 	def create_logits(self) -> (Tensor, Tensor):
 		bsize = 128
-		nb_classes = 10
+		n_classes = 10
 		min_, max_ = -1, 1
-		logits_p = torch.rand(bsize, nb_classes) * (max_ - min_) + min_
-		logits_q = torch.rand(bsize, nb_classes) * (max_ - min_) + min_
+		logits_p = torch.rand(bsize, n_classes) * (max_ - min_) + min_
+		logits_q = torch.rand(bsize, n_classes) * (max_ - min_) + min_
 		return logits_p, logits_q
 
 	def crit_1(self):
