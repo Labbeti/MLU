@@ -61,9 +61,9 @@ class Gray(ImageTransform):
 		self.dim_channel = dim_channel
 
 	def process(self, x: Tensor) -> Tensor:
-		nb_channels = x.shape[self.dim_channel]
+		n_channels = x.shape[self.dim_channel]
 		output = x.mean(dim=self.dim_channel)
-		output = output.repeat([nb_channels] + [1] * (len(x.shape) - 1))
+		output = output.repeat([n_channels] + [1] * (len(x.shape) - 1))
 		output = output.permute(list(range(1, len(x.shape))) + [0])
 		return output
 

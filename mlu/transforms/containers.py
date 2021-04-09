@@ -61,34 +61,34 @@ class RandomChoice(Container):
 	def __init__(
 		self,
 		*transforms: Callable,
-		num_choices: Union[int, Tuple[int, int]] = 1,
+		n_choices: Union[int, Tuple[int, int]] = 1,
 		weights: Optional[Sequence[float]] = None,
 		p: float = 1.0,
 	):
 		"""
 			Select randomly k transforms in a list and apply them sequentially.
 
-			An transform can be chosen multiple times if num_choices > 1. (with replacement)
+			An transform can be chosen multiple times if n_choices > 1. (with replacement)
 
 			:param transforms: The list of transforms from we choose the apply a transform.
-			:param num_choices: The number of transforms to choose.
+			:param n_choices: The number of transforms to choose.
 				If tuple, it will be interpreted as a range [min,max[ for sampling the number of choices for each sample.
 				(default: 1)
 			:param weights: The probabilities to choose the transform. (default: None)
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(*transforms, p=p)
-		self.num_choices = num_choices
+		self.n_choices = n_choices
 		self.weights = weights
 
 	def process(self, x: Any) -> Any:
-		if isinstance(self.num_choices, tuple):
-			num_choices_min, num_choices_max = self.num_choices
-			num_choices = torch.randint(num_choices_min, num_choices_max, ()).item()
+		if isinstance(self.n_choices, tuple):
+			n_choices_min, n_choices_max = self.n_choices
+			n_choices = torch.randint(n_choices_min, n_choices_max, ()).item()
 		else:
-			num_choices = self.num_choices
+			n_choices = self.n_choices
 
-		transforms = random.choices(self.get_transforms(), weights=self.weights, k=num_choices)
+		transforms = random.choices(self.get_transforms(), weights=self.weights, k=n_choices)
 		for transform in transforms:
 			x = transform(x)
 		return x
