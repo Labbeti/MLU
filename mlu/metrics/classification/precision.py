@@ -42,7 +42,8 @@ class Precision(Metric):
 		"""
 		if pred.shape != target.shape:
 			raise ValueError(
-				f"Invalid input and target shapes for metric '{self.__class__.__name__}'. ({pred.shape} != {target.shape})")
+				f"Invalid input and target shapes for metric '{self.__class__.__name__}'. ({pred.shape} != {target.shape})"
+			)
 
 		if self.threshold_input is not None:
 			pred = pred.ge(self.threshold_input).float()

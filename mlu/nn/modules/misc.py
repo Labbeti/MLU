@@ -18,7 +18,10 @@ class Squeeze(Module):
 		self.dim = dim
 
 	def forward(self, x: Tensor) -> Tensor:
-		return x.squeeze(self.dim)
+		if self.dim is None:
+			return torch.squeeze(x)
+		else:
+			return torch.squeeze(x, self.dim)
 
 	def extra_repr(self) -> str:
 		return f"dim={self.dim}"

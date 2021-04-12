@@ -17,10 +17,12 @@ from typing import Dict, List, Optional
 class ClothoV1Subset(str, Enum):
 	DEVELOPMENT: str = "development"
 	EVALUATION: str = "evaluation"
+	TEST: str = "test"
 
 
-FOLDER_NAME = "CLOTHO_V1"
+FOLDER_NAME: str = "CLOTHO_V1"
 SAMPLE_RATE: int = 44100
+AUDIO_MAX_LENGTH: int = 30  # in seconds
 
 FILES_INFOS = {
 	"development": {
@@ -57,6 +59,18 @@ FILES_INFOS = {
 			"hash": "13946f054d4e1bf48079813aac61bf77",
 		},
 	},
+	"test": {
+		"audio_archive": {
+			"filename": "clotho_audio_test.7z",
+			"url": "",
+			"hash": "9b3fe72560a621641ff4351ba1154349",
+		},
+		"metadata": {
+			"filename": "clotho_metadata_test.csv",
+			"url": "",
+			"hash": "52f8ad01c229a310a0ff8043df480e21",
+		},
+	}
 }
 
 
@@ -66,9 +80,9 @@ class ClothoV1(Dataset):
 		Audio are waveform sounds of 15 to 30 seconds, sampled at 44100 Hz.
 		Targets are a list of 5 different sentences describing each audio sample.
 
-		Paper : https://arxiv.org/pdf/1910.09387.pdf
+		Clotho V1 Paper : https://arxiv.org/pdf/1910.09387.pdf
 
-		Folder tree:
+		Dataset folder tree:
 
 		root/
 		└── CLOTHO_V1
@@ -79,9 +93,9 @@ class ClothoV1(Dataset):
 			├── clotho_metadata_development.csv
 			├── clotho_metadata_evaluation.csv
 			├── development
-			│         └── (2893 files, 5,4G)
+			│         └── (2893 files, ~5.4G)
 			├── evaluation
-			│         └── (1045 files, 2,0G)
+			│         └── (1045 files, ~2.0G)
 			└── LICENSE
 	"""
 
@@ -90,34 +104,35 @@ class ClothoV1(Dataset):
 		root: str,
 		subset: str,
 		download: bool = False,
-		waveform_transform: Optional[Module] = None,
+		audio_transform: Optional[Module] = None,
 		captions_transform: Optional[Module] = None,
-		waveform_cache: bool = False,
+		audio_cache: bool = False,
 		verbose: int = 0,
 	):
 		"""
-			:param root: The parent of the dataset root directory.
-			:param subset: The subset of Clotho to use. Can be "development" or "evaluation".
+			:param root: The parent of the dataset root directory. The data will be stored in the 'CLOTHO_V1' subdirectory.
+			:param subset: The subset of Clotho to use. Can be 'development', 'evaluation' or 'test'.
 			:param download: Download the dataset if download=True and if the dataset is not already downloaded.
 				(default: False)
-			:param waveform_transform: The transform to apply to waveforms (Tensor).
+			:param audio_transform: The transform to apply to waveforms (Tensor).
 				(default: None)
-			:param captions_transform: The transform to apply to captions with a list of 5 sentences (List[List[str]]).
+			:param captions_transform: The transform to apply to captions with a list of 5 sentences (List[str]).
 				(default: None)
-			:param waveform_cache: If True, store waveforms in memory otherwise load them from files.
+			:param audio_cache: If True, store audio waveforms into RAM memory after loading them from files.
+				Can increase the data loading process time performance but requires enough RAM to store the data.
 				(default: False)
-			:param verbose: Verbose level to use.
+			:param verbose: Verbose level to use. Can be 0 or 1.
 				(default: 0)
 		"""
-		assert subset in ["development", "evaluation"]
+		assert subset in ["development", "evaluation", "test"]
 
 		super().__init__()
 		self._dataset_root = osp.join(root, FOLDER_NAME)
 		self._subset = subset
 		self._download = download
-		self._waveform_transform = waveform_transform
+		self._audio_transform = audio_transform
 		self._captions_transform = captions_transform
-		self._waveform_cache = waveform_cache
+		self._audio_cache = audio_cache
 		self._verbose = verbose
 
 		self._data_info = {}
@@ -129,7 +144,7 @@ class ClothoV1(Dataset):
 
 		self._prepare_data()
 
-	def __getitem__(self, index: int) -> (Tensor, List[List[str]]):
+	def __getitem__(self, index: int) -> (Tensor, List[str]):
 		"""
 			Get the audio data as 1D tensor and the matching captions as 5 sentences.
 
@@ -151,21 +166,21 @@ class ClothoV1(Dataset):
 			:param index: The index of the item.
 			:return: The audio data as 1D tensor.
 		"""
-		if not self._waveform_cache or index not in self._waveforms.keys():
+		if not self._audio_cache or index not in self._waveforms.keys():
 			filepath = self.get_audio_fpath(index)
 			waveform, _sample_rate = torchaudio.load(filepath)
 
-			if self._waveform_cache:
+			if self._audio_cache:
 				self._waveforms[index] = waveform
 
 		else:
 			waveform = self._waveforms[index]
 
-		if self._waveform_transform is not None:
-			waveform = self._waveform_transform(waveform)
+		if self._audio_transform is not None:
+			waveform = self._audio_transform(waveform)
 		return waveform
 
-	def get_captions(self, index: int) -> List[List[str]]:
+	def get_captions(self, index: int) -> List[str]:
 		"""
 			:param index: The index of the item.
 			:return: The list of 5 captions of an item.
@@ -266,23 +281,27 @@ class ClothoV1(Dataset):
 
 		files_infos = FILES_INFOS[self._subset]
 
-		# Read captions info
-		captions_filename = files_infos["captions"]["filename"]
-		captions_filepath = osp.join(self._dataset_root, captions_filename)
+		# --- Read captions info
+		if self._subset != ClothoV1Subset.TEST:
+			captions_filename = files_infos["captions"]["filename"]
+			captions_filepath = osp.join(self._dataset_root, captions_filename)
 
-		# Keys: file_name, caption_1, caption_2, caption_3, caption_4, caption_5
-		with open(captions_filepath, "r") as file:
-			reader = csv.DictReader(file)
-			for row in reader:
-				filename = row["file_name"]
-				if filename in self._data_info.keys():
-					self._data_info[filename]["captions"] = [
-						row[caption_key] for caption_key in ["caption_1", "caption_2", "caption_3", "caption_4", "caption_5"]
-					]
-				else:
-					raise RuntimeError(f"Found filename '{filename}' in CSV '{captions_filename}' but not the audio file.")
+			# Keys: file_name, caption_1, caption_2, caption_3, caption_4, caption_5
+			with open(captions_filepath, "r") as file:
+				reader = csv.DictReader(file)
+				for row in reader:
+					filename = row["file_name"]
+					if filename in self._data_info.keys():
+						self._data_info[filename]["captions"] = [
+							row[caption_key] for caption_key in ["caption_1", "caption_2", "caption_3", "caption_4", "caption_5"]
+						]
+					else:
+						raise RuntimeError(f"Found filename '{filename}' in CSV '{captions_filename}' but not the audio file.")
+		else:
+			for filename in self._data_info.keys():
+				self._data_info[filename]["captions"] = []
 
-		# Read metadata info
+		# --- Read metadata info
 		metadata_filename = files_infos["metadata"]["filename"]
 		metadata_filepath = osp.join(self._dataset_root, metadata_filename)
 

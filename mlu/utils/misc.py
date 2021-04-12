@@ -26,7 +26,7 @@ def get_datetime() -> str:
 	return now[:10] + "_" + now[11:-7]
 
 
-def reset_seed(seed: int):
+def reset_seed(seed: Optional[int]):
 	"""
 		Reset the seed of following packages :
 			- random
@@ -38,18 +38,19 @@ def reset_seed(seed: int):
 
 		:param seed: The seed to set.
 	"""
-	random.seed(seed)
-	np.random.seed(seed)
-	torch.manual_seed(seed)
-	torch.cuda.manual_seed_all(seed)
+	if seed is not None:
+		random.seed(seed)
+		np.random.seed(seed)
+		torch.manual_seed(seed)
+		torch.cuda.manual_seed_all(seed)
 
-	if hasattr(torch.backends, "cudnn"):
-		torch.backends.cudnn.deterministic = True
-		torch.backends.cudnn.benchmark = False
-	else:
-		raise RuntimeError(
-			"Cannot make deterministic behaviour for current torch backend (torch.backends does have the attribute 'cudnn')."
-		)
+		if hasattr(torch.backends, "cudnn"):
+			torch.backends.cudnn.deterministic = True
+			torch.backends.cudnn.benchmark = False
+		else:
+			raise RuntimeError(
+				"Cannot make deterministic behaviour for current torch backend (torch.backends does have the attribute 'cudnn')."
+			)
 
 
 def random_rect(
