@@ -5,7 +5,7 @@ from torch.utils.data.dataset import Dataset
 from typing import Sized
 from unittest import TestCase
 from mlu.datasets.dummy import DummyDataset
-from mlu.utils.typing.classes import SizedDataset
+from mlu.utils.typing_.classes import SizedDataset
 
 
 class DummyDatasetNotSized(Dataset):

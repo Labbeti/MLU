@@ -61,7 +61,7 @@ class MetricWrapper(Metric):
 		reduce_fn: Optional[Callable] = None,
 	):
 		"""
-			Wrapper of a callable function or class for comply with Metric typing.
+			Wrapper of a callable function or class for comply with Metric typing_.
 
 			:param callable_: The callable object to wrap.
 			:param use_input: If True, the input_ argument will be passed as argument to the callable object wrapped.

@@ -1,6 +1,6 @@
 
-from .classes import SizedDataset, SizedIterable
-from .converters import (
+from mlu.utils.typing_.classes import SizedDataset, SizedIterable
+from mlu.utils.typing_.converters import (
 	str_to_bool,
 	str_to_optional_bool,
 	str_to_optional_str,

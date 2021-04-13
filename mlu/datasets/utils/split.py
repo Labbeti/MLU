@@ -10,7 +10,7 @@ from torch.utils.data.sampler import Sampler, SubsetRandomSampler
 from types import ModuleType
 from typing import List, Optional, Union
 
-from mlu.utils.typing import SizedDataset
+from mlu.utils.typing_ import SizedDataset
 
 
 def generate_subsets_split(

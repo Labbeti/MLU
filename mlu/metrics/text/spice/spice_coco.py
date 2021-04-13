@@ -3,7 +3,7 @@
 
 	Code imported from : https://github.com/peteanderson80/coco-caption/blob/master/pycocoevalcap/spice/spice.py
 	Authors : Peter Anderson
-	Modified : Yes (typing, names, imports)
+	Modified : Yes (typing_, names, imports)
 """
 
 import json

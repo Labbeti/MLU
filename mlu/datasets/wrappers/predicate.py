@@ -2,7 +2,7 @@
 from torch.utils.data.dataset import Subset
 from typing import Callable
 from mlu.datasets.wrappers.base import DatasetWrapper
-from mlu.utils.typing import SizedDataset
+from mlu.utils.typing_ import SizedDataset
 
 
 class PredicateSubset(DatasetWrapper):

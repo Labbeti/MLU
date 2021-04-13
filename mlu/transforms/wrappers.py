@@ -109,7 +109,7 @@ class TransformWrap(Transform):
 	):
 		"""
 			Wrap a callable object to Transform.
-			Useful for keep correct typing and adding transform type (image, waveform or spectrogram) information.
+			Useful for keep correct typing_ and adding transform type (image, waveform or spectrogram) information.
 
 			:param callable_: The callable object to wrap.
 			:param image_transform: Indicate if the object wrapped is an image transform or not. (default: False)

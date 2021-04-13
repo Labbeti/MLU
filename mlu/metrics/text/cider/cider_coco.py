@@ -4,7 +4,7 @@
 	Code imported from : https://github.com/peteanderson80/coco-caption/blob/master/pycocoevalcap/cider/cider_scorer.py
 		and https://github.com/peteanderson80/coco-caption/blob/master/pycocoevalcap/cider/cider.py
 	Authors : Ramakrishna Vedantam <vrama91@vt.edu> and Tsung-Yi Lin <tl483@cornell.edu>
-	Modified : Yes (typing, imports)
+	Modified : Yes (typing_, imports)
 """
 
 # Filename: cider.py

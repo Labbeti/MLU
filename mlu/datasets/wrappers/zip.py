@@ -2,7 +2,7 @@
 from torch.utils.data.dataset import Dataset
 from typing import List
 
-from mlu.utils.typing import SizedDataset
+from mlu.utils.typing_ import SizedDataset
 
 
 class ZipDataset(Dataset):

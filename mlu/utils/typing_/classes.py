@@ -1,7 +1,7 @@
 
 from abc import ABC
-from typing import Iterable, Protocol, Sized, runtime_checkable
 from torch.utils.data.dataset import Dataset
+from typing import Iterable, Protocol, Sized, runtime_checkable
 
 
 class SizedIterable(Sized, Iterable, Protocol):
