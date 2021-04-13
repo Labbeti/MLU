@@ -71,7 +71,10 @@ class GPUUsage:
 		self._info_pids = info_pids
 
 	def get_pid_info(self, pid: int = os.getpid()) -> Dict[str, Any]:
-		return self._info_pids[pid]
+		if pid in self._info_pids.keys():
+			return self._info_pids[pid]
+		else:
+			return {}
 
 	def get_pid_used_memory(self, pid: int = os.getpid()) -> int:
 		""" Returns the PID GPU memory used in MiB. """
@@ -105,10 +108,7 @@ class GPUUsage:
 
 def test():
 	import torch
-
-	z = torch.zeros(64, 64, 500, dtype=torch.bool, device=torch.device("cuda"))
-	u = torch.ones(64, 500, device=z.device)
-	x = z * u
+	from torch.nn import BCELoss
 
 	usage = GPUUsage()
 	usage.update()
@@ -116,6 +116,15 @@ def test():
 	print(usage.get_pid_used_memory())
 	print(usage.get_used_memory())
 	print(usage.get_total_memory())
+
+	bce = BCELoss()
+	with torch.no_grad():
+		for _ in range(10000):
+			z = torch.zeros(64, 500, device=torch.device("cuda"))
+			u = torch.ones(64, 500, device=z.device)
+			loss = bce(z, u)
+			usage.update()
+			print(usage.get_used_memory())
 
 
 if __name__ == "__main__":

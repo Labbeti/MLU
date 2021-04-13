@@ -42,7 +42,7 @@ class BLEU(Metric):
 		super().__init__()
 		self.ngram_order = ngram_order
 		self.smooth = smooth
-		self.weights = weights if weights is not None else (torch.ones(self.ngram_order) / self.ngram_order).tolist()
+		self.weights = weights if weights is not None else [1.0 / ngram_order for _ in range(ngram_order)]
 		self.backend = backend
 
 	def compute_score(
