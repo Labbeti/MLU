@@ -31,7 +31,7 @@ setup(
 	packages=find_packages(),
 	url='https://github.com/Labbeti/MLU',
 	license='MIT',
-	author='Etienne Labbé "Labbeti"',
+	author='Etienne Labbé',
 	author_email='etienne.labbe31@gmail.com',
 	description='Set of personal classes, functions and tools for machine learning.',
 	python_requires='>=3.8.5',
