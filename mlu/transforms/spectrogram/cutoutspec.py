@@ -15,7 +15,6 @@ class CutOutSpec(SpectrogramTransform):
 		freq_scales: Tuple[float, float] = (0.1, 0.5),
 		time_scales: Tuple[float, float] = (0.1, 0.5),
 		fill_value: Union[float, Tuple[float, float]] = -100.0,
-		same_across_channels: bool = True,
 		freq_dim: int = -2,
 		time_dim: int = -1,
 		p: float = 1.0,
@@ -48,7 +47,6 @@ class CutOutSpec(SpectrogramTransform):
 		self.freq_scales = freq_scales
 		self.time_scales = time_scales
 		self.fill_value = fill_value
-		self.same_across_channels = same_across_channels
 		self.freq_dim = freq_dim
 		self.time_dim = time_dim
 
@@ -59,27 +57,6 @@ class CutOutSpec(SpectrogramTransform):
 				f'found {type(data)}' + (f' of shape {data.shape}' if hasattr(data, 'shape') else '') + '.'
 			)
 
-		data = data.clone()
-
-		if self.same_across_channels:
-			data = self._process_same_across_channels(data)
-		else:
-			n_dims = len(data.shape)
-			if n_dims != 3 or self.freq_dim != -2 or self.time_dim != -1:
-				raise NotImplementedError(
-					f'When same_across_channels=False, n_dims must be equal to 3, freq_dim to -2 and time_dim to -1. '
-					f'(n_dims={n_dims}, freq_dim={self.freq_dim}, time_dim={self.time_dim})'
-				)
-
-			batch_dim = 0
-			indexes: list = [slice(None) for _ in range(n_dims)]
-			for i in range(data.shape[batch_dim]):
-				indexes[batch_dim] = i
-				data[indexes] = self._process_same_across_channels(data[indexes])
-
-		return data
-
-	def _process_same_across_channels(self, data: Tensor) -> Tensor:
 		# Prepare slices indexes for frequencies and time dimensions
 		slices = [slice(None)] * len(data.shape)
 
@@ -98,6 +75,7 @@ class CutOutSpec(SpectrogramTransform):
 			fill_value = self.fill_value
 
 		# Set are to fill_value
+		data = data.clone()
 		data[slices] = fill_value
 		return data
 
