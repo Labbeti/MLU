@@ -18,7 +18,7 @@ class TestJS(TestCase):
 
 		seed = torch.randint(low=0, high=1000, size=[]).item()
 		reset_seed(seed)
-		print("Seed ", seed)
+		print('Seed ', seed)
 
 	def create_logits(self) -> (Tensor, Tensor):
 		bsize = 128
@@ -30,13 +30,13 @@ class TestJS(TestCase):
 
 	def crit_1(self):
 		logits_p, logits_q = self.create_logits()
-		criterion = JSDivLoss(reduction="mean")
+		criterion = JSDivLoss(reduction='mean')
 		softmax = Softmax(dim=1)
 		_ = criterion(softmax(logits_p), softmax(logits_q))
 
 	def crit_2(self):
 		logits_p, logits_q = self.create_logits()
-		criterion = JSDivLossFromLogits(reduction="mean")
+		criterion = JSDivLossFromLogits(reduction='mean')
 		_ = criterion(logits_p, logits_q)
 
 	def test_js(self):
@@ -46,33 +46,33 @@ class TestJS(TestCase):
 		r = [0, 0]
 
 		s1 = time()
-		l2 = JSDivLoss(reduction="mean")
+		l2 = JSDivLoss(reduction='mean')
 		softmax = Softmax(dim=1)
 		r[0] += l2(softmax(logits_p), softmax(logits_q))
 		t[0] += time() - s1
 
 		s2 = time()
-		l1 = JSDivLossFromLogits(reduction="mean")
+		l1 = JSDivLossFromLogits(reduction='mean')
 		r[1] += l1(logits_p, logits_q)
 		t[1] += time() - s2
 
-		print("Durations")
+		print('Durations')
 		print(t[0])
 		print(t[1])
 
-		print("Sum Results")
+		print('Sum Results')
 		print(r[0])
 		print(r[1])
 
 	def test_time(self):
-		print("TimeIt")
+		print('TimeIt')
 		print(timeit(self.crit_1, number=10000))
 		print(timeit(self.crit_2, number=10000))
 
 
 class TestEntropy(TestCase):
 	def test_ent(self):
-		ent = Entropy(reduction="none")
+		ent = Entropy(reduction='none')
 
 		d1 = [0, 1, 0, 0]
 		d2 = [0.5, 0.5, 0, 0]
@@ -89,5 +89,5 @@ class TestEntropy(TestCase):
 		self.assertTrue(e1 < e2 < e3 < e4)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	unittest.main()

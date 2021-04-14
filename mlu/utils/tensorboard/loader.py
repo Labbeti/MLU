@@ -6,7 +6,7 @@ from tensorboard.backend.event_processing.event_file_loader import EventFileLoad
 from typing import Any, Callable, Dict, Iterable, List, Optional, Union
 
 
-EVENT_FILE_PREFIX = "events.out.tfevents."
+EVENT_FILE_PREFIX = 'events.out.tfevents.'
 DT_FLOAT = 1
 DT_STRING = 7
 
@@ -57,7 +57,7 @@ class TensorboardLoader:
 		elif isinstance(path, Iterable):
 			paths = path
 		else:
-			raise RuntimeError(f"Invalid type '{type(path)}' for TensorboardLoader.")
+			raise RuntimeError(f'Invalid type "{type(path)}" for TensorboardLoader.')
 
 		event_paths = []
 		for path in paths:
@@ -71,9 +71,9 @@ class TensorboardLoader:
 			Ex:
 
 			>>> {
-			...		"train/acc": {
-			...			"dtype": "float",
-			...			"values": {
+			...		'train/acc': {
+			...			'dtype': 'float',
+			...			'values': {
 			...				0: 0.1,
 			...				1: 0.2
 			...			}
@@ -103,9 +103,9 @@ class TensorboardLoader:
 				tag: str = event_value.tag
 				dtype: int = event_value.tensor.dtype
 
-				if tag.startswith("_"):
+				if tag.startswith('_'):
 					if self._verbose >= 1:
-						print(f"Skip value with tag '{tag}' which begins by an underscore.")
+						print(f'Skip value with tag "{tag}" which begins by an underscore.')
 					continue
 
 				if dtype == DT_FLOAT:
@@ -113,31 +113,31 @@ class TensorboardLoader:
 						continue
 					value = event_value.tensor.float_val
 					value = float(str(value)[1:-1])
-					dtype_str = "float"
+					dtype_str = 'float'
 
 				elif dtype == DT_STRING:
 					if self._skip_str:
 						continue
-					tag = tag.split("/")[0]
+					tag = tag.split('/')[0]
 					value = event_value.tensor.string_val
 					value = str(value)[3:-2]
-					dtype_str = "str"
+					dtype_str = 'str'
 
 				else:
 					if self._verbose >= 1:
-						print(f"WARNING: Unknown dtype '{dtype}'. Skip this event value with tag '{tag}' at step '{step}'.")
+						print(f'WARNING: Unknown dtype "{dtype}". Skip this event value with tag "{tag}" at step "{step}".')
 					continue
 
 				if tag not in data.keys():
-					data[tag] = {"dtype": dtype_str, "values": {}}
+					data[tag] = {'dtype': dtype_str, 'values': {}}
 
-				if step in data[tag]["values"].keys():
+				if step in data[tag]['values'].keys():
 					# Ignore events with same step, just check the same value and dtype
-					assert data[tag]["dtype"] == dtype_str, \
-						f"Duplicate event with tag '{tag}' on step '{step}' does not have the same dtype '{dtype}'."
-					assert data[tag]["values"][step] == value, \
-						f"Duplicate event with tag '{tag}' on step '{step}' does not have the same value '{value}'."
+					assert data[tag]['dtype'] == dtype_str, \
+						f'Duplicate event with tag "{tag}" on step "{step}" does not have the same dtype "{dtype}".'
+					assert data[tag]['values'][step] == value, \
+						f'Duplicate event with tag "{tag}" on step "{step}" does not have the same value "{value}".'
 				else:
-					data[tag]["values"][step] = value
+					data[tag]['values'][step] = value
 
 		return data

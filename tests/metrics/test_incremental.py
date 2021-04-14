@@ -84,5 +84,5 @@ class TestIncremental(TestCase):
 		self.assertTrue(tracker.is_empty())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	main()

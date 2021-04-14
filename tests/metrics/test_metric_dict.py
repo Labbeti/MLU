@@ -8,7 +8,7 @@ from mlu.metrics import MetricDict, CategoricalAccuracy, FScore
 
 class TestMetricDict(TestCase):
 	def test(self):
-		metrics = {"acc": CategoricalAccuracy(), "f1": FScore()}
+		metrics = {'acc': CategoricalAccuracy(), 'f1': FScore()}
 		md = MetricDict(metrics)
 
 		self.assertEqual(len(md), len(metrics))
@@ -19,12 +19,12 @@ class TestMetricDict(TestCase):
 		scores = md(pred, target)
 		# print(scores)
 		self.assertEqual(len(scores), len(metrics))
-		self.assertIn("acc", scores.keys())
-		self.assertIn("f1", scores.keys())
+		self.assertIn('acc', scores.keys())
+		self.assertIn('f1', scores.keys())
 
 	def test_none(self):
 		in_ = None
-		md = MetricDict(in_, prefix="p/", suffix="_tmp")
+		md = MetricDict(in_, prefix='p/', suffix='_tmp')
 
 		self.assertEqual(len(md), 0)
 
@@ -35,5 +35,5 @@ class TestMetricDict(TestCase):
 		self.assertEqual(scores, {})
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	unittest.main()

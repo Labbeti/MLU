@@ -75,7 +75,7 @@ class SubsetInfiniteCycleSampler(Sampler):
 			yield idx
 
 	def __len__(self) -> int:
-		raise NotImplemented("Infinite sampler does not have __len__() method.")
+		raise NotImplemented('Infinite sampler does not have __len__() method.')
 
 	def _shuffle(self):
 		if self.shuffle:

@@ -24,9 +24,9 @@ class TestConvert(TestCase):
 			other = to_base(to(data))
 
 			self.assertEqual(data.shape, other.shape,
-				f"Mismatch shapes for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x")
+				f'Mismatch shapes for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x')
 			self.assertTrue(data.eq(other).all(),
-				f"Mismatch values for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x")
+				f'Mismatch values for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x')
 
 	def test_numpy_conversions(self):
 		# Black image (width, height, channel)
@@ -43,9 +43,9 @@ class TestConvert(TestCase):
 			other = to_base(to(data))
 
 			self.assertEqual(data.shape, other.shape,
-				f"Mismatch shapes for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x")
+				f'Mismatch shapes for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x')
 			self.assertTrue((data == other).all(),
-				f"Mismatch values for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x")
+				f'Mismatch values for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x')
 
 	def test_list_conversions(self):
 		# Black image (width, height, channel)
@@ -64,9 +64,9 @@ class TestConvert(TestCase):
 			other_shape = _get_list_shape(other)
 
 			self.assertEqual(data_shape, other_shape,
-				f"Mismatch shapes for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x")
+				f'Mismatch shapes for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x')
 			self.assertTrue(data == other,
-				f"Mismatch values for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x")
+				f'Mismatch values for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x')
 
 	def test_pil_conversions(self):
 		to_ten = ToTensor()
@@ -75,16 +75,16 @@ class TestConvert(TestCase):
 		to_pil = ToPIL()
 
 		# Black image (width, height)
-		data = Image.new("RGB", (32, 64), color="black")
+		data = Image.new('RGB', (32, 64), color='black')
 		to_base = to_pil
 
 		for to in [to_ten, to_num, to_lis, to_pil]:
 			other = to_base(to(data))
 
 			self.assertEqual(data.size, other.size,
-				f"Mismatch shapes for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x")
+				f'Mismatch shapes for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x')
 			self.assertTrue(data == other,
-				f"Mismatch values for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x")
+				f'Mismatch values for conversion {to_base.__class__.__name__}({to.__class__.__name__}(x)) == x')
 
 
 class TestCompat(TestCase):
@@ -93,15 +93,15 @@ class TestCompat(TestCase):
 		to_tens_tvi = torchvision.transforms.ToTensor()
 
 		# Black image (width, height, 3)
-		data = Image.new("RGB", (32, 64), color="black")
+		data = Image.new('RGB', (32, 64), color='black')
 
 		other_mlu = to_tens_mlu(data)
 		other_tvi = to_tens_tvi(data)
 
 		self.assertEqual(other_mlu.shape, other_tvi.shape,
-			f"Mismatch shapes for conversion {to_tens_mlu.__class__.__name__}(x) == {to_tens_tvi.__class__.__name__}(x)")
+			f'Mismatch shapes for conversion {to_tens_mlu.__class__.__name__}(x) == {to_tens_tvi.__class__.__name__}(x)')
 		self.assertTrue(other_mlu.eq(other_tvi).all(),
-			f"Mismatch values for conversion {to_tens_mlu.__class__.__name__}(x) == {to_tens_tvi.__class__.__name__}(x)")
+			f'Mismatch values for conversion {to_tens_mlu.__class__.__name__}(x) == {to_tens_tvi.__class__.__name__}(x)')
 
 	def test_to_pil(self):
 		to_pil_mlu = ToPIL()
@@ -114,9 +114,9 @@ class TestCompat(TestCase):
 		other_tvi = to_pil_tvi(data)
 
 		self.assertEqual(other_mlu.size, other_tvi.size,
-			f"Mismatch shapes for conversion {to_pil_mlu.__class__.__name__}(x) == {to_pil_tvi.__class__.__name__}(x)")
+			f'Mismatch shapes for conversion {to_pil_mlu.__class__.__name__}(x) == {to_pil_tvi.__class__.__name__}(x)')
 		self.assertTrue(other_mlu == other_tvi,
-			f"Mismatch values for conversion {to_pil_mlu.__class__.__name__}(x) == {to_pil_tvi.__class__.__name__}(x)")
+			f'Mismatch values for conversion {to_pil_mlu.__class__.__name__}(x) == {to_pil_tvi.__class__.__name__}(x)')
 
 
 def _get_list_shape(lst: list) -> tuple:
@@ -131,5 +131,5 @@ def _get_list_shape(lst: list) -> tuple:
 	return tuple(shape)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	main()

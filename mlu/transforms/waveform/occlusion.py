@@ -22,7 +22,7 @@ class Occlusion(WaveformTransform):
 			:param dim: The dimension to apply the occlusion. (default: -1)
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
-		super().__init__(p)
+		super().__init__(p=p)
 		self.scales = scales if isinstance(scales, tuple) else (scales, scales)
 		self.fill_value = fill_value
 		self.dim = dim

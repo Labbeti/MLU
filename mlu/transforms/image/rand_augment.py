@@ -12,7 +12,7 @@ class RandAugment(ImageTransform):
 		n_augm_apply: int = 1,
 		magnitude: Optional[float] = 0.5,
 		augm_pool: Optional[List[Tuple[Type[ImageTransform], Optional[Tuple[float, float]]]]] = None,
-		magnitude_policy: str = "random",
+		magnitude_policy: str = 'random',
 		p: float = 1.0,
 	):
 		"""
@@ -20,20 +20,20 @@ class RandAugment(ImageTransform):
 
 			Original paper : https://arxiv.org/pdf/1909.13719.pdf
 
-			:param n_augm_apply: The number of augmentations "N" to apply on 1 image. (default: 1)
-			:param magnitude: The magnitude "M" used in RandAugment in range [0, 1].
-				If magnitude_policy == "random", this parameter is ignored.
+			:param n_augm_apply: The number of augmentations 'N' to apply on 1 image. (default: 1)
+			:param magnitude: The magnitude 'M' used in RandAugment in range [0, 1].
+				If magnitude_policy == 'random', this parameter is ignored.
 				(default: 0.5)
 			:param augm_pool: The list of augmentations with their optional range.
 				If None, use the default pool.
 				(default: None)
 			:param magnitude_policy: The policy to apply for control magnitude of augmentations.
-				Available policies are "constant" and "random".
+				Available policies are 'constant' and 'random'.
 				(default: 'random')
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		assert magnitude is None or 0.0 <= magnitude <= 1.0
-		assert magnitude_policy in ["constant", "random"]
+		assert magnitude_policy in ['constant', 'random']
 
 		super().__init__(p=p)
 		self._n_augm_apply = n_augm_apply
@@ -44,7 +44,7 @@ class RandAugment(ImageTransform):
 		self._augms = _build_augms(self._augm_pool, self._magnitude)
 
 	def process(self, x):
-		if self._magnitude_policy == "random":
+		if self._magnitude_policy == 'random':
 			new_magnitude = random.random()
 			self.set_magnitude(new_magnitude)
 

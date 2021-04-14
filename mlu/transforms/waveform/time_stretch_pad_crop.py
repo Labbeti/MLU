@@ -13,7 +13,7 @@ class TimeStretchPadCrop(WaveformTransform):
 		self,
 		rates: Union[Tuple[float, float], float] = (0.9, 1.1),
 		target_length: Optional[int] = None,
-		align: str = "random",
+		align: str = 'random',
 		fill_value: float = 0.0,
 		dim: int = -1,
 		p: float = 1.0,

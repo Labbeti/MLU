@@ -14,7 +14,7 @@ class EMA(Module):
 			>>> 'model = decay * model + (1 - decay) * other_model'
 
 			:param model: The target model to update.
-			:param decay: The exponential decay (sometimes called "alpha") used to update the model. (default: 0.99)
+			:param decay: The exponential decay (sometimes called 'alpha') used to update the model. (default: 0.99)
 			:param copy_model: If True, the model passed as input will be copied. (default: False)
 		"""
 		if copy_model:
@@ -29,7 +29,7 @@ class EMA(Module):
 		other_params = [param for param in other_model.parameters()]
 
 		if len(model_params) != len(other_params):
-			raise RuntimeError("For EMA, model used for update is supposed to have the same architecture.")
+			raise RuntimeError('For EMA, model used for update is supposed to have the same architecture.')
 
 		for param, other_param in zip(model_params, other_params):
 			param.set_(self.decay * param + (1.0 - self.decay) * other_param)
@@ -38,10 +38,10 @@ class EMA(Module):
 		return self.model(*args, **kwargs)
 
 	def __setattr__(self, name: str, value: Any):
-		if name not in ["model"]:
+		if name not in ['model']:
 			Module.__setattr__(self, name, value)
 		else:
 			object.__setattr__(self, name, value)
 
 	def extra_repr(self) -> str:
-		return f"decay={self.decay}"
+		return f'decay={self.decay}'

@@ -37,7 +37,7 @@ class CategoricalAccuracy(Metric):
 		if self.vector_target:
 			target = target.argmax(dim=self.dim)
 
-		assert pred.shape == target.shape, "Input and target must have the same shape."
+		assert pred.shape == target.shape, 'Input and target must have the same shape.'
 		assert 0 <= len(pred.shape) <= 2
 
 		score = pred.eq(target).float()

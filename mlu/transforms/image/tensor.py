@@ -40,7 +40,7 @@ class Standardize(ImageTransform):
 		self.channel_dim = channel_dim
 
 		if len(self.means) != len(self.stds):
-			raise RuntimeError("Means and stds lists must have the same size.")
+			raise RuntimeError('Means and stds lists must have the same size.')
 
 	def process(self, x: Tensor) -> Tensor:
 		output = torch.empty_like(x)

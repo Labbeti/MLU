@@ -8,10 +8,10 @@ from unittest import TestCase, main
 class TestBLEU1(TestCase):
 	def test_1(self):
 		# example from the original paper https://www.aclweb.org/anthology/P02-1040.pdf
-		candidate = ["the"] * 7
+		candidate = ['the'] * 7
 		references = [
-			"The cat is on the mat".lower().split(" "),
-			"There is a cat on the mat".lower().split(" "),
+			'The cat is on the mat'.lower().split(' '),
+			'There is a cat on the mat'.lower().split(' '),
 		]
 
 		vocabulary = add_to_vocabulary(candidate)
@@ -28,8 +28,8 @@ class TestBLEU1(TestCase):
 		self.assertAlmostEqual(score, expected)
 
 	def test_2(self):
-		candidate = "a b c d e f".lower().split(" ")
-		references = [candidate, "a g b e d"]
+		candidate = 'a b c d e f'.lower().split(' ')
+		references = [candidate, 'a g b e d']
 
 		vocabulary = add_to_vocabulary(candidate)
 		vocabulary = add_to_vocabulary(references, vocabulary)
@@ -46,14 +46,14 @@ class TestBLEU1(TestCase):
 
 	def test_3(self):
 		candidates = [
-			"It is a guide to action which ensures that the military always obeys the commands of the party".lower().split(" "),
-			# "It is to insure the troops forever hearing the activity guidebook that party direct".lower().split(" "),
+			'It is a guide to action which ensures that the military always obeys the commands of the party'.lower().split(' '),
+			# 'It is to insure the troops forever hearing the activity guidebook that party direct'.lower().split(' '),
 		]
 
 		references = [
-			"It is a guide to action that ensures that the military will forever heed Party commands".lower().split(" "),
-			"It is the guiding principle which guarantees the military forces always being under the command of the Party".lower().split(" "),
-			"It is the practical guide for the army always to heed the directions of the party".lower().split(" "),
+			'It is a guide to action that ensures that the military will forever heed Party commands'.lower().split(' '),
+			'It is the guiding principle which guarantees the military forces always being under the command of the Party'.lower().split(' '),
+			'It is the practical guide for the army always to heed the directions of the party'.lower().split(' '),
 		]
 		expected_lst = [
 			17 / 18,
@@ -78,14 +78,14 @@ class TestBLEUk(TestCase):
 	def test_bleu_4(self):
 		# example from the README of https://github.com/neural-dialogue-metrics/BLEU
 		candidates = [
-			"It is to insure the troops forever hearing the activity guidebook that party direct".lower().split(" "),
-			"It is a guide to action which ensures that the military always obeys the commands of the party".lower().split(" "),
+			'It is to insure the troops forever hearing the activity guidebook that party direct'.lower().split(' '),
+			'It is a guide to action which ensures that the military always obeys the commands of the party'.lower().split(' '),
 		]
 
 		references = [
-			"It is a guide to action that ensures that the military will forever heed Party commands".lower().split(" "),
-			"It is the guiding principle which guarantees the military forces always being under the command of the Party".lower().split(" "),
-			"It is the practical guide for the army always to heed the directions of the party".lower().split(" "),
+			'It is a guide to action that ensures that the military will forever heed Party commands'.lower().split(' '),
+			'It is the guiding principle which guarantees the military forces always being under the command of the Party'.lower().split(' '),
+			'It is the practical guide for the army always to heed the directions of the party'.lower().split(' '),
 		]
 		expected_lst = [0.1327211341271203, 0.5401725898595141]
 
@@ -103,5 +103,5 @@ class TestBLEUk(TestCase):
 			self.assertAlmostEqual(score, expected)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	main(failfast=False)

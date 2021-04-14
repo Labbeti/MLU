@@ -40,7 +40,7 @@ class TestCutOut(TestCase):
 		t = torch.rand(3, 32, 16)
 		o = transform(t)
 
-		print("Shapes")
+		print('Shapes')
 		print(t.shape)
 		print(o.shape)
 
@@ -49,7 +49,8 @@ class TestCutOut(TestCase):
 		plt.imshow(t.numpy().T)
 		plt.figure()
 		plt.imshow(o.numpy().T)
-		plt.show()
+		plt.show(block=False)
+		# input("> ")
 
 	def test_cos_2(self):
 		transform = CutOutSpec(freq_scales=(0.0, 1.0), time_scales=(0.0, 1.0), fill_value=-1.0)
@@ -61,5 +62,5 @@ class TestCutOut(TestCase):
 		self.assertGreater(o.eq(-1.0).sum(), 0)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	main()

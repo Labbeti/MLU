@@ -1,5 +1,5 @@
 """
-	Microsoft COCO caption metric "CIDER".
+	Microsoft COCO caption metric 'CIDER'.
 
 	Code imported from : https://github.com/peteanderson80/coco-caption/blob/master/pycocoevalcap/cider/cider_scorer.py
 		and https://github.com/peteanderson80/coco-caption/blob/master/pycocoevalcap/cider/cider.py
@@ -45,7 +45,7 @@ def precook(s, n=4, out = False):
     return counts
 
 
-def cook_refs(refs, n=4): ## lhuang: oracle will call with "average"
+def cook_refs(refs, n=4): ## lhuang: oracle will call with 'average'
     '''Takes a list of reference sentences for a single segment
     and returns an object that encapsulates everything that BLEU
     needs to know about them.
@@ -98,7 +98,7 @@ class CiderScorer(object):
                 self.ctest.append(None) # lens of crefs and ctest have to match
 
     def size(self):
-        assert len(self.crefs) == len(self.ctest), "refs/test mismatch! %d<>%d" % (len(self.crefs), len(self.ctest))
+        assert len(self.crefs) == len(self.ctest), 'refs/test mismatch! %d<>%d' % (len(self.crefs), len(self.ctest))
         return len(self.crefs)
 
     def __iadd__(self, other):
@@ -254,4 +254,4 @@ class Cider:
         return score, scores
 
     def method(self):
-        return "CIDEr"
+        return 'CIDEr'

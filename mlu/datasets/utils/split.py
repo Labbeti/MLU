@@ -97,14 +97,14 @@ def get_indexes_per_class(
 		:return: The indexes per class in the dataset of size (n_classes, n_elem_in_class_i).
 			Note: If the class distribution is not perfectly uniform, this return is not a complete matrix.
 	"""
-	if not hasattr(dataset, "__len__"):
-		raise RuntimeError("Dataset must have __len__() method for split indexes.")
+	if not hasattr(dataset, '__len__'):
+		raise RuntimeError('Dataset must have __len__() method for split indexes.')
 
-	if hasattr(dataset, "targets") and isinstance(dataset.targets, (np.ndarray, Tensor, list)):
+	if hasattr(dataset, 'targets') and isinstance(dataset.targets, (np.ndarray, Tensor, list)):
 		targets = dataset.targets
 		targets = torch.as_tensor(targets)
-		assert len(dataset) == len(targets), "Dataset and targets must have the same len()."
-	elif hasattr(dataset, "get_target") and callable(dataset.get_target):
+		assert len(dataset) == len(targets), 'Dataset and targets must have the same len().'
+	elif hasattr(dataset, 'get_target') and callable(dataset.get_target):
 		targets = [torch.as_tensor(dataset.get_target(i)) for i in range(len(dataset))]
 		targets = torch.stack(targets)
 	else:
@@ -126,7 +126,7 @@ def shuffle_indexes_per_class(
 	random_state: Optional[Union[RandomState, ModuleType]] = None,
 ) -> List[List[int]]:
 	"""
-		Shuffle each indexes per class. (this operation is "in-place").
+		Shuffle each indexes per class. (this operation is 'in-place').
 
 		:param indexes_per_class: The list of indexes per class.
 		:param random_state: The module or numpy RandomState to use for shuffle. If None, use python random module.
@@ -168,7 +168,7 @@ def split_indexes_per_class(
 			Note: The return is not a tensor or ndarray because 'n_indexes_in_ratio_and_class' can be different for each
 			ratio or class.
 	"""
-	assert 0.0 <= sum(ratios) <= 1.0, "Ratio sum cannot be greater than 1.0."
+	assert 0.0 <= sum(ratios) <= 1.0, 'Ratio sum cannot be greater than 1.0.'
 
 	n_classes = len(indexes_per_class)
 	n_ratios = len(ratios)

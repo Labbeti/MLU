@@ -11,10 +11,10 @@ class Pad(WaveformTransform):
 	def __init__(
 		self,
 		target_length: int,
-		align: str = "left",
+		align: str = 'left',
 		fill_value: float = 0.0,
 		dim: int = -1,
-		mode: str = "constant",
+		mode: str = 'constant',
 		p: float = 1.0,
 	):
 		super().__init__(p=p)
@@ -25,16 +25,16 @@ class Pad(WaveformTransform):
 		self.mode = mode
 
 	def process(self, data: Tensor) -> Tensor:
-		if self.align == "left":
+		if self.align == 'left':
 			return self.pad_align_left(data)
-		elif self.align == "right":
+		elif self.align == 'right':
 			return self.pad_align_right(data)
-		elif self.align == "center":
+		elif self.align == 'center':
 			return self.pad_align_center(data)
-		elif self.align == "random":
+		elif self.align == 'random':
 			return self.pad_align_random(data)
 		else:
-			raise ValueError(f"Unknown alignment '{self.align}'. Must be one of {str(['left', 'right', 'center', 'random'])}.")
+			raise ValueError(f'Unknown alignment "{self.align}". Must be one of {str(["left", "right", "center", "random"])}.')
 
 	def pad_align_left(self, x: Tensor) -> Tensor:
 		# Note: pad_seq : [pad_left_dim_-1, pad_right_dim_-1, pad_left_dim_-2, pad_right_dim_-2, ...)

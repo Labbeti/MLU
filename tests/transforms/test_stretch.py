@@ -33,5 +33,5 @@ class TestStretch(TestCase):
 		self.assertEqual(w.shape, start_shape)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	main()

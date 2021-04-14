@@ -28,11 +28,11 @@ def test_tf_ds():
 
 
 def perf():
-	print("Begin perf test")
+	print('Begin perf test')
 	results = timeit.timeit(test_tf_ds, number=100000)
-	print("End perf test")
+	print('End perf test')
 	print(results)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	perf()

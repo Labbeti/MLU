@@ -21,8 +21,8 @@ class TestStd(TestCase):
 		data_tvi = std_tvi(data)
 
 		self.assertTrue(data_mlu.eq(data_tvi).all(),
-			f"Mismatch values of Standardized images.")
+			f'Mismatch values of Standardized images.')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	unittest.main()

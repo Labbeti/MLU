@@ -15,7 +15,7 @@ class BCEMetric(Metric):
 
 	def compute_score(self, pred, target):
 		if pred.shape != target.shape:
-			raise RuntimeError(f"Mismatch shapes {pred.shape} != {target.shape}.")
+			raise RuntimeError(f'Mismatch shapes {pred.shape} != {target.shape}.')
 
 		scores = - target * torch.log(pred) - (1.0 - target) * torch.log(1.0 - pred)
 		scores = self.reduce_fn(scores)
@@ -35,5 +35,5 @@ class TestBCE(TestCase):
 		self.assertEqual(l1, l2)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	unittest.main()

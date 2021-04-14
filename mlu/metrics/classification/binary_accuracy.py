@@ -37,8 +37,8 @@ class BinaryAccuracy(Metric):
 		if self.threshold_target is not None:
 			target = target.ge(self.threshold_target).float()
 
-		assert pred.eq(0.0).logical_or(pred.eq(1.0)).all(), "Prediction must be binary tensor containing only 0 and 1."
-		assert target.eq(0.0).logical_or(target.eq(1.0)).all(), "Target must be binary tensor containing only 0 and 1."
+		assert pred.eq(0.0).logical_or(pred.eq(1.0)).all(), 'Prediction must be binary tensor containing only 0 and 1.'
+		assert target.eq(0.0).logical_or(target.eq(1.0)).all(), 'Target must be binary tensor containing only 0 and 1.'
 
 		score = pred.eq(target).float()
 		score = self.reduce_fn(score)

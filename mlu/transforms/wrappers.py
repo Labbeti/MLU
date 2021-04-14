@@ -57,7 +57,7 @@ class ProcessTransformWrap(Transform):
 
 
 class PILInternalWrap(ProcessTransformWrap):
-	def __init__(self, pil_transform: ImageTransform, mode: Optional[str] = "RGB", p: float = 1.0):
+	def __init__(self, pil_transform: ImageTransform, mode: Optional[str] = 'RGB', p: float = 1.0):
 		"""
 			Class that convert tensor to PIL image internally for apply PIL transforms.
 			Tensors images must have the shape (width, height, 3).
@@ -139,9 +139,9 @@ class TransformWrap(Transform):
 		return self.callable_
 
 	def extra_repr(self) -> str:
-		if hasattr(self.callable_, "__name__"):
+		if hasattr(self.callable_, '__name__'):
 			return self.callable_.__name__
-		elif hasattr(self.callable_, "__class__"):
+		elif hasattr(self.callable_, '__class__'):
 			return self.callable_.__class__.__name__
 		else:
 			return ""

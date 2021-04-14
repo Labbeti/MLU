@@ -12,7 +12,7 @@ from typing import Optional
 class CrossEntropyWithVectors(Module):
 	def __init__(
 		self,
-		reduction: str = "mean",
+		reduction: str = 'mean',
 		dim: Optional[int] = -1,
 		log_input: bool = False,
 	):
@@ -38,13 +38,13 @@ class CrossEntropyWithVectors(Module):
 		return self.reduce_fn(loss)
 
 	def extra_repr(self) -> str:
-		return f"reduce_fn={self.reduce_fn.__name__}, dim={self.dim}, log_input={self.log_input}"
+		return f'reduce_fn={self.reduce_fn.__name__}, dim={self.dim}, log_input={self.log_input}'
 
 
 class Entropy(Module):
 	def __init__(
 		self,
-		reduction: str = "mean",
+		reduction: str = 'mean',
 		dim: Optional[int] = -1,
 		epsilon: float = DEFAULT_EPSILON,
 		base: Optional[float] = None,
@@ -79,11 +79,11 @@ class Entropy(Module):
 		return self.reduce_fn(entropy)
 
 	def extra_repr(self) -> str:
-		return f"reduce_fn={self.reduce_fn.__name__}, dim={self.dim}, epsilon={self.epsilon}, log_input={self.log_input}"
+		return f'reduce_fn={self.reduce_fn.__name__}, dim={self.dim}, epsilon={self.epsilon}, log_input={self.log_input}'
 
 
 class JSDivLoss(Module):
-	def __init__(self, reduction: str = "mean", dim: int = -1, epsilon: float = DEFAULT_EPSILON):
+	def __init__(self, reduction: str = 'mean', dim: int = -1, epsilon: float = DEFAULT_EPSILON):
 		"""
 			Jensen-Shannon Divergence loss.
 
@@ -105,7 +105,7 @@ class JSDivLoss(Module):
 
 
 class JSDivLossFromLogits(Module):
-	def __init__(self, reduction: str = "mean", log_activation: Module = LogSoftmax(dim=-1)):
+	def __init__(self, reduction: str = 'mean', log_activation: Module = LogSoftmax(dim=-1)):
 		"""
 			Jensen-Shannon Divergence loss with logits.
 
@@ -134,7 +134,7 @@ class JSDivLossFromLogits(Module):
 class KLDivLossWithProbabilities(KLDivLoss):
 	def __init__(
 		self,
-		reduction: str = "mean",
+		reduction: str = 'mean',
 		epsilon: float = DEFAULT_EPSILON,
 		log_input: bool = False,
 		log_target: bool = False,
@@ -159,13 +159,13 @@ class KLDivLossWithProbabilities(KLDivLoss):
 		return super().forward(input=p, target=q)
 
 	def extra_repr(self) -> str:
-		return f"epsilon={self.epsilon}, log_input={self.log_input}, log_target={self.log_target}"
+		return f'epsilon={self.epsilon}, log_input={self.log_input}, log_target={self.log_target}'
 
 
 class BCELossBatchMean(Module):
 	def __init__(self, dim: Optional[int] = -1):
 		super().__init__()
-		self.bce = BCELoss(reduction="none")
+		self.bce = BCELoss(reduction='none')
 		self.mean = Mean(dim=dim)
 
 	def forward(self, input_: Tensor, target: Tensor) -> Tensor:
@@ -176,4 +176,4 @@ class BCELossBatchMean(Module):
 		return self.__getitem__(1).dim
 
 	def extra_repr(self) -> str:
-		return f"dim={self.dim}"
+		return f'dim={self.dim}'

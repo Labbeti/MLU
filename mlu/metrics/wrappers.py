@@ -20,7 +20,7 @@ class MetricDict(Dict[str, Module], Metric):
 			>>> input_, target = torch.rand(5, 10), torch.rand(5, 10)
 			>>> metric_dict = MetricDict(acc=CategoricalAccuracy(), f1=FScore())
 			>>> metric_dict(input_, target)
-			... {"acc": 0.4, "f1": 0.1}
+			... {'acc': 0.4, 'f1': 0.1}
 		"""
 		args = [arg for arg in args if arg is not None]
 		dict.__init__(self, *args, **kwargs)

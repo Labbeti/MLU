@@ -8,7 +8,7 @@ from mlu.transforms.waveform import Occlusion
 
 class TestOcclusion(TestCase):
 	def test_occlusion(self):
-		p = 1
+		p = 1.0
 		occlusion = Occlusion(0.1, p=p)
 		waveform = torch.ones(100)
 
@@ -18,5 +18,5 @@ class TestOcclusion(TestCase):
 		self.assertEqual(waveform_perturbed.sum(), 90)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	unittest.main()

@@ -67,14 +67,14 @@ class ToTensor(Module):
 class ToPIL(Module):
 	def __init__(
 		self,
-		mode: Optional[str] = "RGB",
+		mode: Optional[str] = 'RGB',
 		permute_tensor: bool = False,
 		denormalize_tensor: bool = True,
 	):
 		"""
 			Convert a pytorch tensor, numpy array or python list to PIL image.
 
-			:param mode: Define the type and depth of a pixel in the image. (default: "RGB")
+			:param mode: Define the type and depth of a pixel in the image. (default: 'RGB')
 				See https://pillow.readthedocs.io/en/5.1.x/handbook/concepts.html#modes for details on PIL modes.
 			:param permute_tensor: Permute dimensions (height, width, channel) to (channel, height, width) for PIL image.
 				(default: False)
@@ -128,7 +128,7 @@ def to_numpy(
 def to_tensor(
 	x: Union[list, np.ndarray, Tensor, Image.Image],
 	dtype: Optional[torch.dtype] = None,
-	device: Optional[torch.device] = torch.device("cpu"),
+	device: Optional[torch.device] = torch.device('cpu'),
 	permute_tensor: bool = True,
 	normalize_tensor: bool = True,
 ) -> Tensor:
@@ -153,7 +153,7 @@ def to_tensor(
 
 def to_pil(
 	x: Union[list, np.ndarray, Tensor, Image.Image],
-	mode: Optional[str] = "RGB",
+	mode: Optional[str] = 'RGB',
 	permute_tensor: bool = False,
 	denormalize_tensor: bool = True,
 ) -> Image.Image:

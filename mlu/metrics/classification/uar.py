@@ -17,7 +17,7 @@ class UAR(Metric):
 		dim: int = -1,
 		vector_input: bool = True,
 		vector_target: bool = True,
-		average: str = "macro",
+		average: str = 'macro',
 		reduce_fn: Callable = torch.mean,
 	):
 		super().__init__()

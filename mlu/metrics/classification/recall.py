@@ -42,7 +42,7 @@ class Recall(Metric):
 		"""
 		if pred.shape != target.shape:
 			raise ValueError(
-				f"Invalid input and target shapes for metric '{self.__class__.__name__}'. ({pred.shape} != {target.shape})")
+				f'Invalid input and target shapes for metric "{self.__class__.__name__}". ({pred.shape} != {target.shape})')
 
 		if self.threshold_input is not None:
 			pred = pred.ge(self.threshold_input).float()
@@ -50,8 +50,8 @@ class Recall(Metric):
 		if self.threshold_target is not None:
 			target = target.ge(self.threshold_target).float()
 
-		assert pred.eq(0.0).logical_or(pred.eq(1.0)).all(), "Input must be binary tensor containing only 0 and 1."
-		assert target.eq(0.0).logical_or(target.eq(1.0)).all(), "Target must be binary tensor containing only 0 and 1."
+		assert pred.eq(0.0).logical_or(pred.eq(1.0)).all(), 'Input must be binary tensor containing only 0 and 1.'
+		assert target.eq(0.0).logical_or(target.eq(1.0)).all(), 'Target must be binary tensor containing only 0 and 1.'
 
 		true_positives = (pred * target).sum(dim=self.dim)
 		# Note: TP + FN = Possible positives = sum(target)

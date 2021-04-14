@@ -2,7 +2,7 @@ import random
 import unittest
 
 from mlu.datasets.dummy import DummyDataset
-from datasets.utils.split import split_indexes_per_class, flat_split_indexes_per_class, generate_indexes_split
+from mlu.datasets.utils.split import split_indexes_per_class, flat_split_indexes_per_class, generate_indexes_split
 from unittest import TestCase
 
 

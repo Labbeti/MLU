@@ -12,7 +12,7 @@ class ZipDataset(Dataset):
 
 			:param datasets: The list of dataset to read.
 		"""
-		assert len(self._datasets) > 0, "At least 1 dataset must be given as argument to ZipDataset."
+		assert len(self._datasets) > 0, 'At least 1 dataset must be given as argument to ZipDataset.'
 
 		super().__init__()
 		self._datasets = list(datasets)

@@ -15,7 +15,7 @@ class SPICE(Metric):
 		self._spice_internal = Spice()
 
 	def compute_score(self, reference: List[str], hypothesis: List[List[str]]) -> float:
-		gts = {"no_id": reference}
-		res = {"no_id": hypothesis}
+		gts = {'no_id': reference}
+		res = {'no_id': hypothesis}
 		average_score, scores = self._spice_internal.compute_score(gts, res)
 		return average_score

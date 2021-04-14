@@ -37,7 +37,7 @@ class AveragePrecision(Metric):
 		"""
 		assert pred.shape == target.shape
 		assert len(pred.shape) == 2
-		assert target.eq(0.0).logical_or(target.eq(1.0)).all(), "Target must be binary tensor containing only 0 and 1."
+		assert target.eq(0.0).logical_or(target.eq(1.0)).all(), 'Target must be binary tensor containing only 0 and 1.'
 
 		pred = pred.cpu().numpy()
 		target = target.cpu().numpy()

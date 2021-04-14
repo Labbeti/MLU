@@ -16,7 +16,7 @@ class Container(Transform, ABC):
 
 		for i, transform in enumerate(self._transforms):
 			if not callable(transform):
-				raise RuntimeError(f"Cannot add non-callable object '{type(transform)}'.")
+				raise RuntimeError(f'Cannot add non-callable object "{type(transform)}".')
 			if not isinstance(transform, Module):
 				transform = TransformWrap(transform)
 			self.add_module(str(i), transform)
@@ -141,7 +141,7 @@ class PoolRandomChoice(Container):
 		]
 
 		if len(final_pool) == 0:
-			raise RuntimeError("Found an empty list of transforms.")
+			raise RuntimeError('Found an empty list of transforms.')
 		elif len(final_pool) == 1:
 			transform_composed = final_pool[0]
 		else:
@@ -198,7 +198,7 @@ class AudioPoolRandomChoice(PoolRandomChoice):
 				transforms.append(transform_to_spec)
 
 			if len(transforms) == 0:
-				raise RuntimeError("Found an empty list of transforms.")
+				raise RuntimeError('Found an empty list of transforms.')
 			elif len(transforms) == 1:
 				augm_pool_with_to_spec.append(transforms[0])
 			else:
@@ -206,7 +206,7 @@ class AudioPoolRandomChoice(PoolRandomChoice):
 
 		# Random selection of the augment
 		if len(augm_pool_with_to_spec) == 0:
-			raise RuntimeError("Found an empty transform pool.")
+			raise RuntimeError('Found an empty transform pool.')
 		elif len(augm_pool_with_to_spec) == 1:
 			main_transform = augm_pool_with_to_spec[0]
 		else:

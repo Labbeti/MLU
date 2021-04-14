@@ -13,7 +13,9 @@ class Transform(Module, ABC):
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		if not isinstance(p, float) or not(0.0 <= p <= 1.0):
-			raise ValueError("Probability parameter 'p' must be a float in range [0, 1].")
+			raise ValueError(
+				f'Transform parameter "p" must be a float in range [0, 1]. Found type "{type(p)}" and value "{p}".'
+			)
 
 		super().__init__()
 		self.p = p
@@ -43,7 +45,7 @@ class Transform(Module, ABC):
 		return False
 
 	def process(self, x):
-		raise NotImplemented("Abstract method")
+		raise NotImplemented('Abstract method')
 
 
 class ImageTransform(Transform, ABC):

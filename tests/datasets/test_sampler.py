@@ -44,5 +44,5 @@ class TestSRCSampler(TestCase):
 		self.assertEqual(set(result), set(expected))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	unittest.main()

@@ -18,5 +18,5 @@ class TestLoss(TestCase):
 		self.assertEqual(loss.shape, torch.Size([32]))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	unittest.main()

@@ -14,7 +14,7 @@ class PadV1(WaveformTransform):
 	def __init__(
 		self,
 		target_length: int,
-		align: str = "left",
+		align: str = 'left',
 		fill_value: float = 0.0,
 		dim: int = -1,
 		p: float = 1.0,
@@ -30,23 +30,23 @@ class PadV1(WaveformTransform):
 				(default: 'left')
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
-		super().__init__(p)
+		super().__init__(p=p)
 		self.target_length = target_length
 		self.align = align
 		self.fill_value = fill_value
 		self.dim = dim
 
 	def process(self, waveform: Tensor) -> Tensor:
-		if self.align == "left":
+		if self.align == 'left':
 			return self.pad_align_left(waveform)
-		elif self.align == "right":
+		elif self.align == 'right':
 			return self.pad_align_right(waveform)
-		elif self.align == "center":
+		elif self.align == 'center':
 			return self.pad_align_center(waveform)
-		elif self.align == "random":
+		elif self.align == 'random':
 			return self.pad_align_random(waveform)
 		else:
-			raise ValueError(f"Unknown alignment '{self.align}'. Must be one of {str(['left', 'right', 'center', 'random'])}.")
+			raise ValueError(f'Unknown alignment "{self.align}". Must be one of {str(["left", "right", "center", "random"])}.')
 
 	def pad_align_left(self, data: Tensor) -> Tensor:
 		"""
@@ -143,10 +143,10 @@ class PadV2(WaveformTransform):
 	def __init__(
 		self,
 		target_length: int,
-		align: str = "left",
+		align: str = 'left',
 		fill_value: float = 0.0,
 		dim: int = -1,
-		mode: str = "constant",
+		mode: str = 'constant',
 		p: float = 1.0,
 	):
 		super().__init__(p=p)
@@ -157,16 +157,16 @@ class PadV2(WaveformTransform):
 		self.mode = mode
 
 	def process(self, waveform: Tensor) -> Tensor:
-		if self.align == "left":
+		if self.align == 'left':
 			return self.pad_align_left(waveform)
-		elif self.align == "right":
+		elif self.align == 'right':
 			return self.pad_align_right(waveform)
-		elif self.align == "center":
+		elif self.align == 'center':
 			return self.pad_align_center(waveform)
-		elif self.align == "random":
+		elif self.align == 'random':
 			return self.pad_align_random(waveform)
 		else:
-			raise ValueError(f"Unknown alignment '{self.align}'. Must be one of {str(['left', 'right', 'center', 'random'])}.")
+			raise ValueError(f'Unknown alignment "{self.align}". Must be one of {str(["left", "right", "center", "random"])}.')
 
 	def pad_align_left(self, x: Tensor) -> Tensor:
 		# Note: pad_seq : [pad_left_dim_-1, pad_right_dim_-1, pad_left_dim_-2, pad_right_dim_-2, ...)
@@ -221,8 +221,8 @@ class PadV2(WaveformTransform):
 class TestPadVersions(TestCase):
 	def test_compare_pad(self):
 		target_length = torch.randint(low=5, high=20, size=()).item()
-		pad_v1 = PadV1(target_length, "left", 0)
-		pad_v2 = PadV2(target_length, "left", 0)
+		pad_v1 = PadV1(target_length, 'left', 0)
+		pad_v2 = PadV2(target_length, 'left', 0)
 
 		x = torch.rand(5)
 
@@ -231,7 +231,7 @@ class TestPadVersions(TestCase):
 		expected = torch.cat((x, torch.zeros(target_length - 5)))
 
 		self.assertEqual(out_v1.shape, out_v2.shape)
-		self.assertTrue(out_v1.eq(out_v2).all(), f"Diff: {out_v1} and {out_v2}")
+		self.assertTrue(out_v1.eq(out_v2).all(), f'Diff: {out_v1} and {out_v2}')
 
 		self.assertEqual(out_v1.shape, expected.shape)
 		self.assertTrue(out_v1.eq(expected).all())
@@ -241,7 +241,7 @@ class TestPadVersions(TestCase):
 		dim = torch.randint(low=-len(x.shape), high=len(x.shape), size=()).item()
 		target_length = torch.randint(low=x.shape[dim], high=20, size=()).item()
 
-		for align in ["left", "right", "center"]:
+		for align in ['left', 'right', 'center']:
 			pad_v1 = PadV1(target_length, align, 0, dim)
 			pad_v2 = PadV2(target_length, align, 0, dim)
 
@@ -249,10 +249,10 @@ class TestPadVersions(TestCase):
 			out_v2 = pad_v2(x)
 
 			self.assertEqual(out_v1.shape, out_v2.shape)
-			self.assertTrue(out_v1.eq(out_v2).all(), f"Diff: {out_v1} and {out_v2}")
+			self.assertTrue(out_v1.eq(out_v2).all(), f'Diff: {out_v1} and {out_v2}')
 
 	def test_compare_random(self):
-		align = "random"
+		align = 'random'
 		dim = 1
 		x = torch.rand(5, 3)
 
@@ -274,7 +274,7 @@ class TestPadVersions(TestCase):
 		x = torch.ones(0)
 		expected = torch.zeros(target_length)
 
-		for align in ["left", "right", "center", "random"]:
+		for align in ['left', 'right', 'center', 'random']:
 			pad_v1 = PadV1(target_length, align, 0, dim)
 			pad_v2 = PadV2(target_length, align, 0, dim)
 
@@ -295,7 +295,7 @@ class TestPadVersions(TestCase):
 			x = torch.rand(*shape)
 
 			target_length = torch.randint(low=shape.min(), high=1000000, size=()).item()
-			align = ["left", "right", "center", "random"][torch.randint(low=0, high=4, size=()).item()]
+			align = ['left', 'right', 'center', 'random'][torch.randint(low=0, high=4, size=()).item()]
 			dim = torch.randint(low=-len(x.shape), high=len(x.shape), size=()).item()
 			fill_value = torch.rand(1).item()
 
@@ -311,15 +311,15 @@ class TestPadVersions(TestCase):
 
 			self.assertEqual(out_v1.shape, out_v2.shape)
 			self.assertEqual((out_v1 == 0.0).sum(), (out_v2 == 0.0).sum())
-			if align != "random":
+			if align != 'random':
 				self.assertTrue(out_v1.eq(out_v2).all())
 
 		durations_v1 = torch.as_tensor(durations_v1)
 		durations_v2 = torch.as_tensor(durations_v2)
 		print()
-		print(f"Mean dur V1: {durations_v1.mean():.5e} +/- {durations_v1.std():.5e}")
-		print(f"Mean dur V2: {durations_v2.mean():.5e} +/- {durations_v2.std():.5e}")
+		print(f'Mean dur V1: {durations_v1.mean():.5e} +/- {durations_v1.std():.5e}')
+		print(f'Mean dur V2: {durations_v2.mean():.5e} +/- {durations_v2.std():.5e}')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	unittest.main()

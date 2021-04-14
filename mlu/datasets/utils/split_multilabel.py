@@ -20,7 +20,7 @@ def get_targets(indexes_per_class: List[List[int]]) -> Tensor:
 	for idx_class, indexes in enumerate(indexes_per_class):
 		for idx in indexes:
 			if targets[idx, idx_class]:
-				raise RuntimeError(f"Found duplicate for index '{idx}' and class index '{idx_class}'.")
+				raise RuntimeError(f'Found duplicate for index "{idx}" and class index "{idx_class}".')
 			targets[idx, idx_class] = True
 	return targets
 
@@ -45,7 +45,7 @@ def split_multilabel_indexes_per_class(
 	n_elements = targets.shape[0]
 
 	if verbose:
-		print(f"Info: n_classes={n_classes}, n_splits={n_splits}, n_elements={n_elements}")
+		print(f'Info: n_classes={n_classes}, n_splits={n_splits}, n_elements={n_elements}')
 
 	n_expected_per_splits = torch.as_tensor([
 		[round(len(indexes) * ratio) for indexes in indexes_per_class]
@@ -67,7 +67,7 @@ def split_multilabel_indexes_per_class(
 
 		if verbose:
 			n_missing_total = n_missing_per_splits.sum().item()
-			print(f"[{n_taken}/{n_elements}] taken. Missing: {n_missing_total}. ", end="\r")
+			print(f'[{n_taken}/{n_elements}] taken. Missing: {n_missing_total}. ', end='\r')
 
 		# Search the max missing elem
 		idx_ratio_prior, idx_class_prior = torch.where(n_missing_per_splits.eq(n_missing_per_splits.max()))
@@ -83,7 +83,7 @@ def split_multilabel_indexes_per_class(
 			random_in_class = torch.randint(len(taken_class), (1, ))
 			found_idx = indexes[taken_class[random_in_class]]
 
-			# Search the other classes of this elem "found_idx"
+			# Search the other classes of this elem 'found_idx'
 			classes_of_found_idx = torch.where(targets[found_idx])[0].tolist()
 
 			for idx_class in classes_of_found_idx:
@@ -96,7 +96,7 @@ def split_multilabel_indexes_per_class(
 			n_expected_per_splits[idx_ratio_prior][idx_class_prior] = n_by_splits[idx_ratio_prior][idx_class_prior]
 
 	if verbose:
-		print(f"[{n_taken}/{n_elements}] taken.", end="\n")
+		print(f'[{n_taken}/{n_elements}] taken.', end='\n')
 	return splits
 
 

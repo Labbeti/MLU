@@ -17,12 +17,12 @@ from unittest import TestCase, main
 
 class TestPIL(TestCase):
 	def get_example(self):
-		dataset = CIFAR10(root=osp.join("../..", "data", "CIFAR10"), train=False, download=True, transform=None)
+		dataset = CIFAR10(root=osp.join('../..', 'data', 'CIFAR10'), train=False, download=True, transform=None)
 		idx = torch.randint(low=0, high=len(dataset), size=()).item()  # 908
 		img, label = dataset[idx]
 
-		print(f"Image index: {idx}")
-		print(f"Label: {label}")
+		print(f'Image index: {idx}')
+		print(f'Label: {label}')
 		return img
 
 	def plot_augms(self, augms):
@@ -39,7 +39,7 @@ class TestPIL(TestCase):
 			plt.imshow(img_a)
 
 		plt.show(block=False)
-		input("> ")
+		# input('> ')
 
 	def test_enhance(self):
 		level = -0.9
@@ -77,5 +77,5 @@ class TestPIL(TestCase):
 		self.plot_augms(augms)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	main()

@@ -9,5 +9,5 @@ class FileHandlerCustom(FileHandler):
 	def __init__(self, filename: str, mode='a', encoding=None, delay=False):
 		dpath_parent = osp.dirname(filename)
 		if dpath_parent != "" and not osp.isdir(dpath_parent):
-			os.mkdir(dpath_parent)
+			os.makedirs(dpath_parent)
 		super().__init__(filename, mode, encoding, delay)

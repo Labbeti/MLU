@@ -38,11 +38,11 @@ class TestDatasetWrappers(TestCase):
 		uar = UAR(**kwargs)
 
 		score = acc(pred, target)
-		print("Acc: ", score)
+		print('Acc: ', score)
 
 		score = uar(pred, target)
-		print("UAR: ", score)
+		print('UAR: ', score)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	unittest.main()

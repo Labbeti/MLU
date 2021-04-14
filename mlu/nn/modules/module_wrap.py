@@ -15,9 +15,9 @@ class ModuleWrap(Module):
 		return self.callable_(*args, **kwargs)
 
 	def extra_repr(self) -> str:
-		if hasattr(self.callable_, "__name__"):
+		if hasattr(self.callable_, '__name__'):
 			return self.callable_.__name__
-		elif hasattr(self.callable_, "__class__"):
+		elif hasattr(self.callable_, '__class__'):
 			return self.callable_.__class__.__name__
 		else:
 			return ""

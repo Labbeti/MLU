@@ -35,8 +35,18 @@ class FScore(Metric):
 		self.threshold_target = threshold_target
 		self.reduce_fn = reduce_fn
 
-		self.recall = Recall(dim, None, None, None)
-		self.precision = Precision(dim, None, None, None)
+		self.recall = Recall(
+			threshold_input=None,
+			threshold_target=None,
+			dim=dim,
+			reduce_fn=None,
+		)
+		self.precision = Precision(
+			threshold_input=None,
+			threshold_target=None,
+			dim=dim,
+			reduce_fn=None,
+		)
 
 	def compute_score(self, pred: Tensor, target: Tensor) -> Tensor:
 		"""

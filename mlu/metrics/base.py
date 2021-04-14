@@ -23,7 +23,7 @@ class Metric(Module, ABC):
 		return score
 
 	def compute_score(self, pred, target):
-		raise NotImplemented("Abstract method")
+		raise NotImplemented('Abstract method')
 
 
 class IncrementalMetric(Module, ABC):
@@ -40,7 +40,7 @@ class IncrementalMetric(Module, ABC):
 		"""
 			Reset the current incremental value.
 		"""
-		raise NotImplemented("Abstract method")
+		raise NotImplemented('Abstract method')
 
 	def add(self, value):
 		"""
@@ -48,13 +48,13 @@ class IncrementalMetric(Module, ABC):
 
 			:param value: The value to add to the current incremental metric value.
 		"""
-		raise NotImplemented("Abstract method")
+		raise NotImplemented('Abstract method')
 
 	def is_empty(self) -> bool:
 		"""
 			:return: Return True if no value has been added to the incremental score.
 		"""
-		raise NotImplemented("Abstract method")
+		raise NotImplemented('Abstract method')
 
 	def get_current(self) -> Optional:
 		"""
@@ -62,7 +62,7 @@ class IncrementalMetric(Module, ABC):
 
 			:return: The current incremental metric value.
 		"""
-		raise NotImplemented("Abstract method")
+		raise NotImplemented('Abstract method')
 
 	def add_values(self, values: Iterable):
 		"""

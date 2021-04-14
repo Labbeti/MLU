@@ -108,7 +108,7 @@ def nums_to_smooth_multihot(
 		:returns: Label with multi-hot vectors
 	"""
 	if len(nums_lst) == 0:
-		raise RuntimeError("Cannot build multihot vectors with empty nums lst.")
+		raise RuntimeError('Cannot build multihot vectors with empty nums lst.')
 
 	if isinstance(nums_lst, Tensor):
 		if len(nums_lst.shape) == 1:
@@ -117,8 +117,8 @@ def nums_to_smooth_multihot(
 			nums_lst = nums_lst.tolist()
 		else:
 			raise RuntimeError(
-				f"Invalid shape '{nums_lst.shape}' for nums_lst. "
-				f"Must be of shape (bsize, nb classes present) or (nb classes present) tensor."
+				f'Invalid shape "{nums_lst.shape}" for nums_lst. '
+				f'Must be of shape (bsize, nb classes present) or (nb classes present) tensor.'
 			)
 	elif isinstance(nums_lst, list):
 		if not isinstance(nums_lst[0], list):

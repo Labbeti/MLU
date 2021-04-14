@@ -10,9 +10,9 @@ class GPUUsage:
 	def __init__(self):
 		super().__init__()
 		self._info_pids = {}
-		self._used_memory = (0, "MiB")
-		self._total_memory = (0, "MiB")
-		self._command = ["nvidia-smi", "-x", "-q"]
+		self._used_memory = (0, 'MiB')
+		self._total_memory = (0, 'MiB')
+		self._command = ['nvidia-smi', '-x', '-q']
 
 	def update(self):
 		output = subprocess.check_output(self._command)
@@ -21,34 +21,34 @@ class GPUUsage:
 
 		# print(tree.toxml())
 		elt_nvidia_smi_log = tree.childNodes[1]
-		elt_gpu_lst = elt_nvidia_smi_log.getElementsByTagName("gpu")
-		assert len(elt_gpu_lst) == 1, "Multiple GPU is not supported"
+		elt_gpu_lst = elt_nvidia_smi_log.getElementsByTagName('gpu')
+		assert len(elt_gpu_lst) == 1, 'Multiple GPU is not supported'
 		elt_gpu = elt_gpu_lst[0]
 
 		def get_text(elt) -> str:
 			node_str = elt.toxml()
-			start = node_str.find(">") + 1
+			start = node_str.find('>') + 1
 			end = -start - 1
 			return node_str[start:end]
 
 		# gpu/fb_memory_usage
-		elt_fb_memory_usage = elt_gpu.getElementsByTagName("fb_memory_usage")[0]
-		elt_used = elt_fb_memory_usage.getElementsByTagName("used")[0]
-		elt_total = elt_fb_memory_usage.getElementsByTagName("total")[0]
+		elt_fb_memory_usage = elt_gpu.getElementsByTagName('fb_memory_usage')[0]
+		elt_used = elt_fb_memory_usage.getElementsByTagName('used')[0]
+		elt_total = elt_fb_memory_usage.getElementsByTagName('total')[0]
 
-		self._used_memory = get_text(elt_used).split(" ")
-		self._total_memory = get_text(elt_total).split(" ")
+		self._used_memory = get_text(elt_used).split(' ')
+		self._total_memory = get_text(elt_total).split(' ')
 
 		info_pids = {}
 
-		elt_processes_lst = elt_gpu.getElementsByTagName("processes")
+		elt_processes_lst = elt_gpu.getElementsByTagName('processes')
 		for elt_processes in elt_processes_lst:
-			elt_process_info_lst = elt_processes.getElementsByTagName("process_info")
+			elt_process_info_lst = elt_processes.getElementsByTagName('process_info')
 			for elt_process_info in elt_process_info_lst:
 
-				elt_process_name_lst = elt_process_info.getElementsByTagName("process_name")
-				elt_used_memory_lst = elt_process_info.getElementsByTagName("used_memory")
-				elt_pid_lst = elt_process_info.getElementsByTagName("pid")
+				elt_process_name_lst = elt_process_info.getElementsByTagName('process_name')
+				elt_used_memory_lst = elt_process_info.getElementsByTagName('used_memory')
+				elt_pid_lst = elt_process_info.getElementsByTagName('pid')
 
 				assert len(elt_process_name_lst) == len(elt_used_memory_lst) == len(elt_pid_lst) == 1
 				elt_process_name = elt_process_name_lst[0]
@@ -64,9 +64,9 @@ class GPUUsage:
 
 				# Get process used memory
 				# Example : '<used_memory>16 MiB</used_memory>'
-				used_memory = get_text(elt_used_memory).split(" ")
+				used_memory = get_text(elt_used_memory).split(' ')
 
-				info_pids[pid] = {"process_name": process_name, "used_memory": used_memory}
+				info_pids[pid] = {'process_name': process_name, 'used_memory': used_memory}
 
 		self._info_pids = info_pids
 
@@ -82,7 +82,7 @@ class GPUUsage:
 			return 0
 
 		info = self._info_pids[pid]
-		memory = info["used_memory"]
+		memory = info['used_memory']
 		return self._to_mib(memory)
 
 	def get_used_memory(self) -> int:
@@ -95,14 +95,14 @@ class GPUUsage:
 
 	def _to_mib(self, memory: Tuple[int, str]) -> int:
 		value, unit = memory
-		if unit == "KiB":
+		if unit == 'KiB':
 			value = value // 2 ** 10
-		elif unit == "MiB":
+		elif unit == 'MiB':
 			pass
-		elif unit == "GiB":
+		elif unit == 'GiB':
 			value = value * 2 ** 10
 		else:
-			raise ValueError(f"Unsupported unit '{unit}'.")
+			raise ValueError(f'Unsupported unit "{unit}".')
 		return value
 
 
@@ -120,12 +120,12 @@ def test():
 	bce = BCELoss()
 	with torch.no_grad():
 		for _ in range(10000):
-			z = torch.zeros(64, 500, device=torch.device("cuda"))
+			z = torch.zeros(64, 500, device=torch.device('cuda'))
 			u = torch.ones(64, 500, device=z.device)
 			loss = bce(z, u)
 			usage.update()
 			print(usage.get_used_memory())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	test()

@@ -24,7 +24,7 @@ class Squeeze(Module):
 			return torch.squeeze(x, self.dim)
 
 	def extra_repr(self) -> str:
-		return f"dim={self.dim}"
+		return f'dim={self.dim}'
 
 
 class UnSqueeze(Module):
@@ -36,7 +36,7 @@ class UnSqueeze(Module):
 		return x.unsqueeze(self.dim)
 
 	def extra_repr(self) -> str:
-		return f"dim={self.dim}"
+		return f'dim={self.dim}'
 
 
 class Mish(Module):

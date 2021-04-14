@@ -26,5 +26,5 @@ class TestDatasetWrappers(TestCase):
 		self.assertEqual(list(dataset_w[0].shape), dataset.data_shape)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	unittest.main()

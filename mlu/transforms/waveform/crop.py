@@ -6,23 +6,23 @@ from mlu.transforms.base import WaveformTransform
 
 
 class Crop(WaveformTransform):
-	def __init__(self, target_length: int, align: str = "left", dim: int = -1, p: float = 1.0):
+	def __init__(self, target_length: int, align: str = 'left', dim: int = -1, p: float = 1.0):
 		super().__init__(p=p)
 		self.target_length = target_length
 		self.align = align
 		self.dim = dim
 
 	def process(self, data: Tensor) -> Tensor:
-		if self.align == "center":
+		if self.align == 'center':
 			return self.crop_align_center(data)
-		elif self.align == "left":
+		elif self.align == 'left':
 			return self.crop_align_left(data)
-		elif self.align == "random":
+		elif self.align == 'random':
 			return self.crop_align_random(data)
-		elif self.align == "right":
+		elif self.align == 'right':
 			return self.crop_align_right(data)
 		else:
-			raise ValueError(f"Unknown alignment '{self.align}'. Must be one of {str(['left', 'right', 'center', 'random'])}.")
+			raise ValueError(f'Unknown alignment "{self.align}". Must be one of {str(["left", "right", "center", "random"])}.')
 
 	def crop_align_center(self, data: Tensor) -> Tensor:
 		if data.shape[self.dim] > self.target_length:

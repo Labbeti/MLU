@@ -13,17 +13,17 @@ from types import MethodType, FunctionType, ModuleType
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, TypeVar, Union
 
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 def get_datetime() -> str:
 	"""
-		Returns the date in a specific format : "YYYY_MM_DD_hh:mm:ss".
+		Returns the date in a specific format : 'YYYY_MM_DD_hh:mm:ss'.
 
 		:returns: The current date.
 	"""
 	now = str(datetime.now())
-	return now[:10] + "_" + now[11:-7]
+	return now[:10] + '_' + now[11:-7]
 
 
 def reset_seed(seed: Optional[int]):
@@ -44,12 +44,12 @@ def reset_seed(seed: Optional[int]):
 		torch.manual_seed(seed)
 		torch.cuda.manual_seed_all(seed)
 
-		if hasattr(torch.backends, "cudnn"):
+		if hasattr(torch.backends, 'cudnn'):
 			torch.backends.cudnn.deterministic = True
 			torch.backends.cudnn.benchmark = False
 		else:
 			raise RuntimeError(
-				"Cannot make deterministic behaviour for current torch backend (torch.backends does have the attribute 'cudnn')."
+				'Cannot make deterministic behaviour for current torch backend (torch.backends does have the attribute "cudnn").'
 			)
 
 
@@ -138,14 +138,14 @@ def get_current_git_hash() -> str:
 		:returns: The git hash. If an error occurs, returns 'UNKNOWN'.
 	"""
 	try:
-		git_hash = subprocess.check_output(["git", "describe", "--always"])
-		git_hash = git_hash.decode("UTF-8").replace("\n", "")
+		git_hash = subprocess.check_output(['git', 'describe', '--always'])
+		git_hash = git_hash.decode('UTF-8').replace('\n', "")
 		return git_hash
 	except subprocess.CalledProcessError:
-		return "UNKNOWN"
+		return 'UNKNOWN'
 
 
-def to_dict_rec(obj: Any, class_name_key: Optional[str] = "__class__") -> Union[dict, list]:
+def to_dict_rec(obj: Any, class_name_key: Optional[str] = '__class__') -> Union[dict, list]:
 	"""
 		Convert an object to a dictionary.
 
@@ -163,18 +163,18 @@ def to_dict_rec(obj: Any, class_name_key: Optional[str] = "__class__") -> Union[
 		}
 	elif isinstance(obj, Tensor):
 		return to_dict_rec(obj.tolist(), class_name_key)
-	elif hasattr(obj, "_ast"):
+	elif hasattr(obj, '_ast'):
 		return to_dict_rec(obj._ast(), class_name_key)
-	elif hasattr(obj, "__iter__") and not isinstance(obj, str):
+	elif hasattr(obj, '__iter__') and not isinstance(obj, str):
 		return [to_dict_rec(v, class_name_key) for v in obj]
-	elif hasattr(obj, "__dict__"):
+	elif hasattr(obj, '__dict__'):
 		data = {}
-		if class_name_key is not None and hasattr(obj, "__class__"):
+		if class_name_key is not None and hasattr(obj, '__class__'):
 			data[class_name_key] = obj.__class__.__name__
 		data.update({
 			attr: to_dict_rec(value, class_name_key)
 			for attr, value in obj.__dict__.items()
-			if not callable(value) and not attr.startswith("__")
+			if not callable(value) and not attr.startswith('__')
 		})
 		return data
 	else:
@@ -207,7 +207,7 @@ def scalar_normalization(value: T, old_min: T, old_max: T, new_min: T = 0.0, new
 	return (value - old_min) / (old_max - old_min) * (new_max - new_min) + new_min
 
 
-def duration_formatter(seconds: int, format_: str = "%jd:%Hh:%Mm:%Ss") -> str:
+def duration_formatter(seconds: int, format_: str = '%jd:%Hh:%Mm:%Ss') -> str:
 	rest = seconds
 
 	rest, seconds = divmod(rest, 60)
@@ -216,10 +216,10 @@ def duration_formatter(seconds: int, format_: str = "%jd:%Hh:%Mm:%Ss") -> str:
 	days = rest
 
 	replaces = {
-		"%S": seconds,
-		"%M": minutes,
-		"%H": hours,
-		"%j": days,
+		'%S': seconds,
+		'%M': minutes,
+		'%H': hours,
+		'%j': days,
 	}
 	result = format_
 	for directive, value in replaces.items():
@@ -227,12 +227,12 @@ def duration_formatter(seconds: int, format_: str = "%jd:%Hh:%Mm:%Ss") -> str:
 	return result
 
 
-def duration_unformatter(string: str, format_: str = "%jd:%Hh:%Mm:%Ss") -> int:
+def duration_unformatter(string: str, format_: str = '%jd:%Hh:%Mm:%Ss') -> int:
 	replaces = {
-		"%S": "(?P<S>[0-9]+)",
-		"%M": "(?P<M>[0-9]+)",
-		"%H": "(?P<H>[0-9]+)",
-		"%j": "(?P<j>[0-9]+)",
+		'%S': '(?P<S>[0-9]+)',
+		'%M': '(?P<M>[0-9]+)',
+		'%H': '(?P<H>[0-9]+)',
+		'%j': '(?P<j>[0-9]+)',
 	}
 	format_re = format_
 	for directive, value in replaces.items():
@@ -240,12 +240,12 @@ def duration_unformatter(string: str, format_: str = "%jd:%Hh:%Mm:%Ss") -> int:
 
 	match = re.search(format_re, string)
 	if match is None:
-		raise RuntimeError(f"Invalid string '{string}' with format '{format_}'.")
+		raise RuntimeError(f'Invalid string "{string}" with format "{format_}".')
 
-	seconds = int(match["S"])
-	minutes = int(match["M"])
-	hours = int(match["H"])
-	days = int(match["j"])
+	seconds = int(match['S'])
+	minutes = int(match['M'])
+	hours = int(match['H'])
+	days = int(match['j'])
 	total_seconds = seconds + minutes * 60 + hours * 3600 + days * 3600 * 24
 
 	return total_seconds
@@ -262,13 +262,13 @@ def get_func_params_names(func: Union[MethodType, FunctionType, Callable]) -> Li
 def get_param_names(class_or_func: Callable) -> List[str]:
 	if inspect.isfunction(class_or_func):
 		func = class_or_func
-	elif inspect.isclass(class_or_func) and hasattr(class_or_func, "__init__"):
+	elif inspect.isclass(class_or_func) and hasattr(class_or_func, '__init__'):
 		func = class_or_func.__init__
-	elif callable(class_or_func) and hasattr(class_or_func, "__call__"):
+	elif callable(class_or_func) and hasattr(class_or_func, '__call__'):
 		func = class_or_func.__call__
 	else:
 		raise RuntimeError(
-			f"Invalid class, function or object '{class_or_func.__name__}'. Must be a function, class or callable object.")
+			f'Invalid class, function or object "{class_or_func.__name__}". Must be a function, class or callable object.')
 
 	return get_func_params_names(func)
 
@@ -288,7 +288,7 @@ def collate_dict_item(items: List[Dict[str, Any]]) -> Dict[str, List[Any]]:
 
 def search_function_in_module(func_name: str, module: ModuleType) -> Optional[Callable]:
 	if not inspect.ismodule(module):
-		raise RuntimeError(f"Object '{module.__name__}' is not a Module.")
+		raise RuntimeError(f'Object "{module.__name__}" is not a Module.')
 
 	predicate = lambda member: (
 		inspect.isfunction(member) and member.__module__ == module.__name__
@@ -302,4 +302,4 @@ def search_function_in_module(func_name: str, module: ModuleType) -> Optional[Ca
 		assert inspect.isfunction(functions[0])
 		return functions[0]
 	else:
-		raise RuntimeError(f"Found multiple functions matching the following name : '{func_name}'.")
+		raise RuntimeError(f'Found multiple functions matching the following name : "{func_name}".')

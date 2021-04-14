@@ -15,60 +15,60 @@ from typing import Dict, List, Optional
 
 
 class ClothoV1Subset(str, Enum):
-	DEVELOPMENT: str = "development"
-	EVALUATION: str = "evaluation"
-	TEST: str = "test"
+	DEVELOPMENT: str = 'development'
+	EVALUATION: str = 'evaluation'
+	TEST: str = 'test'
 
 
-FOLDER_NAME: str = "CLOTHO_V1"
+FOLDER_NAME: str = 'CLOTHO_V1'
 SAMPLE_RATE: int = 44100
 AUDIO_MAX_LENGTH: int = 30  # in seconds
 
 FILES_INFOS = {
-	"development": {
-		"audio_archive": {
-			"filename": "clotho_audio_development.7z",
-			"url": "https://zenodo.org/record/3490684/files/clotho_audio_development.7z?download=1",
-			"hash": "e3ce88561b317cc3825e8c861cae1ec6",
+	'development': {
+		'audio_archive': {
+			'filename': 'clotho_audio_development.7z',
+			'url': 'https://zenodo.org/record/3490684/files/clotho_audio_development.7z?download=1',
+			'hash': 'e3ce88561b317cc3825e8c861cae1ec6',
 		},
-		"captions": {
-			"filename": "clotho_captions_development.csv",
-			"url": "https://zenodo.org/record/3490684/files/clotho_captions_development.csv?download=1",
-			"hash": "dd568352389f413d832add5cf604529f",
+		'captions': {
+			'filename': 'clotho_captions_development.csv',
+			'url': 'https://zenodo.org/record/3490684/files/clotho_captions_development.csv?download=1',
+			'hash': 'dd568352389f413d832add5cf604529f',
 		},
-		"metadata": {
-			"filename": "clotho_metadata_development.csv",
-			"url": "https://zenodo.org/record/3490684/files/clotho_metadata_development.csv?download=1",
-			"hash": "582c18ee47cebdbe33dce1feeab53a56",
-		},
-	},
-	"evaluation": {
-		"audio_archive": {
-			"filename": "clotho_audio_evaluation.7z",
-			"url": "https://zenodo.org/record/3490684/files/clotho_audio_evaluation.7z?download=1",
-			"hash": "4569624ccadf96223f19cb59fe4f849f",
-		},
-		"captions": {
-			"filename": "clotho_captions_evaluation.csv",
-			"url": "https://zenodo.org/record/3490684/files/clotho_captions_evaluation.csv?download=1",
-			"hash": "1b16b9e57cf7bdb7f13a13802aeb57e2",
-		},
-		"metadata": {
-			"filename": "clotho_metadata_evaluation.csv",
-			"url": "https://zenodo.org/record/3490684/files/clotho_metadata_evaluation.csv?download=1",
-			"hash": "13946f054d4e1bf48079813aac61bf77",
+		'metadata': {
+			'filename': 'clotho_metadata_development.csv',
+			'url': 'https://zenodo.org/record/3490684/files/clotho_metadata_development.csv?download=1',
+			'hash': '582c18ee47cebdbe33dce1feeab53a56',
 		},
 	},
-	"test": {
-		"audio_archive": {
-			"filename": "clotho_audio_test.7z",
-			"url": "",
-			"hash": "9b3fe72560a621641ff4351ba1154349",
+	'evaluation': {
+		'audio_archive': {
+			'filename': 'clotho_audio_evaluation.7z',
+			'url': 'https://zenodo.org/record/3490684/files/clotho_audio_evaluation.7z?download=1',
+			'hash': '4569624ccadf96223f19cb59fe4f849f',
 		},
-		"metadata": {
-			"filename": "clotho_metadata_test.csv",
-			"url": "",
-			"hash": "52f8ad01c229a310a0ff8043df480e21",
+		'captions': {
+			'filename': 'clotho_captions_evaluation.csv',
+			'url': 'https://zenodo.org/record/3490684/files/clotho_captions_evaluation.csv?download=1',
+			'hash': '1b16b9e57cf7bdb7f13a13802aeb57e2',
+		},
+		'metadata': {
+			'filename': 'clotho_metadata_evaluation.csv',
+			'url': 'https://zenodo.org/record/3490684/files/clotho_metadata_evaluation.csv?download=1',
+			'hash': '13946f054d4e1bf48079813aac61bf77',
+		},
+	},
+	'test': {
+		'audio_archive': {
+			'filename': 'clotho_audio_test.7z',
+			'url': "",
+			'hash': '9b3fe72560a621641ff4351ba1154349',
+		},
+		'metadata': {
+			'filename': 'clotho_metadata_test.csv',
+			'url': "",
+			'hash': '52f8ad01c229a310a0ff8043df480e21',
 		},
 	}
 }
@@ -124,7 +124,7 @@ class ClothoV1(Dataset):
 			:param verbose: Verbose level to use. Can be 0 or 1.
 				(default: 0)
 		"""
-		assert subset in ["development", "evaluation", "test"]
+		assert subset in ['development', 'evaluation', 'test']
 
 		super().__init__()
 		self._dataset_root = osp.join(root, FOLDER_NAME)
@@ -186,7 +186,7 @@ class ClothoV1(Dataset):
 			:return: The list of 5 captions of an item.
 		"""
 		info = self._data_info[self.get_audio_fname(index)]
-		captions = info["captions"]
+		captions = info['captions']
 
 		if self._captions_transform is not None:
 			captions = self._captions_transform(captions)
@@ -196,18 +196,18 @@ class ClothoV1(Dataset):
 		"""
 			Returns the metadata dictionary for a file.
 			This dictionary contains :
-				- "keywords": Contains the keywords of the item, separated by ";".
-				- "sound_id": Id of the audio.
-				- "sound_link": Link to the audio.
-				- "start_end_samples": The range of the sound where it was extracted.
-				- "manufacturer": The manufacturer of this file.
-				- "licence": Link to the licence.
+				- 'keywords': Contains the keywords of the item, separated by ';'.
+				- 'sound_id': Id of the audio.
+				- 'sound_link': Link to the audio.
+				- 'start_end_samples': The range of the sound where it was extracted.
+				- 'manufacturer': The manufacturer of this file.
+				- 'licence': Link to the licence.
 
 			:param index: The index of the item.
 			:return: The metadata dictionary associated to the item.
 		"""
 		info = self._data_info[self.get_audio_fname(index)]
-		return info["metadata"]
+		return info['metadata']
 
 	def get_audio_fname(self, index: int) -> str:
 		"""
@@ -222,7 +222,7 @@ class ClothoV1(Dataset):
 			:return: The filepath associated to the index.
 		"""
 		info = self._data_info[self.get_audio_fname(index)]
-		return info["filepath"]
+		return info['filepath']
 
 	def get_dataset_root(self) -> str:
 		"""
@@ -235,35 +235,35 @@ class ClothoV1(Dataset):
 			os.mkdir(self._dataset_root)
 
 		if self._verbose >= 1:
-			print("Download files for the dataset...")
+			print('Download files for the dataset...')
 
 		infos = FILES_INFOS[self._subset]
 
 		# Download archives files
 		for name, info in infos.items():
-			filename, url, hash_ = info["filename"], info["url"], info["hash"]
+			filename, url, hash_ = info['filename'], info['url'], info['hash']
 			filepath = osp.join(self._dataset_root, filename)
 
 			if not osp.isfile(filepath):
 				if self._verbose >= 1:
-					print(f"Download file '{filename}' from url '{url}'...")
+					print(f'Download file "{filename}" from url "{url}"...')
 
 				if osp.exists(filepath):
-					raise RuntimeError(f"Object '{filepath}' already exists but it's not a file.")
-				download_url(url, self._dataset_root, filename, hash_value=hash_, hash_type="md5")
+					raise RuntimeError(f'Object "{filepath}" already exists but it\'s not a file.')
+				download_url(url, self._dataset_root, filename, hash_value=hash_, hash_type='md5')
 
 		# Extract audio files from archives
 		for name, info in infos.items():
-			filename = info["filename"]
+			filename = info['filename']
 			filepath = osp.join(self._dataset_root, filename)
-			extension = filename.split(".")[-1]
+			extension = filename.split('.')[-1]
 
-			if extension == "7z":
+			if extension == '7z':
 				extracted_path = osp.join(self._dataset_root, self._subset)
 
 				if not osp.isdir(extracted_path):
 					if self._verbose >= 1:
-						print(f"Extract archive file '{filename}'...")
+						print(f'Extract archive file "{filename}"...')
 
 					archive_file = SevenZipFile(filepath)
 					archive_file.extractall(self._dataset_root)
@@ -274,7 +274,7 @@ class ClothoV1(Dataset):
 		dirpath_audio = osp.join(self._dataset_root, self._subset)
 		self._data_info = {
 			filename: {
-				"filepath": osp.join(dirpath_audio, filename)
+				'filepath': osp.join(dirpath_audio, filename)
 			}
 			for filename in os.listdir(dirpath_audio)
 		}
@@ -283,39 +283,39 @@ class ClothoV1(Dataset):
 
 		# --- Read captions info
 		if self._subset != ClothoV1Subset.TEST:
-			captions_filename = files_infos["captions"]["filename"]
+			captions_filename = files_infos['captions']['filename']
 			captions_filepath = osp.join(self._dataset_root, captions_filename)
 
 			# Keys: file_name, caption_1, caption_2, caption_3, caption_4, caption_5
-			with open(captions_filepath, "r") as file:
+			with open(captions_filepath, 'r') as file:
 				reader = csv.DictReader(file)
 				for row in reader:
-					filename = row["file_name"]
+					filename = row['file_name']
 					if filename in self._data_info.keys():
-						self._data_info[filename]["captions"] = [
-							row[caption_key] for caption_key in ["caption_1", "caption_2", "caption_3", "caption_4", "caption_5"]
+						self._data_info[filename]['captions'] = [
+							row[caption_key] for caption_key in ['caption_1', 'caption_2', 'caption_3', 'caption_4', 'caption_5']
 						]
 					else:
-						raise RuntimeError(f"Found filename '{filename}' in CSV '{captions_filename}' but not the audio file.")
+						raise RuntimeError(f'Found filename "{filename}" in CSV "{captions_filename}" but not the audio file.')
 		else:
 			for filename in self._data_info.keys():
-				self._data_info[filename]["captions"] = []
+				self._data_info[filename]['captions'] = []
 
 		# --- Read metadata info
-		metadata_filename = files_infos["metadata"]["filename"]
+		metadata_filename = files_infos['metadata']['filename']
 		metadata_filepath = osp.join(self._dataset_root, metadata_filename)
 
 		# Keys: file_name, keywords, sound_id, sound_link, start_end_samples, manufacturer, license
-		with open(metadata_filepath, "r") as file:
+		with open(metadata_filepath, 'r') as file:
 			reader = csv.DictReader(file)
 			for row in reader:
-				filename = row["file_name"]
+				filename = row['file_name']
 				row_copy = dict(row)
-				row_copy.pop("file_name")
+				row_copy.pop('file_name')
 
 				if filename in self._data_info.keys():
-					self._data_info[filename]["metadata"] = row_copy
+					self._data_info[filename]['metadata'] = row_copy
 				else:
-					raise RuntimeError(f"Found filename '{filename}' in CSV '{metadata_filename}' but not the audio file.")
+					raise RuntimeError(f'Found filename "{filename}" in CSV "{metadata_filename}" but not the audio file.')
 
 		self._idx_to_filename = [filename for filename in self._data_info.keys()]

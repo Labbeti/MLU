@@ -20,16 +20,16 @@ def get_reduction_from_name(name: str) -> Callable[[Tensor], Tensor]:
 			Available functions are 'sum' and 'mean', 'none' and 'batchmean'.
 		:return: The reduction function with a name.
 	"""
-	if name in ["mean"]:
+	if name in ['mean']:
 		return torch.mean
-	elif name in ["sum"]:
+	elif name in ['sum']:
 		return torch.sum
-	elif name in ["none", "identity"]:
+	elif name in ['none', 'identity']:
 		return identity
-	elif name in ["batchmean"]:
+	elif name in ['batchmean']:
 		return batchmean
 	else:
-		raise RuntimeError(f"Unknown reduction '{name}'. Must be one of {str(['mean', 'sum', 'none', 'batchmean'])}.")
+		raise RuntimeError(f'Unknown reduction "{name}". Must be one of {str(["mean", "sum", "none", "batchmean"])}.')
 
 
 def get_module_checksum(model: Module, only_trainable: bool = True) -> Tensor:

@@ -10,7 +10,7 @@ def get_lrs(optim: Optimizer) -> List[float]:
 		:param optim: The optimizer to get.
 		:return: The list of learning rates.
 	"""
-	return [group["lr"] for group in optim.param_groups]
+	return [group['lr'] for group in optim.param_groups]
 
 
 def get_lr(optim: Optimizer, idx: int = 0) -> float:

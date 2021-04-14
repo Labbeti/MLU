@@ -17,9 +17,9 @@ class TestMisc(TestCase):
 		self.assertEqual(diff_fn(limits_rect), diff_fn(limits_cuboid))
 
 	def test_search_func_in_module(self):
-		func = search_function_in_module("search_function_in_module", misc)
+		func = search_function_in_module('search_function_in_module', misc)
 		self.assertIsNotNone(func)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	main()

@@ -28,16 +28,16 @@ class BLEU(Metric):
 		ngram_order: int = 4,
 		smooth: bool = False,
 		weights: Optional[List[float]] = None,
-		backend: str = "scratch",
+		backend: str = 'scratch',
 	):
-		assert backend in ["scratch", "torchtext"], f"Supported backends are {('scratch', 'torchtext')}."
+		assert backend in ['scratch', 'torchtext'], f'Supported backends are {("scratch", "torchtext")}.'
 
-		if backend == "scratch":
+		if backend == 'scratch':
 			if weights is not None:
-				print(f"WARNING: Weights argument is not supported for '{backend}' backend, it will be ignored.")
-		elif backend == "torchtext":
+				print(f'WARNING: Weights argument is not supported for "{backend}" backend, it will be ignored.')
+		elif backend == 'torchtext':
 			if smooth:
-				print(f"WARNING: smooth=True is not supported for '{backend}' backend, it will be ignored.")
+				print(f'WARNING: smooth=True is not supported for "{backend}" backend, it will be ignored.')
 
 		super().__init__()
 		self.ngram_order = ngram_order
@@ -57,12 +57,12 @@ class BLEU(Metric):
 			:param references_corpus: (N, nb references, reference size)
 			:return: The BLEU score in range [0.0, 1.0].
 		"""
-		if self.backend == "scratch":
+		if self.backend == 'scratch':
 			return compute_bleu_score_scratch(candidate_corpus, references_corpus, self.ngram_order, self.smooth)
-		elif self.backend == "torchtext":
+		elif self.backend == 'torchtext':
 			return bleu_score(candidate_corpus, references_corpus, self.ngram_order, self.weights)
 		else:
-			raise RuntimeError(f"Unknown backend '{self.backend}' for BLEU metric.")
+			raise RuntimeError(f'Unknown backend "{self.backend}" for BLEU metric.')
 
 
 def compute_bleu_score_scratch(
@@ -83,7 +83,7 @@ def compute_bleu_score_scratch(
 		counter_input = get_ngrams(candidate, max_order)
 		counter_target = get_ngrams_max_counter(references, max_order)
 
-		# The operator "&" merge dicts (intersection) and apply min between the two value stored
+		# The operator '&' merge dicts (intersection) and apply min between the two value stored
 		counter_min = counter_input & counter_target
 
 		for ngram, occurrence in counter_min.items():
@@ -124,7 +124,7 @@ def get_ngrams_max_counter(sentences: List[Tensor], max_order: int, ignored_valu
 	counter_max = Counter()
 	for sentence in sentences:
 		counter = get_ngrams(sentence, max_order, ignored_value)
-		# The operator "|" merge dicts (union) and apply max if each counters has the same key
+		# The operator '|' merge dicts (union) and apply max if each counters has the same key
 		counter_max |= counter
 	return counter_max
 

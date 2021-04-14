@@ -14,12 +14,12 @@ from typing import Optional, Sized, Union
 
 
 class AudioSetSubset(str, Enum):
-	BALANCED: str = "balanced"
-	UNBALANCED: str = "unbalanced"
-	EVAL: str = "eval"
+	BALANCED: str = 'balanced'
+	UNBALANCED: str = 'unbalanced'
+	EVAL: str = 'eval'
 
 
-CLASS_LABELS_INDICES_URL = "http://storage.googleapis.com/us_audioset/youtube_corpus/v1/csv/class_labels_indices.csv"
+CLASS_LABELS_INDICES_URL = 'https://storage.googleapis.com/us_audioset/youtube_corpus/v1/csv/class_labels_indices.csv'
 
 
 class AudioSet(Dataset, Sized):
@@ -45,28 +45,28 @@ class AudioSet(Dataset, Sized):
 						└── (20371 files, ~18GB)
 	"""
 	METADATA_FILEPATH = {
-		AudioSetSubset.BALANCED: osp.join("data", "balanced_train_segments.csv"),
-		AudioSetSubset.UNBALANCED: osp.join("data", "unbalanced_train_segments.csv"),
-		AudioSetSubset.EVAL: osp.join("data", "eval_segments.csv"),
+		AudioSetSubset.BALANCED: osp.join('data', 'balanced_train_segments.csv'),
+		AudioSetSubset.UNBALANCED: osp.join('data', 'unbalanced_train_segments.csv'),
+		AudioSetSubset.EVAL: osp.join('data', 'eval_segments.csv'),
 	}
 
 	SUBSET_DIRPATH = {
-		AudioSetSubset.BALANCED: osp.join("data", "data", "balanced_train_segments", "audio"),
-		AudioSetSubset.UNBALANCED: osp.join("data", "data", "unbalanced_train_segments", "audio"),
-		AudioSetSubset.EVAL: osp.join("data", "data", "eval_segments", "audio"),
+		AudioSetSubset.BALANCED: osp.join('data', 'data', 'balanced_train_segments', 'audio'),
+		AudioSetSubset.UNBALANCED: osp.join('data', 'data', 'unbalanced_train_segments', 'audio'),
+		AudioSetSubset.EVAL: osp.join('data', 'data', 'eval_segments', 'audio'),
 	}
 
-	AUDIO_FILE_EXTENSION = "flac"
+	AUDIO_FILE_EXTENSION = 'flac'
 
 	# Column indexes in segments metadata files :
-	# "balanced_train_segments.csv", "unbalanced_train_segments.csv", "eval_segments.csv"
+	# 'balanced_train_segments.csv', 'unbalanced_train_segments.csv', 'eval_segments.csv'
 	class MetaIdx(IntEnum):
 		YTID = 0
 		START_SECONDS = 1
 		END_SECONDS = 2
 		POSITIVE_LABELS = 3
 
-	# Column indexes in "labels.csv" metadata file.
+	# Column indexes in 'labels.csv' metadata file.
 	class LabelsIdx(IntEnum):
 		INDEX = 0
 		MID = 1
@@ -87,10 +87,10 @@ class AudioSet(Dataset, Sized):
 
 			>>> from mlu.datasets import AudioSet
 			>>> from mlu.nn import MultiHot
-			>>> dataset = AudioSet("../data", "balanced", target_transform=MultiHot(527))
+			>>> dataset = AudioSet('../data', 'balanced', target_transform=MultiHot(527))
 
 			:param root: Directory path to the dataset root architecture.
-			:param subset: The name of the subset to load. Must be "balanced", "unbalanced" or "eval".
+			:param subset: The name of the subset to load. Must be 'balanced', 'unbalanced' or 'eval'.
 			:param transform: The transform to apply to the raw audio data extracted.
 				The default shape of raw audio is (1, 320000).
 				(default: None)
@@ -109,7 +109,7 @@ class AudioSet(Dataset, Sized):
 			subset = subset.lower()
 			subsets_names = [s.value for s in list(AudioSetSubset)]
 			if subset not in subsets_names:
-				raise RuntimeError(f"Invalid subset name '{subset}'. Must be one of : {str(subsets_names)}")
+				raise RuntimeError(f'Invalid subset name "{subset}". Must be one of : {str(subsets_names)}.')
 			subset = AudioSetSubset(subset)
 
 		self._dataset_root = root
@@ -148,7 +148,7 @@ class AudioSet(Dataset, Sized):
 			:param index: The index of the audio.
 			:return: The audio filepath for a specific index.
 		"""
-		return self._metadata[self._subset][index]["filepath"]
+		return self._metadata[self._subset][index]['filepath']
 
 	def get_audio(self, index: int) -> Tensor:
 		"""
@@ -168,7 +168,7 @@ class AudioSet(Dataset, Sized):
 			:param index: The index of the data.
 			:return: The label classes indexes for a specific sample index.
 		"""
-		target = self._metadata[self._subset][index]["labels"]
+		target = self._metadata[self._subset][index]['labels']
 
 		if self._target_transform is not None:
 			target = self._target_transform(target)
@@ -184,15 +184,15 @@ class AudioSet(Dataset, Sized):
 	def _check_arguments(self):
 		dataset_dirpath = self._dataset_root
 		if not osp.isdir(dataset_dirpath):
-			raise RuntimeError(f"Cannot find dataset root directory path '{dataset_dirpath}'.")
+			raise RuntimeError(f'Cannot find dataset root directory path "{dataset_dirpath}".')
 
 		subset_dirpath = osp.join(self._dataset_root, self.SUBSET_DIRPATH[self._subset])
 		if not osp.isdir(subset_dirpath):
-			raise RuntimeError(f"Cannot find waveform directory '{subset_dirpath}'.")
+			raise RuntimeError(f'Cannot find waveform directory "{subset_dirpath}".')
 
 		meta_filepath = osp.join(self._dataset_root, self.METADATA_FILEPATH[self._subset])
 		if not osp.isfile(meta_filepath):
-			raise RuntimeError(f"Cannot find CSV metadata file '{meta_filepath}'.")
+			raise RuntimeError(f'Cannot find CSV metadata file "{meta_filepath}".')
 
 	def _load_labels_table(self):
 		def rec_basename(path: str, n: int) -> str:
@@ -201,18 +201,18 @@ class AudioSet(Dataset, Sized):
 			return path
 
 		abs_current_fpath = osp.join(os.getcwd(), __file__)
-		class_labels_indices_fpath = osp.join(rec_basename(abs_current_fpath, 3), "metadata", "class_labels_indices.csv")
+		class_labels_indices_fpath = osp.join(rec_basename(abs_current_fpath, 3), 'metadata', 'class_labels_indices.csv')
 		if not osp.isfile(class_labels_indices_fpath):
-			with open(class_labels_indices_fpath, "wb") as file:
+			with open(class_labels_indices_fpath, 'wb') as file:
 				req = requests.get(CLASS_LABELS_INDICES_URL)
 				file.write(req.content)
 
 		table_filepath = class_labels_indices_fpath
 
 		if not osp.isfile(table_filepath):
-			raise RuntimeError(f"Invalid CSV class labels indices file '{table_filepath}'.")
+			raise RuntimeError(f'Invalid CSV class labels indices file "{table_filepath}".')
 
-		with open(table_filepath, "r") as table_file:
+		with open(table_filepath, 'r') as table_file:
 			reader = csv.reader(table_file, skipinitialspace=True, strict=True)
 
 			for _ in range(2):
@@ -226,8 +226,8 @@ class AudioSet(Dataset, Sized):
 				display_name = info[self.LabelsIdx.DISPLAY_NAME]
 
 				convert_table[mid] = {
-					"index": index,
-					"display_name": display_name,
+					'index': index,
+					'display_name': display_name,
 				}
 
 		self._convert_table = convert_table
@@ -236,11 +236,11 @@ class AudioSet(Dataset, Sized):
 		meta_filepath = osp.join(self._dataset_root, self.METADATA_FILEPATH[self._subset])
 
 		if not osp.isfile(meta_filepath):
-			raise RuntimeError(f"Cannot find CSV metadata file '{meta_filepath}'.")
+			raise RuntimeError(f'Cannot find CSV metadata file "{meta_filepath}".')
 
 		subset_metadata = []
 
-		with open(meta_filepath, "r") as meta_file:
+		with open(meta_filepath, 'r') as meta_file:
 			reader = csv.reader(meta_file, skipinitialspace=True, strict=True)
 
 			# Skip the comments
@@ -259,18 +259,18 @@ class AudioSet(Dataset, Sized):
 
 				if osp.isfile(audio_filepath):
 					if self._verbose >= 1:
-						print(f"Warning: Found a metadata entry for '{ytid}' but not the audio FLAC file in '{audio_filepath}'.")
+						print(f'Warning: Found a metadata entry for "{ytid}" but not the audio FLAC file in "{audio_filepath}".')
 
-					labels = metadata[self.MetaIdx.POSITIVE_LABELS].split(",")
+					labels = metadata[self.MetaIdx.POSITIVE_LABELS].split(',')
 					for label in labels:
 						if label not in self._convert_table.keys():
-							raise RuntimeError(f"Found unknown label '{label}'.")
-					labels = [self._convert_table[label]["index"] for label in labels]
+							raise RuntimeError(f'Found unknown label "{label}".')
+					labels = [self._convert_table[label]['index'] for label in labels]
 					labels = torch.as_tensor(labels, dtype=torch.int)
 
 					subset_metadata.append({
-						"filepath": audio_filepath,
-						"labels": labels,
+						'filepath': audio_filepath,
+						'labels': labels,
 					})
 
 				n_entries += 1
@@ -278,6 +278,6 @@ class AudioSet(Dataset, Sized):
 		self._metadata[self._subset] = subset_metadata
 		if self._verbose >= 2:
 			print(
-				f"Info: Found {n_entries} metadata entries and {len(subset_metadata)} audio files matching with entries. "
-				f"(missing {n_entries - len(subset_metadata)} files)"
+				f'Info: Found {n_entries} metadata entries and {len(subset_metadata)} audio files matching with entries. '
+				f'(missing {n_entries - len(subset_metadata)} files)'
 			)

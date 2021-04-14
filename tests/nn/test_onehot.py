@@ -19,5 +19,5 @@ class TestOneHot(TestCase):
 			self.assertTrue(one_hot.eq(expected).all())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	main()

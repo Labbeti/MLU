@@ -4,7 +4,7 @@ import unittest
 
 from torch import Tensor
 from unittest import TestCase
-from datasets.utils.split_multilabel import (
+from mlu.datasets.utils.split_multilabel import (
 	get_indexes_per_class,
 	split_multilabel_indexes_per_class,
 	flat_indexes_per_class,
@@ -51,13 +51,13 @@ class TestSplitMulti(TestCase):
 		indexes_all = list(range(len(targets)))
 		indexes_per_class = get_indexes_per_class(targets)
 
-		split_1, split_2 = split_multilabel_indexes_per_class(indexes_per_class, [0.5, 0.5])
+		split_1, split_2 = split_multilabel_indexes_per_class(indexes_per_class, [0.5, 0.5], verbose=True)
 
 		indexes_1 = flat_indexes_per_class(split_1)
 		indexes_2 = flat_indexes_per_class(split_2)
 
-		# print("Split indexes 1:", indexes_1)
-		# print("Split indexes 2:", indexes_2)
+		# print('Split indexes 1:', indexes_1)
+		# print('Split indexes 2:', indexes_2)
 
 		self.assertTrue(set(indexes_1).isdisjoint(set(indexes_2)))
 
@@ -66,9 +66,9 @@ class TestSplitMulti(TestCase):
 		distribution_1 = targets[indexes_1].mean(dim=0)
 		distribution_2 = targets[indexes_2].mean(dim=0)
 
-		# print("Distribution all:", distribution)
-		# print("Distribution 1:", distribution_1)
-		# print("Distribution 2:", distribution_2)
+		# print('Distribution all:', distribution)
+		# print('Distribution 1:', distribution_1)
+		# print('Distribution 2:', distribution_2)
 
 		def normalize(vec: Tensor) -> Tensor:
 			return vec / vec.norm(p=1, keepdim=True)
@@ -91,8 +91,8 @@ class TestSplitMulti(TestCase):
 
 		split_1, split_2 = split_multilabel_indexes_per_class(indexes_per_class, [0.5, 0.5], verbose=True)
 
-		print("Split 1:", [len(indexes) for indexes in split_1])
-		print("Split 1:", [len(indexes) for indexes in split_2])
+		print('Split 1:', [len(indexes) for indexes in split_1])
+		print('Split 1:', [len(indexes) for indexes in split_2])
 
 		self.assertTrue(check_indexes_per_class(split_1, at_least_one_elem_per_class=True))
 		self.assertTrue(check_indexes_per_class(split_2, at_least_one_elem_per_class=True))
@@ -103,5 +103,5 @@ class TestSplitMulti(TestCase):
 		self.assertTrue(set(indexes_1).isdisjoint(set(indexes_2)))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	unittest.main()

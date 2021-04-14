@@ -3,6 +3,7 @@ import torch
 import unittest
 
 from sklearn.metrics import f1_score
+from torchmetrics import F1
 from unittest import TestCase
 
 from mlu.metrics import BinaryAccuracy, FScore, Precision, Recall
@@ -59,7 +60,7 @@ class BinaryAccuracy2:
 		return value_
 
 
-class TestPrecision(TestCase):
+class TestMetrics(TestCase):
 	def test_precision(self):
 		p1 = Precision()
 		p2 = Precision2()
@@ -74,8 +75,8 @@ class TestPrecision(TestCase):
 		s1 = p1(input_, target)
 		s2 = p2(input_, target)
 
-		# print("s1", s1)
-		# print("s2", s2)
+		# print('s1', s1)
+		# print('s2', s2)
 		self.assertAlmostEqual(s1, s2)
 
 	def test_recall(self):
@@ -92,8 +93,8 @@ class TestPrecision(TestCase):
 		s1 = p1(input_, target)
 		s2 = p2(input_, target)
 
-		# print("s1", s1)
-		# print("s2", s2)
+		# print('s1', s1)
+		# print('s2', s2)
 		self.assertAlmostEqual(s1, s2)
 
 	def test_binacc(self):
@@ -108,7 +109,7 @@ class TestPrecision(TestCase):
 
 		self.assertAlmostEqual(score, score2)
 
-	def test_f1_with_sklearn(self):
+	def test_f1_with_sklearn_and_pl(self):
 		pred = torch.rand(10)
 		target = torch.rand(10).ge(0.5).float()
 
@@ -116,14 +117,18 @@ class TestPrecision(TestCase):
 		pred = thres(pred)
 
 		f1 = FScore()
+		f1_pl = F1(num_classes=10, threshold=0.5, multilabel=True)
 
-		sk_score = f1_score(y_pred=pred.cpu().numpy(), y_true=target.cpu().numpy())
 		mlu_score = f1(pred, target).item()
+		sk_score = f1_score(y_pred=pred.cpu().numpy(), y_true=target.cpu().numpy())
+		pl_score = f1_pl(pred, target).item()
 
-		self.assertAlmostEqual(sk_score, mlu_score)
+		# print(pred, target)
+		self.assertAlmostEqual(mlu_score, sk_score)
+		self.assertAlmostEqual(mlu_score, pl_score)
 
 
-class TestMetricDict(TestCase):
+class TestBinF1(TestCase):
 	def test(self):
 		pred = torch.as_tensor([0, 0.9, 0.85, 0])
 		target = torch.as_tensor([0, 1, 1, 0])
@@ -166,5 +171,5 @@ class TestSimplify(TestCase):
 		self.assertTrue(torch.allclose(score, score_v2))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	unittest.main()

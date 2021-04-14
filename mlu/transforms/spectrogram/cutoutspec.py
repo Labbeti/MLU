@@ -1,10 +1,11 @@
 
+import logging
 import torch
-
-from mlu.transforms.base import SpectrogramTransform
 
 from torch import Tensor
 from typing import Tuple, Union
+
+from mlu.transforms.base import SpectrogramTransform
 
 
 class CutOutSpec(SpectrogramTransform):
@@ -34,11 +35,15 @@ class CutOutSpec(SpectrogramTransform):
 		super().__init__(p=p)
 
 		if width_scales is not None:
-			print("WARNING (package MLU): Parameter name 'width_scales' is depreciated. Please use 'freq_scales' instead.")
+			logging.warning(
+				'(package MLU): Parameter name "width_scales" is depreciated. Please use "freq_scales" instead.'
+			)
 			freq_scales = width_scales if isinstance(width_scales, tuple) else (width_scales, width_scales)
 
 		if height_scales is not None:
-			print("WARNING (package MLU): Parameter name 'height_scales' is depreciated. Please use 'time_scales' instead.")
+			logging.warning(
+				'(package MLU): Parameter name "height_scales" is depreciated. Please use "time_scales" instead.'
+			)
 			time_scales = height_scales if isinstance(height_scales, tuple) else (height_scales, height_scales)
 
 		self.freq_scales = freq_scales
@@ -50,8 +55,8 @@ class CutOutSpec(SpectrogramTransform):
 	def process(self, spectrogram: Tensor) -> Tensor:
 		if len(spectrogram.shape) < 2:
 			raise RuntimeError(
-				f"Invalid spectrogram shape '{spectrogram.shape}."
-				f"Must have at least 2 dimensions but found {len(spectrogram.shape)}."
+				f'Invalid spectrogram shape "{spectrogram.shape}.'
+				f'Must have at least 2 dimensions but found {len(spectrogram.shape)}.'
 			)
 
 		slices = [slice(None)] * len(spectrogram.shape)

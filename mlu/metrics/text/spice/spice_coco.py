@@ -1,5 +1,5 @@
 """
-	Microsoft COCO caption metric "SPICE".
+	Microsoft COCO caption metric 'SPICE'.
 
 	Code imported from : https://github.com/peteanderson80/coco-caption/blob/master/pycocoevalcap/spice/spice.py
 	Authors : Peter Anderson
@@ -40,9 +40,9 @@ class Spice:
 			assert (len(ref) >= 1)
 
 			input_data.append({
-				"image_id": id,
-				"test": hypo[0],
-				"refs": ref
+				'image_id': id,
+				'test': hypo[0],
+				'refs': ref
 			})
 
 		cwd = os.path.dirname(os.path.abspath(__file__))
@@ -96,4 +96,4 @@ class Spice:
 			return np.nan
 
 	def method(self):
-		return "SPICE"
+		return 'SPICE'

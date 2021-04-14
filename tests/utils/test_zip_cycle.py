@@ -9,7 +9,7 @@ class TestZipCycle(TestCase):
 	def test(self):
 		r1 = range(1, 4)
 		r2 = range(1, 6)
-		zip_cycle = ZipCycle(r1, r2, mode="max")
+		zip_cycle = ZipCycle(r1, r2, mode='max')
 
 		expected = [
 			(1, 1),
@@ -30,10 +30,10 @@ class TestZipCycle(TestCase):
 		i1 = range(0, 1)
 		i2 = [1]
 		expected = [[0, 1]]
-		zip_cycle = ZipCycle(i1, i2, mode="min")
+		zip_cycle = ZipCycle(i1, i2, mode='min')
 		self.assertEqual(len(expected), len(zip_cycle))
 		self.assertEqual(expected, list(zip_cycle))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	unittest.main()

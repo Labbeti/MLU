@@ -7,7 +7,7 @@ from PIL import Image, ImageOps, ImageEnhance, ImageFilter
 from torchvision.transforms import RandomHorizontalFlip, RandomVerticalFlip
 from typing import Tuple, Union
 
-ImageEnhance_t = "ImageEnhance"
+ImageEnhance_t = 'ImageEnhance'
 
 
 class _Enhance(ImageTransform):

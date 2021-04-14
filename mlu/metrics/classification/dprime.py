@@ -14,7 +14,7 @@ class DPrime(Metric):
 		"""
 			DPrime metric.
 
-			Note: If score == 0 : bad score, low difference between "noise" and inputs.
+			Note: If score == 0 : bad score, low difference between 'noise' and inputs.
 
 			Backend: sklearn and scipy.
 

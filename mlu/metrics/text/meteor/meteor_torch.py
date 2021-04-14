@@ -33,24 +33,24 @@ class METEOR2(Metric):
 		else:
 			n_classes = self.n_classes
 
-		print("candidate ", candidate)
-		print("references", references)
-		print("n_classes", n_classes)
+		print('candidate ', candidate)
+		print('references', references)
+		print('n_classes', n_classes)
 
 		candidate_onehot = one_hot(candidate.to(torch.int64), n_classes)
 		references_onehot = [one_hot(reference.to(torch.int64), n_classes) for reference in references]
 
 		max_sentence_size = max([len(ref) for ref in references_onehot] + [len(candidate_onehot)])
-		print("max_sentence_size", max_sentence_size)
-		print("shapes", candidate_onehot.shape, " ; ", [ref.shape for ref in references_onehot])
+		print('max_sentence_size', max_sentence_size)
+		print('shapes', candidate_onehot.shape, ' ; ', [ref.shape for ref in references_onehot])
 		candidate_onehot = torch.cat((candidate_onehot, torch.zeros(max_sentence_size - candidate_onehot.shape[0], n_classes)))
 		references_onehot = [torch.cat((reference, torch.zeros(max_sentence_size - reference.shape[0], n_classes))) for reference in references_onehot]
 
 		recall = [self.recall(candidate_onehot, reference) for reference in references_onehot]
 		precision = [self.precision(candidate_onehot, reference) for reference in references_onehot]
 
-		print("recall", recall)
-		print("precision", precision)
+		print('recall', recall)
+		print('precision', precision)
 
 		recall = torch.as_tensor(recall)
 		precision = torch.as_tensor(precision)
@@ -62,15 +62,15 @@ class METEOR2(Metric):
 
 		n_chunks = get_n_chunks(candidate, references)
 		n_matches = get_n_matches(candidate, references)
-		print("n_chunks", n_chunks)
-		print("n_matches", n_matches)
+		print('n_chunks', n_chunks)
+		print('n_matches', n_matches)
 
 		frag = n_chunks / n_matches
 		pen = self.gamma * frag ** self.beta
 		scores = (1.0 - pen) * scores
 
 		score = scores.max()
-		print("score", score)
+		print('score', score)
 
 		return score
 
@@ -105,10 +105,10 @@ def divide_in_chunks(candidate: Tensor, reference: Tensor) -> int:
 					continue_ = False
 				else:
 					continue_ = reference[prev_start:prev_start+len(sub_seq)].eq(sub_seq).all()
-			print(f"{i} : {reference.tolist()}, {candidate.tolist()}, {sub_seq.tolist()}, {continue_}, {start}")
+			# print(f'{i} : {reference.tolist()}, {candidate.tolist()}, {sub_seq.tolist()}, {continue_}, {start}.')
 			if not continue_ and prev_start != -1:
 				indexes = torch.as_tensor(list(range(prev_start)) + list(range(prev_start+len(sub_seq)-1, len(reference)))).long()
-				print(f"indexes {indexes.tolist()}")
+				# print(f'indexes {indexes.tolist()}.')
 				reference = reference[indexes]
 			prev_start = start
 			sub_seq_len += 1
