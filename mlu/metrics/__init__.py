@@ -5,4 +5,4 @@ from .text import *
 
 from .base import Metric, IncrementalMetric
 from .incremental import IncrementalMean, IncrementalStd, MinTracker, MaxTracker
-from .wrappers import MetricWrapper, IncrementalWrapper, IncrementalListWrapper, MetricDict
+from .wrappers import MetricWrapper, IncrementalWrapper, IncrementalListWrapper

@@ -3,53 +3,7 @@ from mlu.metrics.base import Metric, IncrementalMetric
 from mlu.metrics.incremental import IncrementalMean
 
 from torch import Tensor
-from torch.nn import Module
-from typing import Callable, Dict, List, Optional, Union
-
-
-class MetricDict(Dict[str, Module], Metric):
-	def __init__(self, *args: Union[dict, Callable, None], prefix: str = "", suffix: str = "", **kwargs):
-		"""
-			Compute score of each metric stored when forward() is called.
-			Subclass of Dict[str, Module] and Metric.
-
-			Example :
-
-			>>> import torch
-			>>> from mlu.metrics import CategoricalAccuracy, FScore, MetricDict
-			>>> input_, target = torch.rand(5, 10), torch.rand(5, 10)
-			>>> metric_dict = MetricDict(acc=CategoricalAccuracy(), f1=FScore())
-			>>> metric_dict(input_, target)
-			... {'acc': 0.4, 'f1': 0.1}
-		"""
-		args = [arg for arg in args if arg is not None]
-		dict.__init__(self, *args, **kwargs)
-		Metric.__init__(self)
-		self.prefix = prefix
-		self.suffix = suffix
-
-	def compute_score(self, pred, target) -> dict:
-		"""
-			Compute the score of each metric stored and return the dictionary of {metric_name: metric_score, ...}.
-		"""
-		return {
-			(self.prefix + metric_name + self.suffix): metric(pred, target)
-			for metric_name, metric in self.items()
-		}
-
-	def __hash__(self) -> int:
-		return hash(tuple(sorted(self.items()))) + hash(self.prefix) + hash(self.suffix)
-
-	def to_dict(self, with_pre_and_suf: bool = True) -> Dict[str, Module]:
-		"""
-			:param with_pre_and_suf: If True, append the prefix and suffix to the keys metrics names. (default: True)
-			:return: Return the metrics names and metrics as python dict object.
-		"""
-		if with_pre_and_suf:
-			dic = {f"{self.prefix}{metric_name}{self.suffix}": metric for metric_name, metric in self.items()}
-		else:
-			dic = dict(self)
-		return dic
+from typing import Callable, List, Optional
 
 
 class MetricWrapper(Metric):

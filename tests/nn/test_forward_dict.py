@@ -3,13 +3,14 @@ import torch
 import unittest
 
 from unittest import TestCase
-from mlu.metrics import MetricDict, CategoricalAccuracy, FScore
+from mlu.metrics import CategoricalAccuracy, FScore
+from mlu.nn import ForwardDictAffix
 
 
 class TestMetricDict(TestCase):
 	def test(self):
 		metrics = {'acc': CategoricalAccuracy(), 'f1': FScore()}
-		md = MetricDict(metrics)
+		md = ForwardDictAffix(metrics)
 
 		self.assertEqual(len(md), len(metrics))
 
@@ -24,7 +25,7 @@ class TestMetricDict(TestCase):
 
 	def test_none(self):
 		in_ = None
-		md = MetricDict(in_, prefix='p/', suffix='_tmp')
+		md = ForwardDictAffix(in_, prefix='p/', suffix='_tmp')
 
 		self.assertEqual(len(md), 0)
 
