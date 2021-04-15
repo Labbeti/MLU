@@ -92,15 +92,18 @@ class CutOutSpec(SpectrogramTransform):
 		if isinstance(self.fill_value, float):
 			fill_value = self.fill_value
 		else:
-			uniform = Uniform(low=self.fill_value[0], high=self.fill_value[1])
+			uniform = Uniform(*self.fill_value)
 			fill_value = uniform.sample()
 		return torch.full_like(data, fill_value)
 
 	def _gen_random(self, data: Tensor) -> Tensor:
 		if isinstance(self.fill_value, float):
-			return self._gen_constant(data)
+			raise ValueError(
+				'Invalid fill_value with random fill_mode. Please use a tuple of 2 floats for fill_value or use '
+				'fill_mode="constant".'
+			)
 		else:
-			uniform = Uniform(low=self.fill_value[0], high=self.fill_value[1])
+			uniform = Uniform(*self.fill_value)
 			return uniform.sample(data.shape)
 
 	def _check_attributes(self):
@@ -109,6 +112,12 @@ class CutOutSpec(SpectrogramTransform):
 
 		if not isinstance(self.fill_value, float) and not (isinstance(self.fill_value, tuple) and len(self.fill_value) == 2):
 			raise ValueError(f'Invalid fill_value "{self.fill_value}", must be a float or a tuple of 2 floats.')
+
+		if self.fill_mode == 'random' and isinstance(self.fill_value, float):
+			raise ValueError(
+				'Invalid fill_value with random fill_mode. Please use a tuple of 2 floats for fill_value or use '
+				'fill_mode="constant".'
+			)
 
 
 def gen_range(size: int, scales: Tuple[float, float]) -> slice:
