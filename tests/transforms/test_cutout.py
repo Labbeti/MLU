@@ -1,11 +1,12 @@
 
 import torch
+import unittest
 
 from mlu.transforms.converters import ToPIL
 from mlu.transforms.image.pil import CutOutImgPIL
 from mlu.transforms.image.tensor import CutOutImg as CutOutImgTen
 from mlu.transforms.spectrogram import CutOutSpec
-from unittest import TestCase, main
+from unittest import TestCase
 
 
 class TestCutOut(TestCase):
@@ -63,4 +64,4 @@ class TestCutOut(TestCase):
 
 
 if __name__ == '__main__':
-	main()
+	unittest.main()

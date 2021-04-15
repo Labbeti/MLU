@@ -8,7 +8,12 @@ from torch import Tensor
 from typing import Any, Callable, Optional
 
 
-class ProcessTransformWrap(Transform):
+class RandomApplyWrap(Transform):
+	def __init__(self, p: float = 1.0):
+		super().__init__(p=p)
+
+
+class ProcessWrap(Transform):
 	def __init__(
 		self,
 		transform: Optional[Transform],
@@ -56,7 +61,7 @@ class ProcessTransformWrap(Transform):
 			self._callables.append(self.post_convert)
 
 
-class PILInternalWrap(ProcessTransformWrap):
+class PILInternalWrap(ProcessWrap):
 	def __init__(self, pil_transform: ImageTransform, mode: Optional[str] = 'RGB', p: float = 1.0):
 		"""
 			Class that convert tensor to PIL image internally for apply PIL transforms.
@@ -77,7 +82,7 @@ class PILInternalWrap(ProcessTransformWrap):
 		return super().process(x)
 
 
-class TensorInternalWrap(ProcessTransformWrap):
+class TensorInternalWrap(ProcessWrap):
 	def __init__(self, pil_transform: ImageTransform, p: float = 1.0):
 		"""
 			Class that convert PIL image to tensor internally for apply tensor transforms.

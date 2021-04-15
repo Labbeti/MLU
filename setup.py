@@ -22,6 +22,7 @@ install_requires = [
 	'rouge-metric',
 	'py7zr',
 	'requests',
+	'ipython',
 ]
 
 

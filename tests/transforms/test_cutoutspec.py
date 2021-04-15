@@ -3,7 +3,7 @@ import torch
 import unittest
 
 from unittest import TestCase
-from mlu.transforms import CutOutSpec
+from mlu.transforms import CutOutSpec, Fade
 
 
 class TestCutOutSpec(TestCase):
@@ -65,9 +65,24 @@ class TestCutOutSpec(TestCase):
 			fill_value=(0.0, 0.0),
 			freq_scales=(0.25, 0.25),
 			time_scales=(0.5, 0.5),
-			freq_dim=-2,
-			time_dim=-1,
-			same_across_channels=False,
+			freq_dim=1,
+			time_dim=2,
+		)
+		spec_cut = cutoutspec(spec)
+		# print('Shape: ', spec.shape)
+		# print(spec_cut)
+		self.assertFalse(spec.eq(spec_cut).all())
+
+	def test_fade(self):
+		spec = torch.stack([
+			torch.full((4, 6), 1.0),
+			torch.full((4, 6), 2.0),
+			torch.full((4, 6), 3.0),
+		])
+		cutoutspec = CutOutSpec(
+			fill_mode=Fade(0.5),
+			freq_scales=(0.5, 0.5),
+			time_scales=(0.5, 0.5),
 		)
 		spec_cut = cutoutspec(spec)
 		print('Shape: ', spec.shape)

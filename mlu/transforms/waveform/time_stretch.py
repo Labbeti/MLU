@@ -4,7 +4,7 @@ import torch
 from mlu.transforms.base import WaveformTransform
 from torch import Tensor
 from torch.distributions import Uniform
-from typing import Tuple, Union
+from typing import Tuple
 
 
 class TimeStretch(WaveformTransform):
@@ -26,9 +26,13 @@ class TimeStretch(WaveformTransform):
 		self.dim = dim
 
 	def process(self, data: Tensor) -> Tensor:
+		if isinstance(self.rates, tuple):
+			sampler = Uniform(low=self.rates[0], high=self.rates[1])
+			rate = sampler.sample().item()
+		else:
+			rate = self.rates
+
 		length = data.shape[self.dim]
-		sampler = Uniform(low=self.rates[0], high=self.rates[1])
-		rate = sampler.sample().item()
 		step = 1.0 / rate
 		indexes = torch.arange(start=0, end=length, step=step)
 		indexes = indexes.floor().long().clamp(max=length - 1)

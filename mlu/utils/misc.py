@@ -1,3 +1,6 @@
+"""
+	Miscellaneous functions utilities.
+"""
 
 import inspect
 import numpy as np
@@ -7,11 +10,11 @@ import subprocess
 import torch
 
 from datetime import datetime
+from IPython.display import Audio, display
 from torch import Tensor
 from torch.utils.tensorboard import SummaryWriter
 from types import MethodType, FunctionType, ModuleType
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, TypeVar, Union
-
 
 T = TypeVar('T')
 
@@ -54,10 +57,10 @@ def reset_seed(seed: Optional[int]):
 
 
 def random_rect(
-	width_img: int,
-	height_img: int,
-	width_range: Tuple[float, float],
-	height_range: Tuple[float, float]
+		width_img: int,
+		height_img: int,
+		width_range: Tuple[float, float],
+		height_range: Tuple[float, float]
 ) -> (int, int, int, int):
 	"""
 		Create a random rectangle inside an area defined by the limits (left, right, top, down).
@@ -122,11 +125,13 @@ def add_dict_to_writer(dic: Dict[str, Any], writer: SummaryWriter):
 	"""
 		Add dictionary content to tensorboard hyperparameters.
 	"""
+
 	def filter_(v: Any) -> Union[str, int, float, Tensor]:
 		if any([isinstance(v, type_) for type_ in [str, int, float, Tensor]]):
 			return v
 		else:
 			return str(v)
+
 	dic = {k: filter_(v) for k, v in dic.items()}
 	writer.add_hparams(hparam_dict=dic, metric_dict={})
 
@@ -291,7 +296,7 @@ def search_function_in_module(func_name: str, module: ModuleType) -> Optional[Ca
 		raise RuntimeError(f'Object "{module.__name__}" is not a Module.')
 
 	predicate = lambda member: (
-		inspect.isfunction(member) and member.__module__ == module.__name__
+			inspect.isfunction(member) and member.__module__ == module.__name__
 	)
 	functions = inspect.getmembers(module, predicate)
 	functions = [func for name, func in functions if name == func_name]
@@ -303,3 +308,15 @@ def search_function_in_module(func_name: str, module: ModuleType) -> Optional[Ca
 		return functions[0]
 	else:
 		raise RuntimeError(f'Found multiple functions matching the following name : "{func_name}".')
+
+
+def play_audio(waveform, sample_rate):
+	waveform = waveform.numpy()
+
+	num_channels, num_frames = waveform.shape
+	if num_channels == 1:
+		display(Audio(waveform[0], rate=sample_rate))
+	elif num_channels == 2:
+		display(Audio((waveform[0], waveform[1]), rate=sample_rate))
+	else:
+		raise ValueError("Waveform with more than 2 channels are not supported.")
