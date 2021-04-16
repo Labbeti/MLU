@@ -15,6 +15,7 @@ install_requires = [
 	'torchvision~=0.8.2',
 	'torchmetrics~=0.2.0',
 	'pytorch-lightning~=1.2.3',
+	"scikit-learn",
 	'tensorboard',
 	'nltk',
 	'matplotlib',

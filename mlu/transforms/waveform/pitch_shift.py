@@ -2,9 +2,9 @@
 from torch import Tensor
 from torchaudio.transforms import Resample
 
-from mlu.transforms.waveform.time_stretch import TimeStretch
 from mlu.transforms.waveform.crop import Crop
 from mlu.transforms.base import WaveformTransform
+from mlu.utils.misc import time_stretch
 
 
 class PitchShift(WaveformTransform):
@@ -14,19 +14,17 @@ class PitchShift(WaveformTransform):
 		self.n_steps = n_steps
 		self.bins_per_octave = bins_per_octave
 
-		self.time_stretch = TimeStretch()
 		self.resample = Resample()
 		self.crop = Crop(0)
 
 	def process(self, data: Tensor) -> Tensor:
 		rate = 2.0 ** (-self.n_steps / self.bins_per_octave)
 
-		self.time_stretch.rates = 1.0 / rate
 		self.resample.orig_freq = self.sr / rate
 		self.resample.new_freq = self.sr
 		self.crop.target_length = data.shape[-1]
 
-		data = self.time_stretch(data)
+		data = time_stretch(data, rate)
 		data = self.resample(data)
 		data = self.crop(data)
 

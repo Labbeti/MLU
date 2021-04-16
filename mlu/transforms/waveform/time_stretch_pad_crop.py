@@ -12,7 +12,7 @@ class TimeStretchPadCrop(WaveformTransform):
 	def __init__(
 		self,
 		rates: Union[Tuple[float, float], float] = (0.9, 1.1),
-		target_length: Optional[int] = None,
+		target_length: Union[int, str] = 'auto',
 		align: str = 'random',
 		fill_value: float = 0.0,
 		dim: int = -1,
@@ -23,8 +23,8 @@ class TimeStretchPadCrop(WaveformTransform):
 
 			:param rates: The ratio of the signal used for resize. (default: (0.9, 1.1))
 			:param target_length: Optional target length of the signal dimension.
-				If None, the output will have the same shape than the input.
-				(default: None)
+				If 'auto', the output will have the same shape than the input.
+				(default: 'auto')
 			:param align: Alignment to use for cropping and padding. Can be 'left', 'right', 'center' or 'random'.
 				(default: 'random')
 			:param fill_value: The fill value when padding the waveform. (default: 0.0)
@@ -44,7 +44,7 @@ class TimeStretchPadCrop(WaveformTransform):
 		self.crop = Crop(target_length, align, dim)
 
 	def process(self, data: Tensor) -> Tensor:
-		if self.target_length is None:
+		if self.target_length == 'auto':
 			target_length = data.shape[self.dim]
 			self.pad.target_length = target_length
 			self.crop.target_length = target_length
@@ -52,5 +52,5 @@ class TimeStretchPadCrop(WaveformTransform):
 		return self.crop(self.pad(self.stretch(data)))
 
 	@property
-	def target_length(self) -> int:
+	def target_length(self) -> Union[int, str]:
 		return self._target_length

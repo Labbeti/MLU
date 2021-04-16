@@ -122,6 +122,8 @@ class CutOutSpec(SpectrogramTransform):
 
 def gen_range(size: int, scales: Tuple[float, float]) -> slice:
 	"""
+		Generate an interval of size sampled from [size * scales[0], size * scales[1]].
+
 		Example :
 
 		>>> gen_range(size=100, scales=(0.5, 0.5))
