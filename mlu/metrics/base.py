@@ -12,14 +12,17 @@ class Metric(Module, ABC):
 		Abstract methods:
 			- compute_score(self, input_, target):
 	"""
-	def __init__(self, score_to_cpu: bool = False):
+	def __init__(self, input_to_cpu: bool = True):
 		super().__init__()
-		self.score_to_cpu = score_to_cpu
+		self.input_to_cpu = input_to_cpu
 
 	def forward(self, pred, target):
+		if self.input_to_cpu:
+			if isinstance(pred, Tensor):
+				pred = pred.cpu()
+			if isinstance(target, Tensor):
+				target = target.cpu()
 		score = self.compute_score(pred, target)
-		if isinstance(score, Tensor) and self.score_to_cpu:
-			score = score.cpu()
 		return score
 
 	def compute_score(self, pred, target):
