@@ -18,6 +18,7 @@ install_requires = [
 	"scikit-learn",
 	'tensorboard',
 	'nltk',
+	'tqdm',
 	'matplotlib',
 	'numpy',
 	'rouge-metric',
