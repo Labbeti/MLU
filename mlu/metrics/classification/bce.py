@@ -1,10 +1,7 @@
 
 import torch
-import unittest
-
-from torch.nn import BCELoss
+from torch import Tensor
 from typing import Callable, Optional
-from unittest import TestCase
 
 from mlu.metrics.base import Metric
 
@@ -14,7 +11,7 @@ class BCEMetric(Metric):
 		super().__init__()
 		self.reduce_fn = reduce_fn
 
-	def compute_score(self, pred, target):
+	def compute_score(self, pred: Tensor, target: Tensor) -> Tensor:
 		if pred.shape != target.shape:
 			raise RuntimeError(f'Mismatch shapes {pred.shape} != {target.shape}.')
 
@@ -23,20 +20,3 @@ class BCEMetric(Metric):
 		if self.reduce_fn is not None:
 			scores = self.reduce_fn(scores)
 		return scores
-
-
-class TestBCE(TestCase):
-	def test_bce(self):
-		bce1 = BCELoss()
-		bce2 = BCEMetric()
-
-		pred = torch.rand(10, 5)
-		target = torch.rand(10, 5).ge(0.5).float()
-
-		l1 = bce1(pred, target)
-		l2 = bce2(pred, target)
-		self.assertEqual(l1, l2)
-
-
-if __name__ == '__main__':
-	unittest.main()
