@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from setuptools import setup, find_packages
+from setuptools.command.develop import develop
+from setuptools.command.install import install
+from subprocess import check_call
 
 
 install_requires = [
@@ -28,6 +31,18 @@ install_requires = [
 ]
 
 
+class PostDevelopCommand(develop):
+	def run(self):
+		super().run()
+		check_call(['bash', 'install_spice.sh'])
+
+
+class PostInstallCommand(install):
+	def run(self):
+		super().run()
+		check_call(['bash', 'install_spice.sh'])
+
+
 setup(
 	name='mlu',
 	version='0.4.7',
@@ -40,4 +55,8 @@ setup(
 	python_requires='>=3.8.5',
 	install_requires=install_requires,
 	include_package_data=True,
+	cmdclass={
+		'develop': PostDevelopCommand,
+		'install': PostInstallCommand,
+	}
 )

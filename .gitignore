@@ -1,11 +1,15 @@
 
-# Folders
+# Directories
 .idea/
 __pycache__/
 data/
-
-# Folders types
+cache/
+lib/
+tmp/
+SPICE-1.0/
 *.egg-info/
 
-# Files types
+# Files
 *ign*
+SPICE-1.0.zip
+spice-1.0.jar
