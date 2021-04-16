@@ -33,13 +33,13 @@ class ObjectBuilder:
 		if inspect.isclass(obj) or inspect.isfunction(obj):
 			# Register class or function
 			if self._verbose >= 1:
-				print(f"Register class or function '{obj.__name__}'.")
+				print(f'Register class or function "{obj.__name__}".')
 			self.register_class_or_func(obj, predicate_class_or_func=predicate_class_or_func)
 
 		elif inspect.ismodule(obj):
-			# Get submodules, classes and functions defined in the module "obj"
+			# Get submodules, classes and functions defined in the module 'obj'
 			if self._verbose >= 1:
-				print(f"Register module '{obj.__name__}'.")
+				print(f'Register module "{obj.__name__}".')
 			predicate = (
 				lambda member: (
 					((inspect.isclass(member) or inspect.isfunction(member)) and member.__module__ == obj.__name__) or
@@ -53,7 +53,7 @@ class ObjectBuilder:
 		elif isinstance(obj, Iterable):
 			# Recursive call on each element of the iterable
 			if self._verbose >= 1:
-				print(f"Register iterable '{type(obj)}'.")
+				print(f'Register iterable "{type(obj)}".')
 			for member in obj:
 				self.register(member, predicate_class_or_func)
 
@@ -87,7 +87,7 @@ class ObjectBuilder:
 		elif isinstance(aliases, Iterable):
 			aliases = set(aliases)
 		else:
-			raise RuntimeError("Alias must be None, str or a Iterable[str].")
+			raise RuntimeError('Alias must be None, str or a Iterable[str].')
 
 		id_ = class_or_func.__name__
 		id_ = self._process(id_)
@@ -95,7 +95,7 @@ class ObjectBuilder:
 
 		if id_ in self._alias_to_id.keys():
 			if self._verbose >= 1:
-				print(f"WARNING: Overwrite class or func with the same alias '{id_}'.")
+				print(f'WARNING: Overwrite class or func with the same alias "{id_}".')
 			self.pop(id_)
 
 		for alias in aliases:
@@ -120,12 +120,12 @@ class ObjectBuilder:
 		class_or_func = self._get_class_or_func(name)
 
 		if filter_kwargs:
-			if inspect.isfunction(class_or_func) and hasattr(class_or_func, "__code__"):
+			if inspect.isfunction(class_or_func) and hasattr(class_or_func, '__code__'):
 				parameters_names = class_or_func.__code__.co_varnames
-			elif inspect.isclass(class_or_func) and hasattr(class_or_func, "__init__"):
+			elif inspect.isclass(class_or_func) and hasattr(class_or_func, '__init__'):
 				parameters_names = class_or_func.__init__.__code__.co_varnames
 			else:
-				raise RuntimeError(f"Invalid class or func '{class_or_func.__name__}'.")
+				raise RuntimeError(f'Invalid class or func "{class_or_func.__name__}".')
 
 			kwargs = {k: v for k, v in kwargs.items() if k in parameters_names}
 
@@ -144,7 +144,7 @@ class ObjectBuilder:
 		new_alias = self._process(new_alias)
 
 		if old_alias not in self._alias_to_id.keys():
-			raise RuntimeError(f"Unknown object '{old_alias}'.")
+			raise RuntimeError(f'Unknown object "{old_alias}".')
 		id_ = self._alias_to_id[old_alias]
 		self._alias_to_id[new_alias] = id_
 
@@ -166,7 +166,7 @@ class ObjectBuilder:
 		"""
 		alias = self._process(alias)
 		if alias not in self._alias_to_id.keys():
-			raise RuntimeError(f"Unknown object '{alias}'.")
+			raise RuntimeError(f'Unknown object "{alias}".')
 
 		old_id = self._alias_to_id[alias]
 		old_aliases = self._get_aliases(old_id)
@@ -209,7 +209,7 @@ class ObjectBuilder:
 	def _get_class_or_func(self, alias: str) -> Callable:
 		alias = self._process(alias)
 		if alias not in self._alias_to_id.keys():
-			raise RuntimeError(f"Unknown object '{alias}'.")
+			raise RuntimeError(f'Unknown object "{alias}".')
 		id_ = self._alias_to_id[alias]
 		class_or_func = self._classes_or_funcs[id_]
 		return class_or_func
@@ -217,7 +217,7 @@ class ObjectBuilder:
 	def _get_default_kwargs(self, alias: str) -> Dict[str, Any]:
 		alias = self._process(alias)
 		if alias not in self._alias_to_id.keys():
-			raise RuntimeError(f"Unknown object '{alias}'.")
+			raise RuntimeError(f'Unknown object "{alias}".')
 		id_ = self._alias_to_id[alias]
 		default_kwargs = self._default_kwargs[id_]
 		return default_kwargs
@@ -225,7 +225,7 @@ class ObjectBuilder:
 	def _get_aliases(self, alias: str) -> Set[str]:
 		alias = self._process(alias)
 		if alias not in self._alias_to_id.keys():
-			raise RuntimeError(f"Unknown object '{alias}'.")
+			raise RuntimeError(f'Unknown object "{alias}".')
 		main_id = self._alias_to_id[alias]
 		aliases = set()
 		for alias, id_ in self._alias_to_id.items():

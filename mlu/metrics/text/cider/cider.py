@@ -9,7 +9,7 @@ class CIDER(Metric):
 		"""
 			Consensus-based Image Description Evaluation.
 
-			Original paper : http://arxiv.org/pdf/1411.5726.pdf
+			Original paper : https://arxiv.org/pdf/1411.5726.pdf
 
 			:param ngrams_max:
 		"""
@@ -17,7 +17,7 @@ class CIDER(Metric):
 		self._cider_internal = Cider(n=ngrams_max)
 
 	def compute_score(self, reference: List[str], hypothesis: List[List[str]]) -> float:
-		gts = {"no_id": reference}
-		res = {"no_id": hypothesis}
+		gts = {'no_id': reference}
+		res = {'no_id': hypothesis}
 		average_score, scores = self._cider_internal.compute_score(gts, res)
 		return average_score

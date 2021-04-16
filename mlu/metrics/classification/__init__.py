@@ -1,11 +1,13 @@
 
 from .average_precision import AveragePrecision
-from .binary_acc import BinaryAccuracy
-from .categorical import CategoricalAccuracy
+from .binary_accuracy import BinaryAccuracy
+from .accuracy import CategoricalAccuracy
 from .dprime import DPrime
-from .eq import EqMetric
+from .equal import Equal
 from .fscore import FScore
+from .mse import MSE
 from .precision import Precision
 from .recall import Recall
+from .rmse import RMSE
 from .rocauc import RocAuc
 from .uar import UAR

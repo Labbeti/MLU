@@ -27,6 +27,6 @@ class Identity(Transform):
 
 def default_extra_repr(obj: object, skip_private_attr: bool = True) -> str:
 	attributes = [
-		f"name={value}" for name, value in obj.__dict__.items() if not skip_private_attr or not name.startswith("_")
+		f'name={value}' for name, value in obj.__dict__.items() if not skip_private_attr or not name.startswith('_')
 	]
-	return ", ".join(attributes)
+	return ', '.join(attributes)

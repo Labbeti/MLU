@@ -8,7 +8,12 @@ from torch import Tensor
 from typing import Any, Callable, Optional
 
 
-class ProcessTransformWrap(Transform):
+class RandomApplyWrap(Transform):
+	def __init__(self, p: float = 1.0):
+		super().__init__(p=p)
+
+
+class ProcessWrap(Transform):
 	def __init__(
 		self,
 		transform: Optional[Transform],
@@ -56,8 +61,8 @@ class ProcessTransformWrap(Transform):
 			self._callables.append(self.post_convert)
 
 
-class PILInternalWrap(ProcessTransformWrap):
-	def __init__(self, pil_transform: ImageTransform, mode: Optional[str] = "RGB", p: float = 1.0):
+class PILInternalWrap(ProcessWrap):
+	def __init__(self, pil_transform: ImageTransform, mode: Optional[str] = 'RGB', p: float = 1.0):
 		"""
 			Class that convert tensor to PIL image internally for apply PIL transforms.
 			Tensors images must have the shape (width, height, 3).
@@ -77,7 +82,7 @@ class PILInternalWrap(ProcessTransformWrap):
 		return super().process(x)
 
 
-class TensorInternalWrap(ProcessTransformWrap):
+class TensorInternalWrap(ProcessWrap):
 	def __init__(self, pil_transform: ImageTransform, p: float = 1.0):
 		"""
 			Class that convert PIL image to tensor internally for apply tensor transforms.
@@ -109,7 +114,7 @@ class TransformWrap(Transform):
 	):
 		"""
 			Wrap a callable object to Transform.
-			Useful for keep correct typing and adding transform type (image, waveform or spectrogram) information.
+			Useful for keep correct typing_ and adding transform type (image, waveform or spectrogram) information.
 
 			:param callable_: The callable object to wrap.
 			:param image_transform: Indicate if the object wrapped is an image transform or not. (default: False)
@@ -139,7 +144,9 @@ class TransformWrap(Transform):
 		return self.callable_
 
 	def extra_repr(self) -> str:
-		if hasattr(self.callable_, "__class__"):
+		if hasattr(self.callable_, '__name__'):
+			return self.callable_.__name__
+		elif hasattr(self.callable_, '__class__'):
 			return self.callable_.__class__.__name__
 		else:
 			return ""

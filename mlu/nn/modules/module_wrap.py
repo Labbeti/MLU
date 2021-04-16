@@ -3,7 +3,7 @@ from torch.nn import Module
 from typing import Callable
 
 
-class ModuleWrap(Module, Callable):
+class ModuleWrap(Module):
 	"""
 		Wrapper for a Callable object with a forward() method.
 	"""
@@ -15,9 +15,9 @@ class ModuleWrap(Module, Callable):
 		return self.callable_(*args, **kwargs)
 
 	def extra_repr(self) -> str:
-		if hasattr(self.callable_, "__class__"):
-			return self.callable_.__class__.__name__
-		elif hasattr(self.callable_, "__name__"):
+		if hasattr(self.callable_, '__name__'):
 			return self.callable_.__name__
+		elif hasattr(self.callable_, '__class__'):
+			return self.callable_.__class__.__name__
 		else:
 			return ""

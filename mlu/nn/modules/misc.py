@@ -4,7 +4,7 @@ import torch
 
 from torch import Tensor
 from torch.nn import Module
-from typing import Any, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from mlu.nn.functional.misc import mish
 
@@ -18,10 +18,13 @@ class Squeeze(Module):
 		self.dim = dim
 
 	def forward(self, x: Tensor) -> Tensor:
-		return x.squeeze(self.dim)
+		if self.dim is None:
+			return torch.squeeze(x)
+		else:
+			return torch.squeeze(x, self.dim)
 
 	def extra_repr(self) -> str:
-		return f"dim={self.dim}"
+		return f'dim={self.dim}'
 
 
 class UnSqueeze(Module):
@@ -33,7 +36,7 @@ class UnSqueeze(Module):
 		return x.unsqueeze(self.dim)
 
 	def extra_repr(self) -> str:
-		return f"dim={self.dim}"
+		return f'dim={self.dim}'
 
 
 class Mish(Module):
@@ -86,10 +89,8 @@ class Mean(Module):
 		super().__init__()
 		self.dim = dim
 
-	def forward(self, x: Tensor, dim: Optional[int] = None) -> Tensor:
-		if dim is None:
-			dim = self.dim
-		return x.mean(dim=dim)
+	def forward(self, x: Tensor) -> Tensor:
+		return x.mean(dim=self.dim)
 
 
 class Permute(Module):
@@ -129,3 +130,60 @@ class Clamp(Module):
 class Identity(Module):
 	def forward(self, *args):
 		return args
+
+
+class ForwardList(List[Module], Module):
+	def __init__(self, *args, **kwargs):
+		list.__init__(self, *args, **kwargs)
+		Module.__init__(self)
+
+	def forward(self, *args, **kwargs) -> List[Any]:
+		return [module(*args, **kwargs) for module in self]
+
+
+class ForwardDict(Dict[str, Module], Module):
+	def __init__(self, *args: Union[dict, Callable, None], **kwargs):
+		"""
+			Compute output of each module stored when forward() is called.
+			Subclass of Dict[str, Module] and Module.
+		"""
+		args = [arg for arg in args if arg is not None]
+		dict.__init__(self, *args, **kwargs)
+		Module.__init__(self)
+
+	def forward(self, *args, **kwargs) -> Dict[str, Any]:
+		return {name: module(*args, **kwargs) for name, module in self.items()}
+
+	def __hash__(self) -> int:
+		return hash(tuple(sorted(self.items())))
+
+
+class ForwardDictAffix(ForwardDict):
+	"""
+			Compute score of each callable object stored when forward() is applied.
+			Subclass of Dict[str, Module] and Module.
+
+			Example :
+
+			>>> import torch
+			>>> from mlu.metrics import CategoricalAccuracy, FScore
+			>>> from mlu.nn import ForwardDictAffix
+			>>> input_ = torch.rand(5, 10)
+			>>> target = torch.rand(5, 10)
+			>>> metric_dict = ForwardDictAffix(acc=CategoricalAccuracy(), f1=FScore())
+			>>> metric_dict(input_, target)
+			... {'acc': 0.4, 'f1': 0.1}
+	"""
+	def __init__(self, *args: Union[dict, Callable, None], prefix: str = "", suffix: str = "", **kwargs):
+		super().__init__(*args, **kwargs)
+		self.prefix = prefix
+		self.suffix = suffix
+
+	def forward(self, *args, **kwargs) -> Dict[str, Any]:
+		return {self.prefix + name + self.suffix: output for name, output in super().forward(*args, **kwargs).items()}
+
+	def to_dict(self, with_affixes: bool = True) -> Dict[str, Module]:
+		if with_affixes:
+			return {self.prefix + name + self.suffix: module for name, module in self.items()}
+		else:
+			return dict(self)

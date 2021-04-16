@@ -21,21 +21,21 @@ class RocAuc(Metric):
 		self.average = average
 		self.reduce_fn = reduce_fn
 
-	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
+	def compute_score(self, pred: Tensor, target: Tensor) -> Tensor:
 		"""
 			Compute ROC AUC score on prediction and target.
 
-			:param input_: (batch_size, num_classes) tensor
-			:param target: (batch_size, num_classes) tensor
+			:param pred: (batch_size, n_classes) tensor
+			:param target: (batch_size, n_classes) tensor
 			:return: The ROC AUC score as scalar tensor.
 		"""
-		assert input_.shape == target.shape
-		assert len(input_.shape) == 2
+		assert pred.shape == target.shape
+		assert len(pred.shape) == 2
 
-		input_ = input_.cpu().numpy()
+		pred = pred.cpu().numpy()
 		target = target.cpu().numpy()
 
-		score = roc_auc_score(y_true=target, y_score=input_, average=self.average)
+		score = roc_auc_score(y_true=target, y_score=pred, average=self.average)
 		score = torch.as_tensor(score)
 		score = self.reduce_fn(score)
 

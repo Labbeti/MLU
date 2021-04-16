@@ -42,7 +42,7 @@ class IncrementalMean(IncrementalMetric):
 	def get_mean(self) -> Optional[Tensor]:
 		return (self._sum / self._counter) if self._counter > 0 else None
 
-	def get_nb_values_added(self) -> int:
+	def get_n_values_added(self) -> int:
 		return self._counter
 
 	def set_mean(self, mean: Tensor, counter: int):
@@ -100,7 +100,7 @@ class IncrementalStd(IncrementalMetric):
 		else:
 			return None
 
-	def get_nb_values_added(self) -> int:
+	def get_n_values_added(self) -> int:
 		return self._counter
 
 
@@ -109,7 +109,7 @@ class NBestsTracker(IncrementalMetric):
 		self,
 		*args: Tensor,
 		start_index: int = 0,
-		is_better: Callable[[Tensor, Tensor], bool] = lambda x, y: x > y,
+		is_better: Callable[[Tensor, Tensor], bool] = torch.gt,
 		n: int = 1,
 	):
 		super().__init__()
@@ -163,7 +163,7 @@ class NBestsTracker(IncrementalMetric):
 	def get_indexes_current(self) -> List[int]:
 		return self._indexes_list
 
-	def get_nb_values_added(self) -> int:
+	def get_n_values_added(self) -> int:
 		return self._index - self._start_index
 
 	def _check_is_better(self, value: Tensor, best: Tensor) -> bool:
@@ -213,11 +213,11 @@ class BestTracker(IncrementalMetric, ABC):
 	def get_index_current(self) -> int:
 		return self._index_best
 
-	def get_nb_values_added(self) -> int:
+	def get_n_values_added(self) -> int:
 		return self._index - self._start_index
 
 	def _check_is_better(self, value: Tensor, best: Tensor) -> bool:
-		raise NotImplemented("Abstract method")
+		raise NotImplemented('Abstract method')
 
 
 class MinTracker(BestTracker):
@@ -293,7 +293,7 @@ class BestTrackerBetterFunc(BestTracker):
 		start_index: int = 0,
 		start_best: Optional[Tensor] = None,
 		start_index_best: int = -1,
-		is_better: Callable[[Tensor, Tensor], bool] = lambda value, best: value > best,
+		is_better: Callable[[Tensor, Tensor], bool] = torch.gt,
 	):
 		super().__init__(
 			*args,

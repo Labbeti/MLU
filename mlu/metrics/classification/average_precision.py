@@ -27,22 +27,22 @@ class AveragePrecision(Metric):
 		self.average = average
 		self.reduce_fn = reduce_fn
 
-	def compute_score(self, input_: Tensor, target: Tensor) -> Tensor:
+	def compute_score(self, pred: Tensor, target: Tensor) -> Tensor:
 		"""
 			Compute mAP score on prediction and target.
 
-			:param input_: (nb_samples, num_classes) tensor
-			:param target: (nb_samples, num_classes) binary tensor
+			:param pred: (n_samples, n_classes) tensor
+			:param target: (n_samples, n_classes) binary tensor
 			:return: The mAP score as scalar tensor.
 		"""
-		assert input_.shape == target.shape
-		assert len(input_.shape) == 2
-		assert target.eq(0.0).logical_or(target.eq(1.0)).all(), "Target must be binary tensor containing only 0 and 1."
+		assert pred.shape == target.shape
+		assert len(pred.shape) == 2
+		assert target.eq(0.0).logical_or(target.eq(1.0)).all(), 'Target must be binary tensor containing only 0 and 1.'
 
-		input_ = input_.cpu().numpy()
+		pred = pred.cpu().numpy()
 		target = target.cpu().numpy()
 
-		score = average_precision_score(y_true=target, y_score=input_, average=self.average)
+		score = average_precision_score(y_true=target, y_score=pred, average=self.average)
 		score = torch.as_tensor(score)
 		score = self.reduce_fn(score)
 

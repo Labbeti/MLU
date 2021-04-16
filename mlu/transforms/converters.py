@@ -44,11 +44,15 @@ class ToTensor(Module):
 		"""
 			Convert a python list, numpy array or PIL image to pytorch tensor.
 
-			:param dtype: The optional dtype of the pytorch tensor. (default: None)
-			:param device: The optional device of the pytorch tensor. (default: None)
+			:param dtype: The optional dtype of the pytorch tensor.
+				(default: None)
+			:param device: The optional device of the pytorch tensor.
+				(default: None)
 			:param permute_tensor: Permute dimensions (height, width, channel) to (channel, height, width) when converting
-				from PIL image. (default: True)
-			:param normalize_tensor: Normalize the tensor values from [0, 255] to [0.0, 1.0]. (default: True)
+				from PIL image.
+				(default: True)
+			:param normalize_tensor: Normalize the tensor values from [0, 255] to [0.0, 1.0]. when converting from PIL image.
+				(default: True)
 		"""
 		super().__init__()
 		self.dtype = dtype
@@ -63,14 +67,14 @@ class ToTensor(Module):
 class ToPIL(Module):
 	def __init__(
 		self,
-		mode: Optional[str] = "RGB",
+		mode: Optional[str] = 'RGB',
 		permute_tensor: bool = False,
 		denormalize_tensor: bool = True,
 	):
 		"""
 			Convert a pytorch tensor, numpy array or python list to PIL image.
 
-			:param mode: Define the type and depth of a pixel in the image. (default: "RGB")
+			:param mode: Define the type and depth of a pixel in the image. (default: 'RGB')
 				See https://pillow.readthedocs.io/en/5.1.x/handbook/concepts.html#modes for details on PIL modes.
 			:param permute_tensor: Permute dimensions (height, width, channel) to (channel, height, width) for PIL image.
 				(default: False)
@@ -124,7 +128,7 @@ def to_numpy(
 def to_tensor(
 	x: Union[list, np.ndarray, Tensor, Image.Image],
 	dtype: Optional[torch.dtype] = None,
-	device: Optional[torch.device] = torch.device("cpu"),
+	device: Optional[torch.device] = torch.device('cpu'),
 	permute_tensor: bool = True,
 	normalize_tensor: bool = True,
 ) -> Tensor:
@@ -149,7 +153,7 @@ def to_tensor(
 
 def to_pil(
 	x: Union[list, np.ndarray, Tensor, Image.Image],
-	mode: Optional[str] = "RGB",
+	mode: Optional[str] = 'RGB',
 	permute_tensor: bool = False,
 	denormalize_tensor: bool = True,
 ) -> Image.Image:

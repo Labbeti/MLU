@@ -1,18 +1,14 @@
 
 from mlu.datasets.wrappers.base import DatasetWrapper
 from torch.utils.data.dataset import Dataset
-from typing import TypeVar
-
-
-T = TypeVar("T")
 
 
 class CachedDataset(DatasetWrapper):
-	def __init__(self, dataset: Dataset[T]):
+	def __init__(self, dataset: Dataset):
 		super().__init__(dataset)
 		self._cached_items = {}
 
-	def __getitem__(self, *args, **kwargs) -> T:
+	def __getitem__(self, *args, **kwargs):
 		args_dict = locals()
 		args_dict = {k: str(v) for k, v in args_dict.items()}
 

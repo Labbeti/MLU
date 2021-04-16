@@ -5,21 +5,22 @@ from mlu.nn.modules.misc import DEFAULT_EPSILON, Mean
 from mlu.nn.utils import get_reduction_from_name
 
 from torch import Tensor
-from torch.nn import Module, KLDivLoss, LogSoftmax, BCELoss
+from torch.nn import Module, KLDivLoss, LogSoftmax, BCELoss, Sequential
 from typing import Optional
 
 
 class CrossEntropyWithVectors(Module):
 	def __init__(
 		self,
-		reduction: str = "mean",
+		reduction: str = 'mean',
 		dim: Optional[int] = -1,
 		log_input: bool = False,
 	):
 		"""
-			Compute Cross-Entropy between two distributions.
-			Input and targets must be a batch of probabilities distributions of shape (batch_size, num_classes) tensor.
-			Useful when target is not exactly a one-hot label, like in MixMatch method.
+			Compute Cross-Entropy between two distributions probabilities.
+
+			Input and targets must be a batch of probabilities distributions of shape (batch_size, n_classes) tensor.
+			Useful when target is not a one-hot label, like in Label-smoothing or MixMatch methods.
 		"""
 		super().__init__()
 		self.reduce_fn = get_reduction_from_name(reduction)
@@ -29,7 +30,7 @@ class CrossEntropyWithVectors(Module):
 	def forward(self, input_: Tensor, targets: Tensor) -> Tensor:
 		"""
 			Compute cross-entropy with targets.
-			Input and target must be a (batch_size, num_classes) tensor.
+			Input and target must be a (batch_size, n_classes) tensor.
 		"""
 		if not self.log_input:
 			input_ = torch.log(input_)
@@ -37,13 +38,13 @@ class CrossEntropyWithVectors(Module):
 		return self.reduce_fn(loss)
 
 	def extra_repr(self) -> str:
-		return f"reduce_fn={self.reduce_fn.__name__}, dim={self.dim}, log_input={self.log_input}"
+		return f'reduce_fn={self.reduce_fn.__name__}, dim={self.dim}, log_input={self.log_input}'
 
 
 class Entropy(Module):
 	def __init__(
 		self,
-		reduction: str = "mean",
+		reduction: str = 'mean',
 		dim: Optional[int] = -1,
 		epsilon: float = DEFAULT_EPSILON,
 		base: Optional[float] = None,
@@ -78,18 +79,24 @@ class Entropy(Module):
 		return self.reduce_fn(entropy)
 
 	def extra_repr(self) -> str:
-		return f"reduce_fn={self.reduce_fn.__name__}, dim={self.dim}, epsilon={self.epsilon}, log_input={self.log_input}"
+		return f'reduce_fn={self.reduce_fn.__name__}, dim={self.dim}, epsilon={self.epsilon}, log_input={self.log_input}'
 
 
 class JSDivLoss(Module):
-	"""
-		Jensen-Shannon Divergence loss.
-		Use Entropy as backend.
-	"""
+	def __init__(self, reduction: str = 'mean', dim: int = -1, epsilon: float = DEFAULT_EPSILON):
+		"""
+			Jensen-Shannon Divergence loss.
 
-	def __init__(self, reduction: str = "mean", dim: int = -1, epsilon: float = DEFAULT_EPSILON):
+			Use the following formula :
+
+			>>> 'JS(p,q) = H(0.5 * (p+q)) - 0.5 * (H(p) + H(q))'
+
+			:param reduction: The reduction function to apply. (default: 'mean')
+			:param dim: The dimension of the probabilities. (default: -1)
+			:param epsilon: The epsilon value used for numerical stability. (default: DEFAULT_EPSILON)
+		"""
 		super().__init__()
-		self.entropy = Entropy(reduction, dim, epsilon)
+		self.entropy = Entropy(reduction, dim, epsilon, log_input=False)
 
 	def forward(self, p: Tensor, q: Tensor) -> Tensor:
 		a = self.entropy(0.5 * (p + q))
@@ -97,21 +104,26 @@ class JSDivLoss(Module):
 		return a - b
 
 
-class JSDivLossWithLogits(Module):
-	"""
-		Jensen-Shannon Divergence loss with logits.
-		Use KLDivLoss and LogSoftmax as backend.
-	"""
+class JSDivLossFromLogits(Module):
+	def __init__(self, reduction: str = 'mean', log_activation: Module = LogSoftmax(dim=-1)):
+		"""
+			Jensen-Shannon Divergence loss with logits.
 
-	def __init__(self, reduction: str = "mean", dim: int = -1):
+			Use the following formula :
+
+			>>> 'JS(p,q) = 0.5 * (KL(LS(p),m) + KL(LS(q),m)), with m = LS(0.5 * (p+q)), LS = LogSoftmax and KL = KL-Divergence.'
+
+			:param reduction: The reduction function to apply. (default: 'mean')
+			:param log_activation: The log-activation function for compute predictions from logits. (default: LogSoftmax(dim=-1))
+		"""
 		super().__init__()
 		self.kl_div = KLDivLoss(reduction=reduction, log_target=True)
-		self.log_softmax = LogSoftmax(dim=dim)
+		self.log_activation = log_activation
 
-	def forward(self, logits_p: Tensor, logits_q: Tensor):
-		m = self.log_softmax(0.5 * (logits_p + logits_q))
-		p = self.log_softmax(logits_p)
-		q = self.log_softmax(logits_q)
+	def forward(self, logits_p: Tensor, logits_q: Tensor) -> Tensor:
+		m = self.log_activation(0.5 * (logits_p + logits_q))
+		p = self.log_activation(logits_p)
+		q = self.log_activation(logits_q)
 
 		a = self.kl_div(p, m)
 		b = self.kl_div(q, m)
@@ -120,11 +132,22 @@ class JSDivLossWithLogits(Module):
 
 
 class KLDivLossWithProbabilities(KLDivLoss):
-	"""
-		KL divergence with probabilities.
-		The probabilities are transform to log scale internally.
-	"""
-	def __init__(self, reduction: str = "mean", epsilon: float = DEFAULT_EPSILON, log_input: bool = False, log_target: bool = False):
+	def __init__(
+		self,
+		reduction: str = 'mean',
+		epsilon: float = DEFAULT_EPSILON,
+		log_input: bool = False,
+		log_target: bool = False,
+	):
+		"""
+			KL-divergence with probabilities.
+
+			:param reduction: The reduction function to apply. (default: 'mean')
+			:param epsilon: The epsilon value used for numerical stability. (default: DEFAULT_EPSILON)
+			:param log_input: If True, the probabilities of the first argument are transform to log scale internally.
+			:param log_target:
+
+		"""
 		super().__init__(reduction=reduction, log_target=log_target)
 		self.epsilon = epsilon
 		self.log_input = log_input
@@ -136,16 +159,21 @@ class KLDivLossWithProbabilities(KLDivLoss):
 		return super().forward(input=p, target=q)
 
 	def extra_repr(self) -> str:
-		return f"epsilon={self.epsilon}, log_input={self.log_input}, log_target={self.log_target}"
+		return f'epsilon={self.epsilon}, log_input={self.log_input}, log_target={self.log_target}'
 
 
 class BCELossBatchMean(Module):
 	def __init__(self, dim: Optional[int] = -1):
 		super().__init__()
-		self._bce = BCELoss(reduction="none")
-		self._mean = Mean(dim=dim)
+		self.bce = BCELoss(reduction='none')
+		self.mean = Mean(dim=dim)
 
 	def forward(self, input_: Tensor, target: Tensor) -> Tensor:
-		loss = self._bce(input_, target)
-		loss = self._mean(loss)
-		return loss
+		return self.mean(self.bce(input_, target))
+
+	@property
+	def dim(self) -> int:
+		return self.__getitem__(1).dim
+
+	def extra_repr(self) -> str:
+		return f'dim={self.dim}'

@@ -12,7 +12,7 @@ class METEOR(Metric):
 	def __init__(self, alpha: float = 0.9, gamma: float = 0.5, beta: float = 3.0):
 		"""
 			Metric for Evaluation of Translation with Explicit ORdering (METEOR)
-			Use "nltk" package as backend.
+			Use 'nltk' package as backend.
 
 			:param alpha: Parameter for controlling the weights of precision and recall. (default: 0.9)
 			:param gamma: The coefficient used in the brevity penalty function. (default: 0.5)

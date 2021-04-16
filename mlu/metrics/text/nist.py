@@ -6,12 +6,12 @@ from typing import List
 
 
 class NIST(Metric):
-	def __init__(self, ngram_order: int):
+	def __init__(self, ngram_order: int = 5):
 		"""
 			Metric for evaluate the quality of a machine translation.
-			Use "nltk" package as backend.
+			Use 'nltk' package as backend.
 
-			:param ngram_order: The ngram max order to use.
+			:param ngram_order: The ngram max order to use. (default: 5)
 		"""
 		super().__init__()
 		self.ngram_order = ngram_order

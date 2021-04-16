@@ -7,7 +7,7 @@ from PIL import Image, ImageOps, ImageEnhance, ImageFilter
 from torchvision.transforms import RandomHorizontalFlip, RandomVerticalFlip
 from typing import Tuple, Union
 
-ImageEnhance_t = "ImageEnhance"
+ImageEnhance_t = 'ImageEnhance'
 
 
 class _Enhance(ImageTransform):
@@ -154,9 +154,9 @@ class Posterize(ImageTransform):
 		self.nbs_bits = tuple(map(int, self.nbs_bits))
 
 	def process(self, data: Image.Image) -> Image.Image:
-		nb_bits = np.random.randint(*self.nbs_bits) if self.nbs_bits[0] != self.nbs_bits[1] else self.nbs_bits[0]
-		nb_bits = 8 - nb_bits
-		return ImageOps.posterize(data, nb_bits)
+		n_bits = np.random.randint(*self.nbs_bits) if self.nbs_bits[0] != self.nbs_bits[1] else self.nbs_bits[0]
+		n_bits = 8 - n_bits
+		return ImageOps.posterize(data, n_bits)
 
 
 class Rescale(ImageTransform):

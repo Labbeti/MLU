@@ -7,7 +7,7 @@ from typing import Any, Callable, Optional
 class TransformDataset(DatasetWrapper):
 	def __init__(self, dataset: Dataset, transform: Optional[Callable], index: Optional[int] = None):
 		"""
-			Wrap a dataset by applying a post-transform to item get by the method "__getitem__".
+			Wrap a dataset by applying a post-transform to item get by the method '__getitem__'.
 
 			:param dataset: The dataset to wrap.
 			:param transform: The callable transform to apply.

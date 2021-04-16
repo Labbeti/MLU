@@ -1,5 +1,9 @@
+"""
+	Miscellaneous functions utilities.
+"""
 
 import inspect
+import math
 import numpy as np
 import random
 import re
@@ -7,27 +11,27 @@ import subprocess
 import torch
 
 from datetime import datetime
+from IPython.display import Audio, display
 from torch import Tensor
-from torch.nn import Module
+from torch.nn.functional import pad
 from torch.utils.tensorboard import SummaryWriter
 from types import MethodType, FunctionType, ModuleType
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, TypeVar, Union
 
-
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 def get_datetime() -> str:
 	"""
-		Returns the date in a specific format : "YYYY_MM_DD_hh:mm:ss".
+		Returns the date in a specific format : 'YYYY_MM_DD_hh:mm:ss'.
 
 		:returns: The current date.
 	"""
 	now = str(datetime.now())
-	return now[:10] + "_" + now[11:-7]
+	return now[:10] + '_' + now[11:-7]
 
 
-def reset_seed(seed: int):
+def reset_seed(seed: Optional[int]):
 	"""
 		Reset the seed of following packages :
 			- random
@@ -39,25 +43,26 @@ def reset_seed(seed: int):
 
 		:param seed: The seed to set.
 	"""
-	random.seed(seed)
-	np.random.seed(seed)
-	torch.manual_seed(seed)
-	torch.cuda.manual_seed_all(seed)
+	if seed is not None:
+		random.seed(seed)
+		np.random.seed(seed)
+		torch.manual_seed(seed)
+		torch.cuda.manual_seed_all(seed)
 
-	if hasattr(torch.backends, "cudnn"):
-		torch.backends.cudnn.deterministic = True
-		torch.backends.cudnn.benchmark = False
-	else:
-		raise RuntimeError(
-			"Cannot make deterministic behaviour for current torch backend (torch.backends does have the attribute 'cudnn')."
-		)
+		if hasattr(torch.backends, 'cudnn'):
+			torch.backends.cudnn.deterministic = True
+			torch.backends.cudnn.benchmark = False
+		else:
+			raise RuntimeError(
+				'Cannot make deterministic behaviour for current torch backend (torch.backends does have the attribute "cudnn").'
+			)
 
 
 def random_rect(
-	width_img: int,
-	height_img: int,
-	width_range: Tuple[float, float],
-	height_range: Tuple[float, float]
+		width_img: int,
+		height_img: int,
+		width_range: Tuple[float, float],
+		height_range: Tuple[float, float]
 ) -> (int, int, int, int):
 	"""
 		Create a random rectangle inside an area defined by the limits (left, right, top, down).
@@ -118,27 +123,17 @@ def random_cuboid(shapes: Sequence[int], ratios: Sequence[Tuple[float, float]]) 
 	return limits
 
 
-def get_nb_parameters(model: Module, only_trainable: bool = True) -> int:
-	"""
-		Return the number of parameters in a model.
-
-		:param model: Pytorch Module to check.
-		:param only_trainable: If True, count only parameter that requires gradient. (default: True)
-		:returns: The number of parameters.
-	"""
-	params = (p for p in model.parameters() if not only_trainable or p.requires_grad)
-	return sum(p.numel() for p in params)
-
-
 def add_dict_to_writer(dic: Dict[str, Any], writer: SummaryWriter):
 	"""
 		Add dictionary content to tensorboard hyperparameters.
 	"""
+
 	def filter_(v: Any) -> Union[str, int, float, Tensor]:
 		if any([isinstance(v, type_) for type_ in [str, int, float, Tensor]]):
 			return v
 		else:
 			return str(v)
+
 	dic = {k: filter_(v) for k, v in dic.items()}
 	writer.add_hparams(hparam_dict=dic, metric_dict={})
 
@@ -150,14 +145,14 @@ def get_current_git_hash() -> str:
 		:returns: The git hash. If an error occurs, returns 'UNKNOWN'.
 	"""
 	try:
-		git_hash = subprocess.check_output(["git", "describe", "--always"])
-		git_hash = git_hash.decode("UTF-8").replace("\n", "")
+		git_hash = subprocess.check_output(['git', 'describe', '--always'])
+		git_hash = git_hash.decode('UTF-8').replace('\n', "")
 		return git_hash
 	except subprocess.CalledProcessError:
-		return "UNKNOWN"
+		return 'UNKNOWN'
 
 
-def to_dict_rec(obj: Any, class_name_key: Optional[str] = "__class__") -> Union[dict, list]:
+def to_dict_rec(obj: Any, class_name_key: Optional[str] = '__class__') -> Union[dict, list]:
 	"""
 		Convert an object to a dictionary.
 
@@ -175,18 +170,18 @@ def to_dict_rec(obj: Any, class_name_key: Optional[str] = "__class__") -> Union[
 		}
 	elif isinstance(obj, Tensor):
 		return to_dict_rec(obj.tolist(), class_name_key)
-	elif hasattr(obj, "_ast"):
+	elif hasattr(obj, '_ast'):
 		return to_dict_rec(obj._ast(), class_name_key)
-	elif hasattr(obj, "__iter__") and not isinstance(obj, str):
+	elif hasattr(obj, '__iter__') and not isinstance(obj, str):
 		return [to_dict_rec(v, class_name_key) for v in obj]
-	elif hasattr(obj, "__dict__"):
+	elif hasattr(obj, '__dict__'):
 		data = {}
-		if class_name_key is not None and hasattr(obj, "__class__"):
+		if class_name_key is not None and hasattr(obj, '__class__'):
 			data[class_name_key] = obj.__class__.__name__
 		data.update({
 			attr: to_dict_rec(value, class_name_key)
 			for attr, value in obj.__dict__.items()
-			if not callable(value) and not attr.startswith("__")
+			if not callable(value) and not attr.startswith('__')
 		})
 		return data
 	else:
@@ -219,7 +214,7 @@ def scalar_normalization(value: T, old_min: T, old_max: T, new_min: T = 0.0, new
 	return (value - old_min) / (old_max - old_min) * (new_max - new_min) + new_min
 
 
-def duration_formatter(seconds: int, format_: str = "%jd:%Hh:%Mm:%Ss") -> str:
+def duration_formatter(seconds: int, format_: str = '%jd:%Hh:%Mm:%Ss') -> str:
 	rest = seconds
 
 	rest, seconds = divmod(rest, 60)
@@ -228,10 +223,10 @@ def duration_formatter(seconds: int, format_: str = "%jd:%Hh:%Mm:%Ss") -> str:
 	days = rest
 
 	replaces = {
-		"%S": seconds,
-		"%M": minutes,
-		"%H": hours,
-		"%j": days,
+		'%S': seconds,
+		'%M': minutes,
+		'%H': hours,
+		'%j': days,
 	}
 	result = format_
 	for directive, value in replaces.items():
@@ -239,12 +234,12 @@ def duration_formatter(seconds: int, format_: str = "%jd:%Hh:%Mm:%Ss") -> str:
 	return result
 
 
-def duration_unformatter(string: str, format_: str = "%jd:%Hh:%Mm:%Ss") -> int:
+def duration_unformatter(string: str, format_: str = '%jd:%Hh:%Mm:%Ss') -> int:
 	replaces = {
-		"%S": "(?P<S>[0-9]+)",
-		"%M": "(?P<M>[0-9]+)",
-		"%H": "(?P<H>[0-9]+)",
-		"%j": "(?P<j>[0-9]+)",
+		'%S': '(?P<S>[0-9]+)',
+		'%M': '(?P<M>[0-9]+)',
+		'%H': '(?P<H>[0-9]+)',
+		'%j': '(?P<j>[0-9]+)',
 	}
 	format_re = format_
 	for directive, value in replaces.items():
@@ -252,12 +247,12 @@ def duration_unformatter(string: str, format_: str = "%jd:%Hh:%Mm:%Ss") -> int:
 
 	match = re.search(format_re, string)
 	if match is None:
-		raise RuntimeError(f"Invalid string '{string}' with format '{format_}'.")
+		raise RuntimeError(f'Invalid string "{string}" with format "{format_}".')
 
-	seconds = int(match["S"])
-	minutes = int(match["M"])
-	hours = int(match["H"])
-	days = int(match["j"])
+	seconds = int(match['S'])
+	minutes = int(match['M'])
+	hours = int(match['H'])
+	days = int(match['j'])
 	total_seconds = seconds + minutes * 60 + hours * 3600 + days * 3600 * 24
 
 	return total_seconds
@@ -274,13 +269,13 @@ def get_func_params_names(func: Union[MethodType, FunctionType, Callable]) -> Li
 def get_param_names(class_or_func: Callable) -> List[str]:
 	if inspect.isfunction(class_or_func):
 		func = class_or_func
-	elif inspect.isclass(class_or_func) and hasattr(class_or_func, "__init__"):
+	elif inspect.isclass(class_or_func) and hasattr(class_or_func, '__init__'):
 		func = class_or_func.__init__
-	elif callable(class_or_func) and hasattr(class_or_func, "__call__"):
+	elif callable(class_or_func) and hasattr(class_or_func, '__call__'):
 		func = class_or_func.__call__
 	else:
 		raise RuntimeError(
-			f"Invalid class, function or object '{class_or_func.__name__}'. Must be a function, class or callable object.")
+			f'Invalid class, function or object "{class_or_func.__name__}". Must be a function, class or callable object.')
 
 	return get_func_params_names(func)
 
@@ -300,10 +295,10 @@ def collate_dict_item(items: List[Dict[str, Any]]) -> Dict[str, List[Any]]:
 
 def search_function_in_module(func_name: str, module: ModuleType) -> Optional[Callable]:
 	if not inspect.ismodule(module):
-		raise RuntimeError(f"Object '{module.__name__}' is not a Module.")
+		raise RuntimeError(f'Object "{module.__name__}" is not a Module.')
 
 	predicate = lambda member: (
-		inspect.isfunction(member) and member.__module__ == module.__name__
+			inspect.isfunction(member) and member.__module__ == module.__name__
 	)
 	functions = inspect.getmembers(module, predicate)
 	functions = [func for name, func in functions if name == func_name]
@@ -314,4 +309,82 @@ def search_function_in_module(func_name: str, module: ModuleType) -> Optional[Ca
 		assert inspect.isfunction(functions[0])
 		return functions[0]
 	else:
-		raise RuntimeError(f"Found multiple functions matching the following name : '{func_name}'.")
+		raise RuntimeError(f'Found multiple functions matching the following name : "{func_name}".')
+
+
+def play_audio(waveform, sample_rate):
+	waveform = waveform.numpy()
+
+	num_channels, num_frames = waveform.shape
+	if num_channels == 1:
+		display((Audio(waveform[0], rate=sample_rate),))
+	elif num_channels == 2:
+		display((Audio((waveform[0], waveform[1]), rate=sample_rate),))
+	else:
+		raise ValueError("Waveform with more than 2 channels are not supported.")
+
+
+def phase_vocoder(data: Tensor, rate: float, hop_length: Optional[int] = None) -> Tensor:
+	"""
+		Based on librosa implementation :
+		https://librosa.org/doc/main/_modules/librosa/core/spectrum.html#phase_vocoder
+	"""
+	assert len(data.shape) >= 2
+
+	device = data.device
+	n_fft = 2 * (data.shape[0] - 1)
+
+	if hop_length is None:
+		hop_length = int(n_fft // 4)
+
+	time_steps = torch.arange(0, data.shape[-1], rate, dtype=torch.float, device=device)
+
+	# Create an empty output array
+	d_stretch = torch.zeros(*data.shape[:-1], len(time_steps), dtype=data.dtype, device=device)
+
+	# Expected phase advance in each bin
+	phi_advance = torch.linspace(0, math.pi * hop_length, data.shape[-2], device=device)
+
+	# Phase accumulator; initialize to the first sample
+	phase_acc = torch.angle(data[:, 0])
+
+	# Pad 0 columns to simplify boundary logic
+	data = pad(data, [0, 2, 0, 0], mode='constant')
+
+	for (t, step) in enumerate(time_steps):
+		slices = [slice(None)] * len(data.shape)
+		slices[-1] = slice(int(step), int(step + 2))
+		columns = data[slices]
+
+		# Weighting for linear magnitude interpolation
+		alpha = torch.fmod(step, 1.0)
+		mag = (1.0 - alpha) * torch.abs(columns[:, 0]) + alpha * torch.abs(columns[:, 1])
+
+		# Store to output array
+		print("d_stretch =", d_stretch.shape)
+		print("d_stretch[:, t] =", d_stretch[:, t].shape)
+		print("mag =", mag.shape)
+		print("phase_acc =", phase_acc.shape)
+		d_stretch[:, t] = mag * torch.as_tensor(1.j * phase_acc).exp()
+
+		# Compute phase advance
+		dphase = torch.angle(columns[:, 1]) - torch.angle(columns[:, 0]) - phi_advance
+
+		# Wrap to -pi:pi range
+		dphase = dphase - 2.0 * math.pi * torch.round(dphase / (2.0 * math.pi))
+
+		# Accumulate phase
+		phase_acc += phi_advance + dphase
+
+	return d_stretch
+
+
+def time_stretch(data: Tensor, rate: float) -> Tensor:
+	"""
+		Based on librosa implementation :
+		https://man.hubwiz.com/docset/LibROSA.docset/Contents/Resources/Documents/_modules/librosa/effects.html#time_stretch
+	"""
+	stft = torch.stft(data, n_fft=2048, return_complex=True)
+	stft_stretch = phase_vocoder(stft, rate)
+	data_stretch = torch.istft(stft_stretch, n_fft=2048)
+	return data_stretch

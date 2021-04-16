@@ -1,11 +1,12 @@
 
 import random
+import torch
 
 from abc import ABC
 from mlu.transforms.base import Transform
 from mlu.transforms.wrappers import TransformWrap
 from torch.nn import Module
-from typing import Any, Callable, List, Optional, Sequence
+from typing import Any, Callable, List, Optional, Sequence, Tuple, Union
 
 
 class Container(Transform, ABC):
@@ -15,7 +16,7 @@ class Container(Transform, ABC):
 
 		for i, transform in enumerate(self._transforms):
 			if not callable(transform):
-				raise RuntimeError(f"Cannot add non-callable object '{type(transform)}'.")
+				raise RuntimeError(f'Cannot add non-callable object "{type(transform)}".')
 			if not isinstance(transform, Module):
 				transform = TransformWrap(transform)
 			self.add_module(str(i), transform)
@@ -30,20 +31,20 @@ class Container(Transform, ABC):
 		return self._transforms
 
 	def is_image_transform(self) -> bool:
-		return all([isinstance(transform, Transform) and transform.is_image_transform() for transform in self._transforms])
+		return all(isinstance(transform, Transform) and transform.is_image_transform() for transform in self._transforms)
 
 	def is_waveform_transform(self) -> bool:
-		return all([isinstance(transform, Transform) and transform.is_waveform_transform() for transform in self._transforms])
+		return all(isinstance(transform, Transform) and transform.is_waveform_transform() for transform in self._transforms)
 
 	def is_spectrogram_transform(self) -> bool:
-		return all([isinstance(transform, Transform) and transform.is_spectrogram_transform() for transform in self._transforms])
+		return all(isinstance(transform, Transform) and transform.is_spectrogram_transform() for transform in self._transforms)
 
 
 class Compose(Container):
 	def __init__(self, *transforms: Callable, p: float = 1.0):
 		"""
 			Compose a list of transforms for apply them sequentially.
-			The use is very similar to pytorch Sequential(), but it wrap non-modules object into TransformWrap() class.
+			This class is very similar to torch.nn.Sequential(), but it wrap non-modules object into TransformWrap() class.
 
 			:param transforms: The list of transforms to apply.
 			:param p: The probability to apply the transform. (default: 1.0)
@@ -60,26 +61,34 @@ class RandomChoice(Container):
 	def __init__(
 		self,
 		*transforms: Callable,
-		nb_choices: int = 1,
+		n_choices: Union[int, Tuple[int, int]] = 1,
 		weights: Optional[Sequence[float]] = None,
 		p: float = 1.0,
 	):
 		"""
 			Select randomly k transforms in a list and apply them sequentially.
 
-			An transform can be chosen multiple times if nb_choices > 1. (with replacement)
+			An transform can be chosen multiple times if n_choices > 1. (with replacement)
 
 			:param transforms: The list of transforms from we choose the apply a transform.
-			:param nb_choices: The number of transforms to choose. (default: 1)
+			:param n_choices: The number of transforms to choose.
+				If tuple, it will be interpreted as a range [min,max[ for sampling the number of choices for each sample.
+				(default: 1)
 			:param weights: The probabilities to choose the transform. (default: None)
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(*transforms, p=p)
-		self.nb_choices = nb_choices
+		self.n_choices = n_choices
 		self.weights = weights
 
 	def process(self, x: Any) -> Any:
-		transforms = random.choices(self.get_transforms(), weights=self.weights, k=self.nb_choices)
+		if isinstance(self.n_choices, tuple):
+			n_choices_min, n_choices_max = self.n_choices
+			n_choices = torch.randint(n_choices_min, n_choices_max, ()).item()
+		else:
+			n_choices = self.n_choices
+
+		transforms = random.choices(self.get_transforms(), weights=self.weights, k=n_choices)
 		for transform in transforms:
 			x = transform(x)
 		return x
@@ -132,7 +141,7 @@ class PoolRandomChoice(Container):
 		]
 
 		if len(final_pool) == 0:
-			raise RuntimeError("Found an empty list of transforms.")
+			raise RuntimeError('Found an empty list of transforms.')
 		elif len(final_pool) == 1:
 			transform_composed = final_pool[0]
 		else:
@@ -189,7 +198,7 @@ class AudioPoolRandomChoice(PoolRandomChoice):
 				transforms.append(transform_to_spec)
 
 			if len(transforms) == 0:
-				raise RuntimeError("Found an empty list of transforms.")
+				raise RuntimeError('Found an empty list of transforms.')
 			elif len(transforms) == 1:
 				augm_pool_with_to_spec.append(transforms[0])
 			else:
@@ -197,7 +206,7 @@ class AudioPoolRandomChoice(PoolRandomChoice):
 
 		# Random selection of the augment
 		if len(augm_pool_with_to_spec) == 0:
-			raise RuntimeError("Found an empty transform pool.")
+			raise RuntimeError('Found an empty transform pool.')
 		elif len(augm_pool_with_to_spec) == 1:
 			main_transform = augm_pool_with_to_spec[0]
 		else:
