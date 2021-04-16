@@ -1,7 +1,8 @@
 
 from .average_precision import AveragePrecision
+from .bce import BCEMetric
 from .binary_accuracy import BinaryAccuracy
-from .accuracy import CategoricalAccuracy
+from .categorical_accuracy import CategoricalAccuracy
 from .dprime import DPrime
 from .equal import Equal
 from .fscore import FScore

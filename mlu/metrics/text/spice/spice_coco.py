@@ -12,7 +12,7 @@ import os
 import subprocess
 import tempfile
 
-from json import JSONEncoder
+from typing import Any, Dict
 
 # Assumes spice.jar is in the same directory as spice.py.  Change as needed.
 SPICE_JAR = 'spice-1.0.jar'
@@ -25,7 +25,7 @@ class Spice:
 	Main Class to compute the SPICE metric
 	"""
 
-	def compute_score(self, gts: dict[any, list], res: dict[any, list]):
+	def compute_score(self, gts: Dict[Any, list], res: Dict[Any, list]):
 		assert (sorted(gts.keys()) == sorted(res.keys()))
 		imgIds = sorted(gts.keys())
 
