@@ -5,6 +5,6 @@
 """
 
 __author__ = 'Etienne Labbé'
-__license__ = 'MIT'
 __maintainer__ = 'Etienne Labbé'
-__email__ = "etienne.labbe31@gmail.com"
+__email__ = 'etienne.labbe31@gmail.com'
+__license__ = 'MIT'

@@ -4,7 +4,7 @@ from torchaudio.transforms import Resample
 
 from mlu.transforms.waveform.crop import Crop
 from mlu.transforms.base import WaveformTransform
-from mlu.utils.misc import time_stretch
+from mlu.transforms.utils import time_stretch_freq_domain
 
 
 class PitchShift(WaveformTransform):
@@ -24,7 +24,7 @@ class PitchShift(WaveformTransform):
 		self.resample.new_freq = self.sr
 		self.crop.target_length = data.shape[-1]
 
-		data = time_stretch(data, rate)
+		data = time_stretch_freq_domain(data, rate)
 		data = self.resample(data)
 		data = self.crop(data)
 
