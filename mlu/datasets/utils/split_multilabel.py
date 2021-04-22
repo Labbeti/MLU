@@ -2,10 +2,34 @@
 import torch
 
 from torch import Tensor
-from typing import List
+from typing import List, Sequence
+
+from mlu.utils.typing_ import SizedDataset
 
 
-def get_indexes_per_class(targets: Tensor) -> List[List[int]]:
+def get_indexes_per_class(dataset: SizedDataset, n_classes: int, target_type: str = 'indexes') -> Sequence[Sequence[int]]:
+	if not hasattr(dataset, 'get_target'):
+		raise RuntimeError(f'Dataset "{type(dataset)}" must have a method "get_target" for getting indexes per class.')
+
+	indexes_per_class: list = [[] for _ in range(n_classes)]
+	for i in range(len(dataset)):
+		target = dataset.get_target(i)
+
+		if target_type == 'indexes':
+			for idx in target:
+				indexes_per_class[idx].append(i)
+		elif target_type == 'multihot':
+			target_idx = torch.arange(0, len(target))
+			target_idx = target_idx[torch.as_tensor(target)]
+			for idx in target_idx:
+				indexes_per_class[idx].append(i)
+		else:
+			raise RuntimeError(f'Unknown target_type "{target_type}".')
+
+	return indexes_per_class
+
+
+def get_indexes_per_class_from_targets(targets: Tensor) -> List[List[int]]:
 	n_classes = targets.shape[1]
 	return [torch.where(targets[:, i].eq(1.0))[0].tolist() for i in range(n_classes)]
 

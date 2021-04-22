@@ -4,8 +4,9 @@ import unittest
 
 from torch import Tensor
 from unittest import TestCase
+
 from mlu.datasets.utils.split_multilabel import (
-	get_indexes_per_class,
+	get_indexes_per_class_from_targets,
 	split_multilabel_indexes_per_class,
 	flat_indexes_per_class,
 	check_targets,
@@ -24,7 +25,7 @@ class TestSplitMulti(TestCase):
 			if target.sum().eq(False):
 				target[torch.randint(n_classes, (1,))] = True
 
-		indexes_per_class = get_indexes_per_class(targets)
+		indexes_per_class = get_indexes_per_class_from_targets(targets)
 		targets_rebuild = get_targets(indexes_per_class)
 		self.assertEqual(targets, targets_rebuild)
 
@@ -40,7 +41,7 @@ class TestSplitMulti(TestCase):
 			[1, 0, 0],
 		])
 
-		indexes_per_class = get_indexes_per_class(targets)
+		indexes_per_class = get_indexes_per_class_from_targets(targets)
 		expected_indexes_per_class = [
 			[0, 1, 3, 7],
 			[0, 4, 5, 6],
@@ -49,7 +50,7 @@ class TestSplitMulti(TestCase):
 		self.assertEqual(indexes_per_class, expected_indexes_per_class)
 
 		indexes_all = list(range(len(targets)))
-		indexes_per_class = get_indexes_per_class(targets)
+		indexes_per_class = get_indexes_per_class_from_targets(targets)
 
 		split_1, split_2 = split_multilabel_indexes_per_class(indexes_per_class, [0.5, 0.5], verbose=True)
 
@@ -87,7 +88,7 @@ class TestSplitMulti(TestCase):
 
 		self.assertTrue(check_targets(targets, at_least_one_elem_per_class=True, at_least_one_class_per_elem=True))
 
-		indexes_per_class = get_indexes_per_class(targets)
+		indexes_per_class = get_indexes_per_class_from_targets(targets)
 
 		split_1, split_2 = split_multilabel_indexes_per_class(indexes_per_class, [0.5, 0.5], verbose=True)
 

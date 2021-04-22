@@ -32,5 +32,5 @@ class CheckType(Module):
 
 	def forward(self, x):
 		if not isinstance(x, self.types):
-			raise ValueError(f'Invalid type "{type(x)}". Must one of: {tuple(self.types)}.')
+			raise ValueError(f'Invalid type "{type(x)}". Must one of: {self.types}.')
 		return x

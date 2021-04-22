@@ -31,7 +31,7 @@ def generate_subsets_split(
 		:param target_one_hot: Consider labels as one-hot vectors. If False, consider labels as class indexes.
 		:return: A list of subsets.
 	"""
-	indexes = generate_indexes_split(dataset, n_classes, ratios, shuffle_idx, target_one_hot)
+	indexes = balanced_split(dataset, n_classes, ratios, shuffle_idx, target_one_hot)
 	return [Subset(dataset, idx) for idx in indexes]
 
 
@@ -51,11 +51,11 @@ def generate_samplers_split(
 		:param target_one_hot: Consider labels as one-hot vectors. If False, consider labels as class indexes.
 		:return: A list of samplers of length of ratios list.
 	"""
-	indexes = generate_indexes_split(dataset, n_classes, ratios, target_one_hot=target_one_hot)
+	indexes = balanced_split(dataset, n_classes, ratios, target_one_hot=target_one_hot)
 	return [SubsetRandomSampler(idx) for idx in indexes]
 
 
-def generate_indexes_split(
+def balanced_split(
 	dataset: SizedDataset,
 	n_classes: int,
 	ratios: List[float],

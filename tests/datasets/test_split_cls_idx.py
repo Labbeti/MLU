@@ -1,9 +1,11 @@
+
 import random
 import unittest
 
-from mlu.datasets.dummy import DummyDataset
-from mlu.datasets.utils.split import split_indexes_per_class, flat_split_indexes_per_class, generate_indexes_split
 from unittest import TestCase
+
+from mlu.datasets.dummy import DummyDataset
+from mlu.datasets.utils.split import split_indexes_per_class, flat_split_indexes_per_class, balanced_split
 
 
 class TestSplitIdx(TestCase):
@@ -86,7 +88,7 @@ class TestSplitIdx(TestCase):
 		ratio_s = random.random()
 		ratio_u = 1.0 - ratio_s
 
-		indexes_s, indexes_u = generate_indexes_split(dataset, n_classes, [ratio_s, ratio_u], False)
+		indexes_s, indexes_u = balanced_split(dataset, n_classes, [ratio_s, ratio_u], False)
 
 		# Check if contains an index multiple times
 		self.assertEqual(len(indexes_s), len(set(indexes_s)))

@@ -13,7 +13,7 @@ from torch import Tensor
 from torch.nn import Module
 from torch.utils.data.dataset import Dataset
 from torchaudio.datasets.utils import download_url, extract_archive, validate_file
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
 
 class FSD50KSubset(str, Enum):
@@ -21,9 +21,10 @@ class FSD50KSubset(str, Enum):
 	EVAL: str = 'eval'
 
 
-class FSD50KDataset(Dataset):
+class FSD50K(Dataset):
 	FOLDER = 'FSD50K'
 	N_CLASSES = 200
+	SAMPLE_RATE = 44100
 
 	def __init__(
 		self,
