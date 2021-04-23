@@ -39,7 +39,7 @@ class TimeStretchPadCrop(WaveformTransform):
 		self.dim = dim
 
 		target_length = self.target_length if self.target_length is not None else 1
-		self.stretch = TimeStretch(rates, dim)
+		self.stretch = TimeStretch(rates, dim=dim)
 		self.pad = Pad(target_length, align, fill_value, dim)
 		self.crop = Crop(target_length, align, dim)
 

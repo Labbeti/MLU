@@ -84,3 +84,12 @@ class Pad(WaveformTransform):
 
 		x = pad(x, pad_seq, mode=self.mode, value=self.fill_value)
 		return x
+
+	def extra_repr(self) -> str:
+		return (
+			f'target_length={self.target_length}, '
+			f'align={self.align}, '
+			f'fill_value={self.fill_value}, '
+			f'dim={self.dim}, '
+			f'mode={self.mode}'
+		)

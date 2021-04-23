@@ -17,8 +17,10 @@ from typing import Optional, Tuple
 
 
 class FSD50KSubset(str, Enum):
-	DEV: str = 'dev'
+	TRAIN: str = 'train'
+	VAL: str = 'val'
 	EVAL: str = 'eval'
+	DEV: str = 'dev'
 
 
 class FSD50K(Dataset):
@@ -35,8 +37,35 @@ class FSD50K(Dataset):
 		download: bool = False,
 		verbose: int = 1,
 	):
-		if subset not in ['dev', 'eval']:
-			raise ValueError(f'Invalid subset "{subset}". Must be one of ("dev", "eval").')
+		"""
+			Unofficial FreeSound Dataset 50k (FSD50K) pytorch dataset.
+			Items are a tuple of audio waveform tensor and list of class indexes.
+
+			>>> 'Dataset tree directories :'
+			root/
+			└── FSD50K/
+				├── FSD50K.dev_audio/
+				│  	└── (40966 files, ~24GB)
+				├── FSD50K.doc/
+				├── FSD50K.eval_audio/
+				│  	└── (10231 files, ~8.3GB)
+				├── FSD50K.ground_truth/
+				│  	├── dev.csv
+				│  	├── eval.csv
+				│  	└── vocabulary.csv
+				└── FSD50K.metadata/
+					└── collection/
+
+
+			:param root: The dataset root directory path.
+			:param subset: TODO
+			:param transform: TODO
+			:param target_transform: TODO
+			:param download: TODO
+			:param verbose: TODO
+		"""
+		if subset not in ('dev', 'train', 'val', 'eval'):
+			raise ValueError(f'Invalid subset "{subset}". Must be one of ("dev", "train", "val", "eval").')
 
 		super().__init__()
 		self._root = root
@@ -63,7 +92,7 @@ class FSD50K(Dataset):
 		fpath = self.get_audio_fpath(index)
 		audio, _sample_rate = torchaudio.load(fpath)
 		if self._transform is not None:
-			audio = audio
+			audio = self._transform(audio)
 		return audio
 
 	def get_target(self, index: int) -> Tensor:
@@ -183,13 +212,21 @@ class FSD50K(Dataset):
 				labels_indices = [target_name_to_idx[name] for name in labels]
 				labels_indices = torch.as_tensor(labels_indices)
 
-				fnames.append(fname)
-				targets.append(labels_indices)
+				is_in_subset = (
+					self._subset == FSD50KSubset.DEV or
+					self._subset == FSD50KSubset.EVAL or
+					(self._subset == FSD50KSubset.TRAIN and line['split'] == 'train') or
+					(self._subset == FSD50KSubset.VAL and line['split'] == 'val')
+				)
 
-				# Check if file exists
-				fpath = osp.join(self.get_root_dir(), SUBSET_INFO[self._subset]['audio_dir'], fname)
-				if not osp.isfile(fpath):
-					raise RuntimeError(f'File "{fname}" has not been downloaded.')
+				if is_in_subset:
+					fnames.append(fname)
+					targets.append(labels_indices)
+
+					# Check if file exists
+					fpath = osp.join(self.get_root_dir(), SUBSET_INFO[self._subset]['audio_dir'], fname)
+					if not osp.isfile(fpath):
+						raise RuntimeError(f'File "{fname}" has not been downloaded.')
 
 		self._fnames = fnames
 		self._targets = targets
@@ -256,5 +293,15 @@ SUBSET_INFO = {
 		'n_samples': 10231,
 		'ground_truth': osp.join('FSD50K.ground_truth', 'eval.csv'),
 		'audio_dir': 'FSD50K.eval_audio',
+	},
+	'train': {
+		'n_samples': 36796,
+		'ground_truth': osp.join('FSD50K.ground_truth', 'dev.csv'),
+		'audio_dir': 'FSD50K.dev_audio',
+	},
+	'val': {
+		'n_samples': 4170,
+		'ground_truth': osp.join('FSD50K.ground_truth', 'dev.csv'),
+		'audio_dir': 'FSD50K.dev_audio',
 	},
 }

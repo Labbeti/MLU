@@ -5,7 +5,7 @@ import unittest
 from unittest import TestCase
 
 from mlu.datasets.dummy import DummyDataset
-from mlu.datasets.utils.split import split_indexes_per_class, flat_split_indexes_per_class, balanced_split
+from mlu.datasets.split.monolabel import balanced_split
 
 
 class TestSplitIdx(TestCase):

@@ -2,7 +2,6 @@
 import itertools
 import random
 
-from torch.utils.data.dataset import Dataset
 from torch.utils.data.sampler import Sampler
 from typing import Iterator, List, Optional, Sequence, Sized
 
@@ -85,29 +84,50 @@ class SubsetInfiniteCycleSampler(Sampler):
 
 class BalancedSampler(Sampler):
 	def __init__(self, indexes_per_class: Sequence[Sequence[int]], n_max_samples: int, shuffle: bool = True):
+		for cls_idx, indexes in enumerate(indexes_per_class):
+			if len(indexes) == 0:
+				raise RuntimeError(f'Found a class index {cls_idx} without any indexes.')
+
 		super().__init__(None)
 		self.indexes_per_class = indexes_per_class
 		self.n_max_samples = n_max_samples
 		self.shuffle = shuffle
 
+		self.max_idx = max(len(indexes) for indexes in self.indexes_per_class)
 		self.pointers_per_class = [list(range(len(indexes))) for indexes in self.indexes_per_class]
 		self.local_idx_per_class = [0 for _ in range(len(self.indexes_per_class))]
 
+		self.shuffle_pointers()
+
 	def __iter__(self) -> Iterator[int]:
+		global_idx = 0
 		n_classes = len(self.indexes_per_class)
 		for cls_idx in itertools.cycle(range(n_classes)):
-			class_indexes = self.indexes_per_class[cls_idx]
-			pointers = self.pointers_per_class[cls_idx]
-			pointer_idx = self.local_idx_per_class[cls_idx]
+			cls_idx: int
 
-			pointer = pointers[pointer_idx]
-			sample_idx = class_indexes[pointer]
+			if global_idx % self.max_idx == self.max_idx - 1:
+				self.shuffle_pointers()
+
+			try:
+				class_indexes = self.indexes_per_class[cls_idx]
+				pointers = self.pointers_per_class[cls_idx]
+				pointer_idx = self.local_idx_per_class[cls_idx]
+
+				pointer = pointers[pointer_idx]
+				sample_idx = class_indexes[pointer]
+			except IndexError:
+				print('global_idx =', global_idx)
+				print('cls_idx =', cls_idx)
+				breakpoint()
 			yield sample_idx
+
 			self.local_idx_per_class[cls_idx] = (self.local_idx_per_class[cls_idx] + 1) % len(pointers)
+			global_idx += 1
 
 	def __len__(self) -> int:
 		return self.n_max_samples
 
-	def shuffle(self):
-		for pointers in self.pointers_per_class:
-			random.shuffle(pointers)
+	def shuffle_pointers(self):
+		if self.shuffle:
+			for pointers in self.pointers_per_class:
+				random.shuffle(pointers)

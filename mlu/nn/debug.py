@@ -1,10 +1,10 @@
 
 from torch.nn import Module
-from typing import Callable, Type
+from typing import Any, Callable, Type
 
 
 class Print(Module):
-	def __init__(self, format_: Callable = lambda x: ""):
+	def __init__(self, format_: Callable[[Any], str] = lambda x: ""):
 		super().__init__()
 		self.format_ = format_
 
@@ -14,7 +14,7 @@ class Print(Module):
 
 
 class Assert(Module):
-	def __init__(self, assertion: Callable, msg: str = "", msg_fn: Callable = lambda x: ""):
+	def __init__(self, assertion: Callable[[Any], bool], msg: str = "", msg_fn: Callable = lambda x: ""):
 		super().__init__()
 		self.assertion = assertion
 		self.msg = msg

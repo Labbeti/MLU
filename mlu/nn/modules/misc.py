@@ -124,7 +124,10 @@ class Clamp(Module):
 		self.max = max_
 
 	def forward(self, x: Tensor) -> Tensor:
-		return torch.clamp(x, self.min, self.max)
+		return torch.clamp(x, min=self.min, max=self.max)
+
+	def extra_repr(self) -> str:
+		return f'min={self.min}, max={self.max}'
 
 
 class Identity(Module):
