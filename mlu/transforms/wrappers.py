@@ -1,3 +1,4 @@
+import torch
 
 from mlu.transforms.base import ImageTransform, Transform
 from mlu.transforms.converters import ToPIL, ToTensor
@@ -5,12 +6,16 @@ from mlu.transforms.converters import ToPIL, ToTensor
 from PIL import Image
 
 from torch import Tensor
-from typing import Any, Callable, Optional
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 
 class RandomApplyWrap(Transform):
-	def __init__(self, p: float = 1.0):
+	def __init__(self, callable_: Callable, p: float = 1.0):
 		super().__init__(p=p)
+		self.callable = callable_
+
+	def process(self, x):
+		return self.callable(x)
 
 
 class ProcessWrap(Transform):
@@ -31,10 +36,9 @@ class ProcessWrap(Transform):
 		self.transform = transform
 		self.pre_convert = pre_convert
 		self.post_convert = post_convert
-		self._update_callables()
 
 	def process(self, x: Any) -> Any:
-		for callable_ in self._callables:
+		for callable_ in self.get_transforms():
 			x = callable_(x)
 		return x
 
@@ -50,15 +54,8 @@ class ProcessWrap(Transform):
 	def unwrap(self) -> Optional[Transform]:
 		return self.transform
 
-	def _update_callables(self):
-		self._callables = []
-
-		if self.pre_convert is not None:
-			self._callables.append(self.pre_convert)
-		if self.transform is not None:
-			self._callables.append(self.transform)
-		if self.post_convert is not None:
-			self._callables.append(self.post_convert)
+	def get_transforms(self) -> List[Callable]:
+		return [callable_ for callable_ in (self.pre_convert, self.transform, self.post_convert) if callable_ is not None]
 
 
 class PILInternalWrap(ProcessWrap):
@@ -153,13 +150,18 @@ class TransformWrap(Transform):
 
 
 class Duplicate(Transform):
-	def __init__(self, transform: Transform, n: int, p: float = 1.0):
+	def __init__(self, transform: Transform, n: Union[int, Tuple[int, int]], p: float = 1.0):
 		super().__init__(p=p)
 		self.transform = transform
 		self.n = n
 
 	def process(self, x: Any) -> Any:
-		for _ in range(self.n):
+		if isinstance(self.n, tuple):
+			n = torch.randint(*self.n)
+		else:
+			n = self.n
+
+		for _ in range(n):
 			x = self.transform(x)
 		return x
 

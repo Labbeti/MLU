@@ -12,9 +12,10 @@ class Metric(Module, ABC):
 		Abstract methods:
 			- compute_score(self, input_, target):
 	"""
-	def __init__(self, input_to_cpu: bool = True):
+	def __init__(self, input_to_cpu: bool = True, enable_graph: bool = False):
 		super().__init__()
 		self.input_to_cpu = input_to_cpu
+		self.enable_graph = enable_graph
 
 	def forward(self, pred, target):
 		if self.input_to_cpu:
@@ -22,6 +23,13 @@ class Metric(Module, ABC):
 				pred = pred.cpu()
 			if isinstance(target, Tensor):
 				target = target.cpu()
+
+		if not self.enable_graph:
+			if isinstance(pred, Tensor):
+				pred = pred.detach()
+			if isinstance(target, Tensor):
+				target = target.detach()
+
 		score = self.compute_score(pred, target)
 		return score
 

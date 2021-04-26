@@ -38,9 +38,9 @@ class TimeStretchPadCrop(WaveformTransform):
 		self.fill_value = fill_value
 		self.dim = dim
 
-		target_length = self.target_length if self.target_length is not None else 1
+		target_length = self.target_length if isinstance(self.target_length, int) else 1
 		self.stretch = TimeStretch(rates, dim=dim)
-		self.pad = Pad(target_length, align, fill_value, dim)
+		self.pad = Pad(target_length, align, fill_value, dim, mode='constant')
 		self.crop = Crop(target_length, align, dim)
 
 	def process(self, data: Tensor) -> Tensor:

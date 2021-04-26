@@ -62,3 +62,10 @@ class Crop(WaveformTransform):
 			data = data[slices]
 			data = data.contiguous()
 		return data
+
+	def extra_repr(self) -> str:
+		return (
+			f'target_length={self.target_length}, '
+			f'align={self.align}, '
+			f'dim={self.dim}'
+		)

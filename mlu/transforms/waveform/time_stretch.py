@@ -1,10 +1,12 @@
 
+import logging
 import torch
 
-from mlu.transforms.base import WaveformTransform
 from torch import Tensor
 from torch.distributions import Uniform
 from typing import Tuple
+
+from mlu.transforms.base import WaveformTransform
 
 
 class TimeStretch(WaveformTransform):
@@ -32,7 +34,7 @@ class TimeStretch(WaveformTransform):
 
 	def process(self, data: Tensor) -> Tensor:
 		if isinstance(self.rates, tuple):
-			sampler = Uniform(low=self.rates[0], high=self.rates[1])
+			sampler = Uniform(*self.rates)
 			rate = sampler.sample().item()
 		else:
 			rate = self.rates
@@ -42,7 +44,7 @@ class TimeStretch(WaveformTransform):
 		elif self.interpolation == 'linear':
 			data = self.stretch_linear(data, rate)
 		else:
-			raise ValueError(f'Invalid interpolation mode "{self.interpolation}". Must be one of ("nearest").')
+			raise ValueError(f'Invalid interpolation mode "{self.interpolation}". Must be one of ("nearest", "linear").')
 
 		return data
 
@@ -50,13 +52,15 @@ class TimeStretch(WaveformTransform):
 		length = data.shape[self.dim]
 		step = 1.0 / rate
 		indexes = torch.arange(0, length, step)
-		indexes = indexes.floor().long().clamp(max=length - 1)
+		indexes = indexes.round().long().clamp(max=length - 1)
 		slices = [slice(None)] * len(data.shape)
 		slices[self.dim] = indexes
 		output = data[slices]
 		return output.contiguous()
 
 	def stretch_linear(self, data: Tensor, rate: float) -> Tensor:
+		logging.warning('This mode is currently experimental.')
+
 		length = data.shape[self.dim]
 		step = 1.0 / rate
 		indexes = torch.arange(0, length, step)
@@ -71,5 +75,9 @@ class TimeStretch(WaveformTransform):
 		slices_ceil[self.dim] = indexes_ceil
 		data_ceil = data[slices_floor]
 
-		output = data_floor * (indexes - indexes_floor) + data_ceil * (indexes_ceil - indexes) + data_floor * (indexes_floor == indexes_ceil)
+		coefficient_floor = indexes - indexes_floor
+		coefficient_floor[coefficient_floor == 0.0] = 1.0
+		coefficient_ceil = 1.0 - coefficient_floor
+
+		output = data_floor * coefficient_floor + data_ceil * coefficient_ceil
 		return output.contiguous()
