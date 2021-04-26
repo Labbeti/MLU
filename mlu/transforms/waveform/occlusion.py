@@ -23,13 +23,17 @@ class Occlusion(WaveformTransform):
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
 		super().__init__(p=p)
-		self.scales = scales if isinstance(scales, tuple) else (scales, scales)
+		self.scales = scales
 		self.fill_value = fill_value
 		self.dim = dim
 
 	def process(self, data: Tensor) -> Tensor:
+		if isinstance(self.scales, tuple):
+			min_scale, max_scale = self.scales
+		else:
+			min_scale, max_scale = self.scales, self.scales
+
 		length = data.shape[self.dim]
-		min_scale, max_scale = self.scales
 
 		occlusion_min, occlusion_max = round(min_scale * length), round(max_scale * length)
 		occlusion_max = max(occlusion_max, occlusion_min + 1)

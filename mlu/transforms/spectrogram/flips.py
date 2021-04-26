@@ -1,17 +1,22 @@
 
 import torch
-from torch import Tensor
 
+from torch import Tensor
+from typing import Tuple, Union
 from mlu.transforms.base import SpectrogramTransform
 
 
 class Flip(SpectrogramTransform):
-	def __init__(self, dim: int, p: float = 1.0):
+	def __init__(self, dim: Union[int, Tuple[int, ...]], p: float = 1.0):
 		super().__init__(p=p)
 		self.dim = dim
 
-	def process(self, x: Tensor) -> Tensor:
-		return torch.flip(x, (self.dim,))
+	def process(self, data: Tensor) -> Tensor:
+		if isinstance(self.dim, int):
+			dims = (self.dim,)
+		else:
+			dims = tuple(self.dim)
+		return torch.flip(data, dims)
 
 
 class VerticalFlip(Flip):
