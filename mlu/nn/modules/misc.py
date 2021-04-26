@@ -131,8 +131,8 @@ class Clamp(Module):
 
 
 class Identity(Module):
-	def forward(self, *args):
-		return args
+	def forward(self, x):
+		return x
 
 
 class ForwardList(List[Module], Module):
@@ -173,9 +173,9 @@ class ForwardDictAffix(ForwardDict):
 			>>> from mlu.nn import ForwardDictAffix
 			>>> input_ = torch.rand(5, 10)
 			>>> target = torch.rand(5, 10)
-			>>> metric_dict = ForwardDictAffix(acc=CategoricalAccuracy(), f1=FScore())
+			>>> metric_dict = ForwardDictAffix(acc=CategoricalAccuracy(), f1=FScore(), prefix='test/')
 			>>> metric_dict(input_, target)
-			... {'acc': 0.4, 'f1': 0.1}
+			... {'test/acc': 0.4, 'test/f1': 0.1}
 	"""
 	def __init__(self, *args: Union[dict, Callable, None], prefix: str = "", suffix: str = "", **kwargs):
 		super().__init__(*args, **kwargs)

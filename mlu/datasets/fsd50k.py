@@ -58,11 +58,13 @@ class FSD50K(Dataset):
 
 
 			:param root: The dataset root directory path.
-			:param subset: TODO
-			:param transform: TODO
-			:param target_transform: TODO
-			:param download: TODO
-			:param verbose: TODO
+			:param subset: The name of the subset. Can be 'train', 'val', 'eval' or 'dev'.
+				Note : The 'dev' subset is just the union of the 'train' and 'val' subsets.
+			:param transform: The optional transform to apply to audio. (default: None)
+			:param target_transform: The optional transform to apply the targets. (default: None)
+			:param download: If True, download the dataset in the specified root.
+				(default: False)
+			:param verbose: The verbose level. (default: 1)
 		"""
 		if subset not in ('dev', 'train', 'val', 'eval'):
 			raise ValueError(f'Invalid subset "{subset}". Must be one of ("dev", "train", "val", "eval").')
@@ -108,12 +110,11 @@ class FSD50K(Dataset):
 		return osp.join(self.get_root_dir(), SUBSET_INFO[self._subset]['audio_dir'], self._fnames[index])
 
 	def _prepare_dataset(self):
-		root_dir = self.get_root_dir()
-
 		if self._is_prepared():
 			logging.info('Dataset already downloaded.')
 			return
 
+		root_dir = self.get_root_dir()
 		files_info = URL_INFO['files']
 		hash_type = URL_INFO['hash_type']
 
