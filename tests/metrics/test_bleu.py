@@ -1,11 +1,11 @@
 
-from mlu.metrics.text.bleu import BLEU
+from mlu.metrics.text.bleu import Bleu
 from mlu.utils.sentence import sentence_to_tensor
 from mlu.utils.vocabulary import add_to_vocabulary, build_conversions_tables
 from unittest import TestCase, main
 
 
-class TestBLEU1(TestCase):
+class TestBleu1(TestCase):
 	def test_1(self):
 		# example from the original paper https://www.aclweb.org/anthology/P02-1040.pdf
 		candidate = ['the'] * 7
@@ -21,7 +21,7 @@ class TestBLEU1(TestCase):
 		candidate = sentence_to_tensor(candidate, word_to_cls_table)
 		references = [sentence_to_tensor(reference, word_to_cls_table) for reference in references]
 
-		bleu_metric = BLEU(1)
+		bleu_metric = Bleu(1)
 		expected = 2.0 / 7.0
 		score = bleu_metric([candidate], [references]).item()
 
@@ -38,7 +38,7 @@ class TestBLEU1(TestCase):
 		candidate = sentence_to_tensor(candidate, word_to_cls_table)
 		references = [sentence_to_tensor(reference, word_to_cls_table) for reference in references]
 
-		bleu_metric = BLEU(1)
+		bleu_metric = Bleu(1)
 		expected = 1.0
 		score = bleu_metric([candidate], [references]).item()
 
@@ -60,7 +60,7 @@ class TestBLEU1(TestCase):
 			# 8 / 14, # no, its precision but without bp
 		]
 
-		bleu_metric = BLEU(1)
+		bleu_metric = Bleu(1)
 
 		for candidate, expected in zip(candidates, expected_lst):
 			vocabulary = add_to_vocabulary(candidate)
@@ -74,9 +74,9 @@ class TestBLEU1(TestCase):
 			self.assertAlmostEqual(score, expected)
 
 
-class TestBLEUk(TestCase):
+class TestBleuk(TestCase):
 	def test_bleu_4(self):
-		# example from the README of https://github.com/neural-dialogue-metrics/BLEU
+		# example from the README of https://github.com/neural-dialogue-metrics/Bleu
 		candidates = [
 			'It is to insure the troops forever hearing the activity guidebook that party direct'.lower().split(' '),
 			'It is a guide to action which ensures that the military always obeys the commands of the party'.lower().split(' '),
@@ -97,7 +97,7 @@ class TestBLEUk(TestCase):
 			candidate_tensor = sentence_to_tensor(candidate, word_to_cls_table)
 			references_tensor = [sentence_to_tensor(reference, word_to_cls_table) for reference in references]
 
-			bleu_metric = BLEU(4, True)
+			bleu_metric = Bleu(4, True)
 			score = bleu_metric([candidate_tensor], [references_tensor]).item()
 
 			self.assertAlmostEqual(score, expected)

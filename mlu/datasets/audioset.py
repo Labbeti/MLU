@@ -10,7 +10,7 @@ from enum import Enum, IntEnum
 from torch import Tensor
 from torch.nn import Module
 from torch.utils.data.dataset import Dataset
-from typing import Optional, Sized, Union
+from typing import Optional, Union
 
 
 class AudioSetSubset(str, Enum):

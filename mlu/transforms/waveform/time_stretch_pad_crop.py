@@ -5,7 +5,7 @@ from mlu.transforms.waveform.pad import Pad
 from mlu.transforms.waveform.time_stretch import TimeStretch
 
 from torch import Tensor
-from typing import Optional, Tuple, Union
+from typing import Tuple, Union
 
 
 class TimeStretchPadCrop(WaveformTransform):

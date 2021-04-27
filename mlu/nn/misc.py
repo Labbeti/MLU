@@ -6,7 +6,7 @@ from torch import Tensor
 from torch.nn import Module
 from typing import Any, Callable, Dict, List, Optional, Union
 
-from mlu.nn.functional.misc import mish
+from mlu.nn.utils import mish
 
 
 DEFAULT_EPSILON = 2e-20

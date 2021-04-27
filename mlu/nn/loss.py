@@ -1,7 +1,7 @@
 
 import torch
 
-from mlu.nn.modules.misc import DEFAULT_EPSILON, Mean
+from mlu.nn.misc import DEFAULT_EPSILON, Mean
 from mlu.nn.utils import get_reduction_from_name
 
 from torch import Tensor

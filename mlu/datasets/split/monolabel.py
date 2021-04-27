@@ -1,14 +1,9 @@
 
 import numpy as np
-import random
 import torch
 
-from numpy.random import RandomState
 from torch import Tensor
-from torch.utils.data.dataset import Dataset, Subset
-from torch.utils.data.sampler import Sampler, SubsetRandomSampler
-from types import ModuleType
-from typing import List, Optional, Union
+from typing import List
 
 from mlu.utils.typing_ import SizedDataset
 

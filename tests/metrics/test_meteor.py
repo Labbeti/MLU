@@ -1,45 +1,16 @@
 
-from mlu.metrics.text.meteor.meteor import METEOR
-from mlu.metrics.text.meteor.meteor_torch import get_n_chunks
-from mlu.utils.sentence import list_sentence_to_list_tensor
-from mlu.utils.vocabulary import add_to_vocabulary, build_conversions_tables
 from unittest import TestCase, main
+from mlu.metrics.text.meteor import Meteor
 
 
-class TestChunks(TestCase):
-	def test_chunks(self):
-		candidates = [
-			'on the mat sat the cat',
-			'the cat sat on the mat',
-			'the cat was sat on the mat',
-		]
-		references = [
-			'the cat sat on the mat',
-		]
-		candidates = [can.lower().split(' ') for can in candidates]
-		references = [ref.lower().split(' ') for ref in references]
-
-		vocabulary = add_to_vocabulary(candidates)
-		vocabulary = add_to_vocabulary(references, vocabulary)
-		word_to_cls_table, cls_to_word_table = build_conversions_tables(vocabulary)
-
-		candidates = list_sentence_to_list_tensor(candidates, word_to_cls_table)
-		references = list_sentence_to_list_tensor(references, word_to_cls_table)
-
-		expected_list = [6, 1, 2]
-		for candidate, expected in zip(candidates, expected_list):
-			n_chunks = get_n_chunks(candidate, references)[0].item()
-			self.assertEqual(n_chunks, expected)
-
-
-class TestMETEOR(TestCase):
+class TestMeteor(TestCase):
 	def test_meteor_1(self):
 		candidate = 'non matching hypothesis'
 		references = [
 			'this is a cat',
 		]
 
-		meteor = METEOR()
+		meteor = Meteor()
 		score = meteor(candidate, references).item()
 		expected = 0.0
 
@@ -54,7 +25,7 @@ class TestMETEOR(TestCase):
 			'It is the practical guide for the army always to heed the directions of the party',
 		]
 
-		meteor = METEOR()
+		meteor = Meteor()
 		score = meteor(candidate, references).item()
 		expected = 0.7398
 
@@ -67,7 +38,7 @@ class TestMETEOR(TestCase):
 		candidates = ['an apple on this tree', 'a red color fruit']
 		expected_list = [0.6233062330623306, 0.0]
 
-		meteor = METEOR()
+		meteor = Meteor()
 
 		for candidate, expected in zip(candidates, expected_list):
 			score = meteor(candidate, references).item()
