@@ -24,7 +24,7 @@ class TimeStretch(WaveformTransform):
 			:param dim: The dimension to modify. (default: -1)
 			:param p: The probability to apply the transform. (default: 1.0)
 		"""
-		if interpolation not in ('nearest', 'linear'):
+		if interpolation not in ('nearest',):
 			raise ValueError(f'Invalid interpolation mode "{interpolation}". Must be one of ("nearest").')
 
 		super().__init__(p=p)
@@ -59,25 +59,26 @@ class TimeStretch(WaveformTransform):
 		return output.contiguous()
 
 	def stretch_linear(self, data: Tensor, rate: float) -> Tensor:
-		logging.warning('This mode is currently experimental.')
-
-		length = data.shape[self.dim]
-		step = 1.0 / rate
-		indexes = torch.arange(0, length, step)
-
-		indexes_floor = indexes.floor().long().clamp(max=length - 1)
-		slices_floor = [slice(None)] * len(data.shape)
-		slices_floor[self.dim] = indexes_floor
-		data_floor = data[slices_floor]
-
-		indexes_ceil = indexes.ceil().long().clamp(max=length - 1)
-		slices_ceil = [slice(None)] * len(data.shape)
-		slices_ceil[self.dim] = indexes_ceil
-		data_ceil = data[slices_floor]
-
-		coefficient_floor = indexes - indexes_floor
-		coefficient_floor[coefficient_floor == 0.0] = 1.0
-		coefficient_ceil = 1.0 - coefficient_floor
-
-		output = data_floor * coefficient_floor + data_ceil * coefficient_ceil
-		return output.contiguous()
+		raise NotImplementedError('This mode is currently disabled.')
+		# logging.warning('This mode is currently experimental.')
+		#
+		# length = data.shape[self.dim]
+		# step = 1.0 / rate
+		# indexes = torch.arange(0, length, step)
+		#
+		# indexes_floor = indexes.floor().long().clamp(max=length - 1)
+		# slices_floor = [slice(None)] * len(data.shape)
+		# slices_floor[self.dim] = indexes_floor
+		# data_floor = data[slices_floor]
+		#
+		# indexes_ceil = indexes.ceil().long().clamp(max=length - 1)
+		# slices_ceil = [slice(None)] * len(data.shape)
+		# slices_ceil[self.dim] = indexes_ceil
+		# data_ceil = data[slices_floor]
+		#
+		# coefficient_floor = indexes - indexes_floor
+		# coefficient_floor[coefficient_floor == 0.0] = 1.0
+		# coefficient_ceil = 1.0 - coefficient_floor
+		#
+		# output = data_floor * coefficient_floor + data_ceil * coefficient_ceil
+		# return output.contiguous()

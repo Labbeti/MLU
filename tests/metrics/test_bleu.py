@@ -97,7 +97,7 @@ class TestBleuk(TestCase):
 			candidate_tensor = sentence_to_tensor(candidate, word_to_cls_table)
 			references_tensor = [sentence_to_tensor(reference, word_to_cls_table) for reference in references]
 
-			bleu_metric = Bleu(4, True)
+			bleu_metric = Bleu(4)
 			score = bleu_metric([candidate_tensor], [references_tensor]).item()
 
 			self.assertAlmostEqual(score, expected)

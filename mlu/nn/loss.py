@@ -6,7 +6,7 @@ from mlu.nn.utils import get_reduction_from_name
 
 from torch import Tensor
 from torch.nn import Module, KLDivLoss, LogSoftmax, BCELoss
-from typing import Optional
+from typing import Callable, Optional
 
 
 class CrossEntropyWithVectors(Module):
@@ -27,14 +27,14 @@ class CrossEntropyWithVectors(Module):
 		self.dim = dim
 		self.log_input = log_input
 
-	def forward(self, input_: Tensor, targets: Tensor) -> Tensor:
+	def forward(self, pred: Tensor, targets: Tensor) -> Tensor:
 		"""
 			Compute cross-entropy with targets.
 			Input and target must be a (batch_size, n_classes) tensor.
 		"""
 		if not self.log_input:
-			input_ = torch.log(input_)
-		loss = -torch.sum(input_ * targets, dim=self.dim)
+			pred = torch.log(pred)
+		loss = -torch.sum(pred * targets, dim=self.dim)
 		return self.reduce_fn(loss)
 
 	def extra_repr(self) -> str:
@@ -71,11 +71,11 @@ class Entropy(Module):
 			log_base = torch.log(torch.scalar_tensor(base))
 			self.log_func = lambda x: torch.log(x) / log_base
 
-	def forward(self, input_: Tensor) -> Tensor:
+	def forward(self, probabilities: Tensor) -> Tensor:
 		if not self.log_input:
-			entropy = - torch.sum(input_ * self.log_func(input_ + self.epsilon), dim=self.dim)
+			entropy = - torch.sum(probabilities * self.log_func(probabilities + self.epsilon), dim=self.dim)
 		else:
-			entropy = - torch.sum(torch.exp(input_) * input_, dim=self.dim)
+			entropy = - torch.sum(torch.exp(probabilities) * probabilities, dim=self.dim)
 		return self.reduce_fn(entropy)
 
 	def extra_repr(self) -> str:
@@ -111,7 +111,8 @@ class JSDivLossFromLogits(Module):
 
 			Use the following formula :
 
-			>>> 'JS(p,q) = 0.5 * (KL(LS(p),m) + KL(LS(q),m)), with m = LS(0.5 * (p+q)), LS = LogSoftmax and KL = KL-Divergence.'
+			>>> 'JS(p,q) = 0.5 * (KL(LS(p),m) + KL(LS(q),m)), with m = LS(0.5 * (p+q))'
+			>>> 'where LS = LogSoftmax and KL = KL-Divergence.'
 
 			:param reduction: The reduction function to apply. (default: 'mean')
 			:param log_activation: The log-activation function for compute predictions from logits. (default: LogSoftmax(dim=-1))
@@ -163,17 +164,20 @@ class KLDivLossWithProbabilities(KLDivLoss):
 
 
 class BCELossBatchMean(Module):
-	def __init__(self, dim: Optional[int] = -1):
+	def __init__(self, reduce_fn: Callable = Mean(dim=-1)):
 		super().__init__()
 		self.bce = BCELoss(reduction='none')
-		self.mean = Mean(dim=dim)
+		self.reduce_fn = reduce_fn
 
 	def forward(self, input_: Tensor, target: Tensor) -> Tensor:
-		return self.mean(self.bce(input_, target))
+		return self.reduce_fn(self.bce(input_, target))
 
-	@property
-	def dim(self) -> int:
-		return self.mean.dim
 
-	def extra_repr(self) -> str:
-		return f'dim={self.dim}'
+class BCELossSoftMean(Module):
+	def __init__(self):
+		super().__init__()
+		self.bce = BCELoss(reduction='none')
+
+	def forward(self, pred: Tensor, target: Tensor) -> Tensor:
+		n_targets = target.sum(dim=-1).clamp(min=1.0)
+		return self.bce(pred, target).sum(dim=-1) / n_targets

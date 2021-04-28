@@ -90,7 +90,16 @@ class Mean(Module):
 		self.dim = dim
 
 	def forward(self, x: Tensor) -> Tensor:
-		return x.mean(dim=self.dim)
+		return torch.mean(x, dim=self.dim)
+
+
+class Sum(Module):
+	def __init__(self, dim: Optional[int] = None):
+		super().__init__()
+		self.dim = dim
+
+	def forward(self, x: Tensor) -> Tensor:
+		return torch.sum(x, dim=self.dim)
 
 
 class Permute(Module):
@@ -162,12 +171,11 @@ class ForwardDict(Dict[str, Module], Module):
 
 
 class ForwardDictAffix(ForwardDict):
-	"""
+	def __init__(self, *args: Union[dict, Callable, None], prefix: str = "", suffix: str = "", **kwargs):
+		"""
 			Compute score of each callable object stored when forward() is applied.
-			Subclass of Dict[str, Module] and Module.
 
-			Example :
-
+			>>> 'Example :'
 			>>> import torch
 			>>> from mlu.metrics import CategoricalAccuracy, FScore
 			>>> from mlu.nn import ForwardDictAffix
@@ -176,8 +184,7 @@ class ForwardDictAffix(ForwardDict):
 			>>> metric_dict = ForwardDictAffix(acc=CategoricalAccuracy(), f1=FScore(), prefix='test/')
 			>>> metric_dict(input_, target)
 			... {'test/acc': 0.4, 'test/f1': 0.1}
-	"""
-	def __init__(self, *args: Union[dict, Callable, None], prefix: str = "", suffix: str = "", **kwargs):
+		"""
 		super().__init__(*args, **kwargs)
 		self.prefix = prefix
 		self.suffix = suffix
