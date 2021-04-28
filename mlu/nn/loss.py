@@ -164,13 +164,14 @@ class KLDivLossWithProbabilities(KLDivLoss):
 
 
 class BCELossBatchMean(Module):
-	def __init__(self, reduce_fn: Callable = Mean(dim=-1)):
+	def __init__(self, reduce_fn: Callable = torch.mean, dim: int = -1):
 		super().__init__()
 		self.bce = BCELoss(reduction='none')
 		self.reduce_fn = reduce_fn
+		self.dim = dim
 
-	def forward(self, input_: Tensor, target: Tensor) -> Tensor:
-		return self.reduce_fn(self.bce(input_, target))
+	def forward(self, pred: Tensor, target: Tensor) -> Tensor:
+		return self.reduce_fn(self.bce(pred, target), dim=self.dim)
 
 
 class BCELossSoftMean(Module):
