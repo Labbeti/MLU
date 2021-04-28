@@ -1,5 +1,4 @@
 
-import logging
 import torch
 
 from torch import Tensor
@@ -32,6 +31,9 @@ class TimeStretch(WaveformTransform):
 		self.interpolation = interpolation
 		self.dim = dim
 
+	def extra_repr(self) -> str:
+		return f'rates={str(self.rates)}'
+
 	def process(self, data: Tensor) -> Tensor:
 		if isinstance(self.rates, tuple):
 			sampler = Uniform(*self.rates)
@@ -39,6 +41,7 @@ class TimeStretch(WaveformTransform):
 		else:
 			rate = self.rates
 
+		print('RATE', rate)
 		if self.interpolation == 'nearest':
 			data = self.stretch_nearest(data, rate)
 		elif self.interpolation == 'linear':
@@ -55,8 +58,9 @@ class TimeStretch(WaveformTransform):
 		indexes = indexes.round().long().clamp(max=length - 1)
 		slices = [slice(None)] * len(data.shape)
 		slices[self.dim] = indexes
-		output = data[slices]
-		return output.contiguous()
+		data = data[slices]
+		data = data.contiguous()
+		return data
 
 	def stretch_linear(self, data: Tensor, rate: float) -> Tensor:
 		raise NotImplementedError('This mode is currently disabled.')

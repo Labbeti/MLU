@@ -18,6 +18,14 @@ class Pad(WaveformTransform):
 		p: float = 1.0,
 	):
 		"""
+			Example :
+
+			>>> import torch; from torch import tensor
+			>>> x = torch.ones(6)
+			>>> zero_pad = Pad(10, align='left')
+			>>> x_pad = zero_pad(x)
+			... tensor([1, 1, 1, 1, 1, 1, 0, 0, 0, 0])
+
 			:param target_length: The target length of the dimension.
 			:param align: The alignment type. Can be 'left', 'right', 'center' or 'random'. (default: 'left')
 			:param fill_value: The fill value used for constant padding. (default: 0.0)

@@ -20,7 +20,7 @@ class PitchShift(WaveformTransform):
 	def process(self, data: Tensor) -> Tensor:
 		rate = 2.0 ** (-self.n_steps / self.bins_per_octave)
 
-		self.resample.orig_freq = self.sr / rate
+		self.resample.orig_freq = int(self.sr / rate)
 		self.resample.new_freq = self.sr
 		self.crop.target_length = data.shape[-1]
 

@@ -49,7 +49,10 @@ class TimeStretchPadCrop(WaveformTransform):
 			self.pad.target_length = target_length
 			self.crop.target_length = target_length
 
-		return self.crop(self.pad(self.stretch(data)))
+		data = self.stretch(data)
+		data = self.pad(data)
+		data = self.crop(data)
+		return data
 
 	@property
 	def target_length(self) -> Union[int, str]:
