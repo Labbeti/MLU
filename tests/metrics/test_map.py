@@ -71,8 +71,8 @@ class TestMAP(TestCase):
 		map1 = AveragePrecision()
 		map2 = MAP()
 
-		pred = torch.rand(32, 527)
-		target = torch.rand(32, 527).ge(0.75).float()
+		pred = torch.rand(128, 527)
+		target = torch.rand(128, 527).ge(0.75).float()
 
 		score1 = map1(pred, target)
 		score2 = map2(pred, target).mean()
