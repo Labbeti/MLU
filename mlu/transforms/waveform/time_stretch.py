@@ -41,7 +41,6 @@ class TimeStretch(WaveformTransform):
 		else:
 			rate = self.rates
 
-		print('RATE', rate)
 		if self.interpolation == 'nearest':
 			data = self.stretch_nearest(data, rate)
 		elif self.interpolation == 'linear':
