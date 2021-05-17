@@ -42,7 +42,7 @@ class PostInstallCommand(install):
 
 setup(
 	name='mlu',
-	version='0.4.8',
+	version='0.5.0',
 	packages=find_packages(),
 	url='https://github.com/Labbeti/MLU',
 	license='MIT',

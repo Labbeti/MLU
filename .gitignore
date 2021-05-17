@@ -8,6 +8,7 @@ lib/
 tmp/
 SPICE-1.0/
 *.egg-info/
+.vscode/
 
 # Files
 *ign*

@@ -164,7 +164,7 @@ def _fill_subset(
 	expected: Tensor,
 	n_classes: int,
 	verbose: bool = True,
-) -> Tuple[List[int], List[Tuple[Tensor, int]]]:
+) -> Tuple[Tensor, List[Tuple[Tensor, int]]]:
 	subset_occur = torch.zeros(n_classes)
 	subset = []
 	total_expected = expected.sum().item()
