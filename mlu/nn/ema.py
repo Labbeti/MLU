@@ -1,6 +1,5 @@
 
 import copy
-import torch
 
 from torch.nn import Module
 from typing import Any

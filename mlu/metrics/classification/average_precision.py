@@ -1,4 +1,5 @@
 
+import numpy as np
 import torch
 
 from sklearn.metrics import average_precision_score
@@ -43,6 +44,7 @@ class AveragePrecision(Metric):
 		target = target.cpu().numpy()
 
 		score = average_precision_score(y_true=target, y_score=pred, average=self.average)
+		score = np.nan_to_num(score)
 		score = torch.as_tensor(score)
 		score = self.reduce_fn(score)
 

@@ -5,21 +5,7 @@ import unittest
 from torch.nn import BCELoss
 from unittest import TestCase
 
-from mlu.metrics.base import Metric
-
-
-class BCEMetric(Metric):
-	def __init__(self):
-		super().__init__()
-		self.reduce_fn = torch.mean
-
-	def compute_score(self, pred, target):
-		if pred.shape != target.shape:
-			raise RuntimeError(f'Mismatch shapes {pred.shape} != {target.shape}.')
-
-		scores = - target * torch.log(pred) - (1.0 - target) * torch.log(1.0 - pred)
-		scores = self.reduce_fn(scores)
-		return scores
+from mlu.metrics import BCEMetric
 
 
 class TestBCE(TestCase):

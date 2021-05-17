@@ -15,11 +15,15 @@ class RollSpec(SpectrogramTransform):
 	):
 		super().__init__(p=p)
 		self.dim = dim
-		self.rolls = rolls if isinstance(rolls, tuple) else (rolls, rolls)
-		self.uniform = Uniform(low=self.rolls[0], high=self.rolls[1])
+		self.rolls = rolls
 
-	def process(self, spectrogram: Tensor) -> Tensor:
-		roll_scale = self.uniform.sample().item()
-		roll_size = round(spectrogram.shape[self.dim] * roll_scale)
-		spectrogram = spectrogram.roll(roll_size, dims=self.dim)
-		return spectrogram
+	def process(self, data: Tensor) -> Tensor:
+		if isinstance(self.rolls, tuple):
+			uniform = Uniform(*self.rolls)
+			roll_scale = uniform.sample().item()
+		else:
+			roll_scale = self.rolls
+
+		roll_size = round(data.shape[self.dim] * roll_scale)
+		data = data.roll(roll_size, dims=self.dim)
+		return data

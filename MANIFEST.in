@@ -1,4 +1,5 @@
 
 include README.md
 include LICENCE.txt
+include install_spice.sh
 graft metadata/

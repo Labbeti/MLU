@@ -11,7 +11,8 @@ import numpy as np
 import os
 import subprocess
 import tempfile
-from typing import Any, Dict, List
+
+from typing import Any, Dict
 
 # Assumes spice.jar is in the same directory as spice.py.  Change as needed.
 SPICE_JAR = 'spice-1.0.jar'
@@ -23,7 +24,8 @@ class Spice:
 	"""
 	Main Class to compute the SPICE metric
 	"""
-	def compute_score(self, gts: Dict[Any, List[str]], res: Dict[Any, List[List[str]]]):
+
+	def compute_score(self, gts: Dict[Any, list], res: Dict[Any, list]):
 		assert (sorted(gts.keys()) == sorted(res.keys()))
 		imgIds = sorted(gts.keys())
 
@@ -42,31 +44,33 @@ class Spice:
 			input_data.append({
 				'image_id': id,
 				'test': hypo[0],
-				'refs': ref
+				'refs': ref,
 			})
 
 		cwd = os.path.dirname(os.path.abspath(__file__))
 		temp_dir = os.path.join(cwd, TEMP_DIR)
 		if not os.path.exists(temp_dir):
 			os.makedirs(temp_dir)
-		in_file = tempfile.NamedTemporaryFile(delete=False, dir=temp_dir)
+
+		in_file = tempfile.NamedTemporaryFile(mode='w', delete=False, dir=temp_dir)
+
 		json.dump(input_data, in_file, indent=2)
 		in_file.close()
 
 		# Start job
-		out_file = tempfile.NamedTemporaryFile(delete=False, dir=temp_dir)
+		out_file = tempfile.NamedTemporaryFile(mode='w', delete=False, dir=temp_dir)
 		out_file.close()
 		cache_dir = os.path.join(cwd, CACHE_DIR)
 		if not os.path.exists(cache_dir):
 			os.makedirs(cache_dir)
-		spice_cmd = ['java', '-jar', '-Xmx8G', SPICE_JAR, in_file.name,
-					 '-cache', cache_dir,
-					 '-out', out_file.name,
-					 '-subset',
-					 '-silent'
-					 ]
-		subprocess.check_call(spice_cmd,
-							  cwd=os.path.dirname(os.path.abspath(__file__)))
+		spice_cmd = [
+			'java', '-jar', '-Xmx8G', SPICE_JAR, in_file.name,
+			'-cache', cache_dir,
+			'-out', out_file.name,
+			'-subset',
+			'-silent',
+		]
+		subprocess.check_call(spice_cmd, cwd=os.path.dirname(os.path.abspath(__file__)))
 
 		# Read and process results
 		with open(out_file.name) as data_file:
@@ -84,7 +88,7 @@ class Spice:
 		for image_id in imgIds:
 			# Convert none to NaN before saving scores over subcategories
 			score_set = {}
-			for category, score_tuple in imgId_to_scores[image_id].iteritems():
+			for category, score_tuple in imgId_to_scores[image_id].items():
 				score_set[category] = {k: self.float_convert(v) for k, v in score_tuple.items()}
 			scores.append(score_set)
 		return average_score, scores
@@ -93,6 +97,8 @@ class Spice:
 		try:
 			return float(obj)
 		except ValueError:
+			return np.nan
+		except TypeError:
 			return np.nan
 
 	def method(self):

@@ -10,7 +10,7 @@ from enum import Enum, IntEnum
 from torch import Tensor
 from torch.nn import Module
 from torch.utils.data.dataset import Dataset
-from typing import Optional, Sized, Union
+from typing import Optional, Union
 
 
 class AudioSetSubset(str, Enum):
@@ -22,12 +22,11 @@ class AudioSetSubset(str, Enum):
 CLASS_LABELS_INDICES_URL = 'https://storage.googleapis.com/us_audioset/youtube_corpus/v1/csv/class_labels_indices.csv'
 
 
-class AudioSet(Dataset, Sized):
+class AudioSet(Dataset):
 	"""
 		Unofficial AudioSet pytorch dataset.
 
-		Dataset files and folders tree :
-
+		>>> 'Dataset tree directories :'
 		root/
 		└── data/
 			├── balanced_train_segments.csv

@@ -20,15 +20,15 @@ class TestPickable(TestCase):
 			Recall(),
 			RocAuc(),
 			UAR(),
-			BLEU(),
+			Bleu(),
 			LCS(),
 			NIST(),
 			RougeL(),
-			SPIDER(),
+			Spider(),
 			WordErrorRate(),
-			CIDER(),
-			METEOR(),
-			SPICE(),
+			Cider(),
+			Meteor(),
+			Spice(),
 		]
 
 		try:

@@ -17,6 +17,22 @@ class Pad(WaveformTransform):
 		mode: str = 'constant',
 		p: float = 1.0,
 	):
+		"""
+			Example :
+
+			>>> import torch; from torch import tensor
+			>>> x = torch.ones(6)
+			>>> zero_pad = Pad(10, align='left')
+			>>> x_pad = zero_pad(x)
+			... tensor([1, 1, 1, 1, 1, 1, 0, 0, 0, 0])
+
+			:param target_length: The target length of the dimension.
+			:param align: The alignment type. Can be 'left', 'right', 'center' or 'random'. (default: 'left')
+			:param fill_value: The fill value used for constant padding. (default: 0.0)
+			:param dim: The dimension to pad. (default: -1)
+			:param mode: The padding mode. Can be 'constant', 'reflect', 'replicate' or 'circular'. (default: 'constant')
+			:param p: The probability to apply the transform. (default: 1.0)
+		"""
 		super().__init__(p=p)
 		self.target_length = target_length
 		self.align = align
@@ -84,3 +100,12 @@ class Pad(WaveformTransform):
 
 		x = pad(x, pad_seq, mode=self.mode, value=self.fill_value)
 		return x
+
+	def extra_repr(self) -> str:
+		return (
+			f'target_length={self.target_length}, '
+			f'align={self.align}, '
+			f'fill_value={self.fill_value}, '
+			f'dim={self.dim}, '
+			f'mode={self.mode}'
+		)

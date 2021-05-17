@@ -5,7 +5,7 @@ from mlu.transforms.waveform.pad import Pad
 from mlu.transforms.waveform.time_stretch import TimeStretch
 
 from torch import Tensor
-from typing import Optional, Tuple, Union
+from typing import Tuple, Union
 
 
 class TimeStretchPadCrop(WaveformTransform):
@@ -38,9 +38,9 @@ class TimeStretchPadCrop(WaveformTransform):
 		self.fill_value = fill_value
 		self.dim = dim
 
-		target_length = self.target_length if self.target_length is not None else 1
-		self.stretch = TimeStretch(rates, dim)
-		self.pad = Pad(target_length, align, fill_value, dim)
+		target_length = self.target_length if isinstance(self.target_length, int) else 1
+		self.stretch = TimeStretch(rates, dim=dim)
+		self.pad = Pad(target_length, align, fill_value, dim, mode='constant')
 		self.crop = Crop(target_length, align, dim)
 
 	def process(self, data: Tensor) -> Tensor:
@@ -49,7 +49,10 @@ class TimeStretchPadCrop(WaveformTransform):
 			self.pad.target_length = target_length
 			self.crop.target_length = target_length
 
-		return self.crop(self.pad(self.stretch(data)))
+		data = self.stretch(data)
+		data = self.pad(data)
+		data = self.crop(data)
+		return data
 
 	@property
 	def target_length(self) -> Union[int, str]:

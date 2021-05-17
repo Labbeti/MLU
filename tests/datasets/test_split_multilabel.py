@@ -3,15 +3,38 @@ import torch
 import unittest
 
 from torch import Tensor
+from typing import Sequence
 from unittest import TestCase
-from mlu.datasets.utils.split_multilabel import (
-	get_indexes_per_class,
-	split_multilabel_indexes_per_class,
+
+from mlu.datasets.split.multilabel import (
+	get_indexes_per_class_from_multihots,
 	flat_indexes_per_class,
-	check_targets,
-	check_indexes_per_class,
-	get_targets,
+	get_multihots_from_indexes_per_class,
+	balanced_split_v2,
 )
+
+
+def check_indexes_per_class(
+	indexes_per_class: Sequence[Sequence[int]],
+	at_least_one_elem_per_class: bool = True,
+) -> bool:
+	ok = True
+	if at_least_one_elem_per_class:
+		ok &= all(len(indexes) > 0 for indexes in indexes_per_class)
+	return ok
+
+
+def check_multihots(
+	targets: Tensor,
+	at_least_one_elem_per_class: bool = True,
+	at_least_one_class_per_elem: bool = True,
+) -> bool:
+	ok = True
+	if at_least_one_elem_per_class:
+		ok &= targets.sum(dim=0).gt(0).all().item()
+	if at_least_one_class_per_elem:
+		ok &= targets.sum(dim=1).gt(0).all().item()
+	return ok
 
 
 class TestSplitMulti(TestCase):
@@ -24,8 +47,8 @@ class TestSplitMulti(TestCase):
 			if target.sum().eq(False):
 				target[torch.randint(n_classes, (1,))] = True
 
-		indexes_per_class = get_indexes_per_class(targets)
-		targets_rebuild = get_targets(indexes_per_class)
+		indexes_per_class = get_indexes_per_class_from_multihots(targets)
+		targets_rebuild = get_multihots_from_indexes_per_class(indexes_per_class)
 		self.assertEqual(targets, targets_rebuild)
 
 	def test_basic(self):
@@ -40,7 +63,7 @@ class TestSplitMulti(TestCase):
 			[1, 0, 0],
 		])
 
-		indexes_per_class = get_indexes_per_class(targets)
+		indexes_per_class = get_indexes_per_class_from_multihots(targets)
 		expected_indexes_per_class = [
 			[0, 1, 3, 7],
 			[0, 4, 5, 6],
@@ -49,9 +72,9 @@ class TestSplitMulti(TestCase):
 		self.assertEqual(indexes_per_class, expected_indexes_per_class)
 
 		indexes_all = list(range(len(targets)))
-		indexes_per_class = get_indexes_per_class(targets)
+		indexes_per_class = get_indexes_per_class_from_multihots(targets)
 
-		split_1, split_2 = split_multilabel_indexes_per_class(indexes_per_class, [0.5, 0.5], verbose=True)
+		split_1, split_2 = balanced_split_v2(indexes_per_class, [0.5, 0.5], verbose=True)
 
 		indexes_1 = flat_indexes_per_class(split_1)
 		indexes_2 = flat_indexes_per_class(split_2)
@@ -85,11 +108,11 @@ class TestSplitMulti(TestCase):
 			if target.sum().eq(0.0):
 				target[torch.randint(n_classes, (1,))] = 1.0
 
-		self.assertTrue(check_targets(targets, at_least_one_elem_per_class=True, at_least_one_class_per_elem=True))
+		self.assertTrue(check_multihots(targets, at_least_one_elem_per_class=True, at_least_one_class_per_elem=True))
 
-		indexes_per_class = get_indexes_per_class(targets)
+		indexes_per_class = get_indexes_per_class_from_multihots(targets)
 
-		split_1, split_2 = split_multilabel_indexes_per_class(indexes_per_class, [0.5, 0.5], verbose=True)
+		split_1, split_2 = balanced_split_v2(indexes_per_class, [0.5, 0.5], verbose=True)
 
 		print('Split 1:', [len(indexes) for indexes in split_1])
 		print('Split 1:', [len(indexes) for indexes in split_2])

@@ -2,10 +2,8 @@
 	Neural Network module.
 """
 
-from .functional.misc import *
-from .functional.labels import *
-from .modules.labels import *
-from .modules.loss import *
-from .modules.misc import *
 from .ema import EMA
+from .labels import OneHot, MultiHot, Thresholding
+from .loss import *
+from .misc import *
 from .utils import *
